@@ -1,0 +1,519 @@
+Contents
+一.UI
+   1.1 RP旋转
+   1.2 PITCH指针
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+1.1 RP旋转
+/*RP旋转****************************************************/
+命名部分：
+	D_RP_UP_LINE,
+	D_RP_R_UP_LINE,
+	D_RP_R_DOWN_LINE,
+	D_RP_L_UP_LINE,
+	D_RP_L_DOWN_LINE,
+	D_RP_DOWN_LINE,
+	D_RP_R1_LINE,
+	D_RP_R2_LINE,
+	D_RP_ARC,
+
+定义部分：
+[D_RP_UP_LINE] = {
+  /*不变配置*/
+  .ui_config.priority = HIGH_PRIORITY, // UI优先级(仅动态UI需要配置)
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.operate_type = MODIFY, // 操作类型
+  .ui_config.layer = 2, // 图层数，0~9
+  .ui_config.color = CYAN_BLUE, // 颜色
+  .ui_config.width = 6, // 线条宽度
+  .ui_config.start_x = CLIENT_MID_POSITION_X -200, // 起点 x 坐标
+  .ui_config.start_y = CLIENT_MID_POSITION_Y + 300, // 起点 y 坐标
+  .ui_config.end_x = CLIENT_MID_POSITION_X + 200, // 终点 x 坐标
+  .ui_config.end_y = CLIENT_MID_POSITION_Y + 300, // 终点 y 坐标
+  }, 
+  [D_RP_R_UP_LINE] = {
+  /*不变配置*/
+  .ui_config.priority = HIGH_PRIORITY, // UI优先级(仅动态UI需要配置)
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.operate_type = MODIFY, // 操作类型
+  .ui_config.layer = 2, // 图层数，0~9
+  .ui_config.color = CYAN_BLUE, // 颜色
+  .ui_config.width = 6, // 线条宽度
+  .ui_config.start_x = CLIENT_MID_POSITION_X +200, // 起点 x 坐标
+  .ui_config.start_y = CLIENT_MID_POSITION_Y + 300, // 起点 y 坐标
+  .ui_config.end_x = CLIENT_MID_POSITION_X +370, // 终点 x 坐标
+  .ui_config.end_y = CLIENT_MID_POSITION_Y , // 终点 y 坐标
+  }, 
+  [D_RP_L_UP_LINE] = {
+  /*不变配置*/
+  .ui_config.priority = HIGH_PRIORITY, // UI优先级(仅动态UI需要配置)
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.operate_type = MODIFY, // 操作类型
+  .ui_config.layer = 2, // 图层数，0~9
+  .ui_config.color = CYAN_BLUE, // 颜色
+  .ui_config.width = 6, // 线条宽度
+  .ui_config.start_x = CLIENT_MID_POSITION_X -200, // 起点 x 坐标
+  .ui_config.start_y = CLIENT_MID_POSITION_Y + 300, // 起点 y 坐标
+  .ui_config.end_x = CLIENT_MID_POSITION_X -370, // 终点 x 坐标
+  .ui_config.end_y = CLIENT_MID_POSITION_Y , // 终点 y 坐标
+  }, 
+  [D_RP_R_DOWN_LINE] = {
+  /*不变配置*/
+  .ui_config.priority = HIGH_PRIORITY, // UI优先级(仅动态UI需要配置)
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.operate_type = MODIFY, // 操作类型
+  .ui_config.layer = 2, // 图层数，0~9
+  .ui_config.color = CYAN_BLUE, // 颜色
+  .ui_config.width = 6, // 线条宽度
+  .ui_config.start_x = CLIENT_MID_POSITION_X +370, // 起点 x 坐标
+  .ui_config.start_y = CLIENT_MID_POSITION_Y , // 起点 y 坐标
+  .ui_config.end_x = CLIENT_MID_POSITION_X +200, // 终点 x 坐标
+  .ui_config.end_y = CLIENT_MID_POSITION_Y -300, // 终点 y 坐标
+  }, 
+  [D_RP_L_DOWN_LINE] = {
+  /*不变配置*/
+  .ui_config.priority = HIGH_PRIORITY, // UI优先级(仅动态UI需要配置)
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.operate_type = MODIFY, // 操作类型
+  .ui_config.layer = 2, // 图层数，0~9
+  .ui_config.color = CYAN_BLUE, // 颜色
+  .ui_config.width = 6, // 线条宽度
+  .ui_config.start_x = CLIENT_MID_POSITION_X -370, // 起点 x 坐标
+  .ui_config.start_y = CLIENT_MID_POSITION_Y , // 起点 y 坐标
+  .ui_config.end_x = CLIENT_MID_POSITION_X -252, // 终点 x 坐标
+  .ui_config.end_y = CLIENT_MID_POSITION_Y -180, // 终点 y 坐标
+  }, 
+  [D_RP_DOWN_LINE] = {
+  /*不变配置*/
+  .ui_config.priority = HIGH_PRIORITY, // UI优先级(仅动态UI需要配置)
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.operate_type = MODIFY, // 操作类型
+  .ui_config.layer = 2, // 图层数，0~9
+  .ui_config.color = CYAN_BLUE, // 颜色
+  .ui_config.width = 6, // 线条宽度
+  .ui_config.start_x = CLIENT_MID_POSITION_X +200, // 起点 x 坐标
+  .ui_config.start_y = CLIENT_MID_POSITION_Y -300, // 起点 y 坐标
+  .ui_config.end_x = CLIENT_MID_POSITION_X +60, // 终点 x 坐标
+  .ui_config.end_y = CLIENT_MID_POSITION_Y -300, // 终点 y 坐标
+  }, 
+   [D_RP_R1_LINE] = {
+  /*不变配置*/
+  .ui_config.priority = HIGH_PRIORITY, // UI优先级(仅动态UI需要配置)
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.operate_type = MODIFY, // 操作类型
+  .ui_config.layer = 2, // 图层数，0~9
+  .ui_config.color = CYAN_BLUE, // 颜色
+  .ui_config.width = 6, // 线条宽度
+  .ui_config.start_x = CLIENT_MID_POSITION_X -252, // 起点 x 坐标
+  .ui_config.start_y = CLIENT_MID_POSITION_Y -180, // 起点 y 坐标
+  .ui_config.end_x = CLIENT_MID_POSITION_X -50, // 终点 x 坐标
+  .ui_config.end_y = CLIENT_MID_POSITION_Y +140, // 终点 y 坐标
+  }, 
+  [D_RP_R2_LINE] = {
+  /*不变配置*/
+  .ui_config.priority = HIGH_PRIORITY, // UI优先级(仅动态UI需要配置)
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.operate_type = MODIFY, // 操作类型
+  .ui_config.layer = 2, // 图层数，0~9
+  .ui_config.color = CYAN_BLUE, // 颜色
+  .ui_config.width = 6, // 线条宽度
+  .ui_config.start_x = CLIENT_MID_POSITION_X +60, // 起点 x 坐标
+  .ui_config.start_y = CLIENT_MID_POSITION_Y -300, // 起点 y 坐标
+  .ui_config.end_x = CLIENT_MID_POSITION_X , // 终点 x 坐标
+  .ui_config.end_y = CLIENT_MID_POSITION_Y -145, // 终点 y 坐标
+  }, 
+  [D_RP_ARC] = {
+  /*不变配置*/
+  .ui_config.priority = HIGH_PRIORITY, // UI优先级(仅动态UI需要配置)
+  .ui_config.ui_type = ARC, // UI内容类型
+  /*可变配置*/
+  .ui_config.operate_type = MODIFY, // 操作类型
+  .ui_config.layer = 2, // 图层数，0~9
+  .ui_config.color = CYAN_BLUE, // 颜色
+  .ui_config.width = 6, // 线条宽度
+  .ui_config.start_x = CLIENT_MID_POSITION_X , // 坐标
+  .ui_config.start_y = CLIENT_MID_POSITION_Y , //  坐标
+  .ui_config.end_x = 145, // x 半轴长度
+  .ui_config.end_y = 145, // y 半轴长度
+  .ui_config.start_angel = 0, // 起始角度
+  .ui_config.end_angel = 200, // 终止角度
+  }, 
+
+更新部分：
+  static double RP_rotated_angle = 0;
+  static double RP_rotated_angle_last = 0;
+  static float rotated_cnt=0;
+  rotated_cnt+=(0.05)*360/1000.f; //每秒(1)圈
+  if(rotated_cnt>=360)
+  {
+	rotated_cnt=0;
+  }
+  RP_rotated_angle = rotated_cnt * 2.f * 3.14 / 360.f ; // 底盘角度转浮点数 
+ 
+  if (RP_rotated_angle != RP_rotated_angle_last)
+  {
+    // 旋转线条
+    rotate_point(&dynamic_ui_info[D_RP_UP_LINE].ui_config.start_x,
+                    &dynamic_ui_info[D_RP_UP_LINE].ui_config.start_y,
+                    CLIENT_MID_POSITION_X - 200,
+                    CLIENT_MID_POSITION_Y + 300,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+    rotate_point(&dynamic_ui_info[D_RP_UP_LINE].ui_config.end_x,
+                    &dynamic_ui_info[D_RP_UP_LINE].ui_config.end_y,
+                    CLIENT_MID_POSITION_X + 200,
+                    CLIENT_MID_POSITION_Y + 300,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	rotate_point(&dynamic_ui_info[D_RP_R_UP_LINE].ui_config.start_x,
+                    &dynamic_ui_info[D_RP_R_UP_LINE].ui_config.start_y,
+                    CLIENT_MID_POSITION_X + 200,
+                    CLIENT_MID_POSITION_Y + 300,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	rotate_point(&dynamic_ui_info[D_RP_R_UP_LINE].ui_config.end_x,
+                    &dynamic_ui_info[D_RP_R_UP_LINE].ui_config.end_y,
+                    CLIENT_MID_POSITION_X +370,
+                    CLIENT_MID_POSITION_Y ,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	rotate_point(&dynamic_ui_info[D_RP_R_DOWN_LINE].ui_config.start_x,
+                    &dynamic_ui_info[D_RP_R_DOWN_LINE].ui_config.start_y,
+                    CLIENT_MID_POSITION_X + 370,
+                    CLIENT_MID_POSITION_Y ,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	rotate_point(&dynamic_ui_info[D_RP_R_DOWN_LINE].ui_config.end_x,
+                    &dynamic_ui_info[D_RP_R_DOWN_LINE].ui_config.end_y,
+                    CLIENT_MID_POSITION_X +200,
+                    CLIENT_MID_POSITION_Y -300,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	rotate_point(&dynamic_ui_info[D_RP_L_UP_LINE].ui_config.start_x,
+                    &dynamic_ui_info[D_RP_L_UP_LINE].ui_config.start_y,
+                    CLIENT_MID_POSITION_X -200,
+                    CLIENT_MID_POSITION_Y +300,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	rotate_point(&dynamic_ui_info[D_RP_L_UP_LINE].ui_config.end_x,
+                    &dynamic_ui_info[D_RP_L_UP_LINE].ui_config.end_y,
+                    CLIENT_MID_POSITION_X -370,
+                    CLIENT_MID_POSITION_Y ,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	rotate_point(&dynamic_ui_info[D_RP_L_DOWN_LINE].ui_config.start_x,
+                    &dynamic_ui_info[D_RP_L_DOWN_LINE].ui_config.start_y,
+                    CLIENT_MID_POSITION_X -370,
+                    CLIENT_MID_POSITION_Y ,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	rotate_point(&dynamic_ui_info[D_RP_L_DOWN_LINE].ui_config.end_x,
+                    &dynamic_ui_info[D_RP_L_DOWN_LINE].ui_config.end_y,
+                    CLIENT_MID_POSITION_X -252,
+                    CLIENT_MID_POSITION_Y -180,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	rotate_point(&dynamic_ui_info[D_RP_DOWN_LINE].ui_config.start_x,
+                    &dynamic_ui_info[D_RP_DOWN_LINE].ui_config.start_y,
+                    CLIENT_MID_POSITION_X +200,
+                    CLIENT_MID_POSITION_Y -300,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	rotate_point(&dynamic_ui_info[D_RP_DOWN_LINE].ui_config.end_x,
+                    &dynamic_ui_info[D_RP_DOWN_LINE].ui_config.end_y,
+                    CLIENT_MID_POSITION_X +60,
+                    CLIENT_MID_POSITION_Y -300,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	rotate_point(&dynamic_ui_info[D_RP_R1_LINE].ui_config.start_x,
+                    &dynamic_ui_info[D_RP_R1_LINE].ui_config.start_y,
+                    CLIENT_MID_POSITION_X -252,
+                    CLIENT_MID_POSITION_Y -180,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	rotate_point(&dynamic_ui_info[D_RP_R1_LINE].ui_config.end_x,
+                    &dynamic_ui_info[D_RP_R1_LINE].ui_config.end_y,
+                    CLIENT_MID_POSITION_X -50,
+                    CLIENT_MID_POSITION_Y +140,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	rotate_point(&dynamic_ui_info[D_RP_R2_LINE].ui_config.start_x,
+                    &dynamic_ui_info[D_RP_R2_LINE].ui_config.start_y,
+                    CLIENT_MID_POSITION_X +60,
+                    CLIENT_MID_POSITION_Y -300,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	rotate_point(&dynamic_ui_info[D_RP_R2_LINE].ui_config.end_x,
+                    &dynamic_ui_info[D_RP_R2_LINE].ui_config.end_y,
+                    CLIENT_MID_POSITION_X ,
+                    CLIENT_MID_POSITION_Y -145,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    RP_rotated_angle);
+	dynamic_ui_info[D_RP_ARC].ui_config.start_angel=rotated_cnt;
+	if(200+rotated_cnt>360)
+	{
+		dynamic_ui_info[D_RP_ARC].ui_config.end_angel=rotated_cnt-160;
+	}
+	else
+	{
+		dynamic_ui_info[D_RP_ARC].ui_config.end_angel=200+rotated_cnt;
+	}
+	
+             
+    Enqueue_Ui_For_Sending(&dynamic_ui_info[D_RP_UP_LINE]);
+	Enqueue_Ui_For_Sending(&dynamic_ui_info[D_RP_R_UP_LINE]);
+	Enqueue_Ui_For_Sending(&dynamic_ui_info[D_RP_R_DOWN_LINE]);
+	Enqueue_Ui_For_Sending(&dynamic_ui_info[D_RP_L_UP_LINE]);
+	Enqueue_Ui_For_Sending(&dynamic_ui_info[D_RP_L_DOWN_LINE]);
+	Enqueue_Ui_For_Sending(&dynamic_ui_info[D_RP_DOWN_LINE]);
+	Enqueue_Ui_For_Sending(&dynamic_ui_info[D_RP_R1_LINE]);
+	Enqueue_Ui_For_Sending(&dynamic_ui_info[D_RP_R2_LINE]);
+	Enqueue_Ui_For_Sending(&dynamic_ui_info[D_RP_ARC]);
+
+  }
+  RP_rotated_angle_last = RP_rotated_angle;
+  
+1.2 PITCH指针
+ /*PITCH指针*******************************************************/
+ 命名部分：
+ 动态UI
+ D_PITCH_POINTER
+ 不变UI
+ //pitch指示器
+ C_PITCH_LINE_0,
+ C_PITCH_LINE_10,
+ C_PITCH_LINE_20,
+ C_PITCH_LINE_30,
+ 			  
+ C_PITCH_LINE_40,
+ C_PITCH_LINE_50,
+ C_PITCH_LINE_N_10,
+ C_PITCH_LINE_N_20,
+ C_PITCH_LINE_N_30,
+ 
+ C_PITCH_0_CHAR,
+ C_PITCH_50_CHAR,
+ C_PITCH_N_30_CHAR,
+ 
+ 定义部分：
+ 动态UI
+  [D_PITCH_POINTER] = {
+  /*不变配置*/
+  .ui_config.priority = HIGH_PRIORITY, // UI优先级(仅动态UI需要配置)
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.operate_type = MODIFY, // 操作类型
+  .ui_config.layer = 1, // 图层数，0~9
+  .ui_config.color = RED_BLUE, // 颜色
+  .ui_config.width = 5, // 线条宽度
+  .ui_config.start_x = 1260, // 起点 x 坐标
+  .ui_config.start_y = 540, // 起点 y 坐标
+  .ui_config.end_x = 1340, // 终点 x 坐标
+  .ui_config.end_y = 540, // 终点 y 坐标
+  },
+  
+  不变UI
+  [C_PITCH_LINE_0] = {
+  /*不变配置*/
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.layer = 0, // 图层数，0~9
+  .ui_config.color = WHITE, // 颜色
+  .ui_config.width = 10, // 线条宽度
+  .ui_config.start_x = 1300, // 起点 x 坐标
+  .ui_config.start_y = 540, // 起点 y 坐标
+  .ui_config.end_x = 1330, // 终点 x 坐标
+  .ui_config.end_y = 540, // 终点 y 坐标
+  },
+  [C_PITCH_LINE_10] = {
+  /*不变配置*/
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.layer = 0, // 图层数，0~9
+  .ui_config.color = WHITE, // 颜色
+  .ui_config.width = 10, // 线条宽度
+  .ui_config.start_x = 1295, // 起点 x 坐标
+  .ui_config.start_y = 599, // 起点 y 坐标
+  .ui_config.end_x = 1324, // 终点 x 坐标
+  .ui_config.end_y = 604, // 终点 y 坐标
+  },
+  [C_PITCH_LINE_20] = {
+  /*不变配置*/
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.layer = 0, // 图层数，0~9
+  .ui_config.color = WHITE, // 颜色
+  .ui_config.width = 10, // 线条宽度
+  .ui_config.start_x = 1279, // 起点 x 坐标
+  .ui_config.start_y = 656, // 起点 y 坐标
+  .ui_config.end_x = 1307, // 终点 x 坐标
+  .ui_config.end_y = 666, // 终点 y 坐标
+  },
+  [C_PITCH_LINE_30] = {
+  /*不变配置*/
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.layer = 0, // 图层数，0~9
+  .ui_config.color = WHITE, // 颜色
+  .ui_config.width = 10, // 线条宽度
+  .ui_config.start_x = 1254, // 起点 x 坐标
+  .ui_config.start_y = 710, // 起点 y 坐标
+  .ui_config.end_x = 1280, // 终点 x 坐标
+  .ui_config.end_y = 725, // 终点 y 坐标
+  },
+  [C_PITCH_LINE_40] = {
+  /*不变配置*/
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.layer = 0, // 图层数，0~9
+  .ui_config.color = WHITE, // 颜色
+  .ui_config.width = 10, // 线条宽度
+  .ui_config.start_x = 1220, // 起点 x 坐标
+  .ui_config.start_y = 758, // 起点 y 坐标
+  .ui_config.end_x = 1243, // 终点 x 坐标
+  .ui_config.end_y = 778, // 终点 y 坐标
+  },
+  [C_PITCH_LINE_50] = {
+  /*不变配置*/
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.layer = 0, // 图层数，0~9
+  .ui_config.color = WHITE, // 颜色
+  .ui_config.width = 10, // 线条宽度
+  .ui_config.start_x = 1178, // 起点 x 坐标
+  .ui_config.start_y = 800, // 起点 y 坐标
+  .ui_config.end_x = 1198, // 终点 x 坐标
+  .ui_config.end_y = 823, // 终点 y 坐标
+  },
+  [C_PITCH_LINE_N_10] = {
+  /*不变配置*/
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.layer = 0, // 图层数，0~9
+  .ui_config.color = WHITE, // 颜色
+  .ui_config.width = 10, // 线条宽度
+  .ui_config.start_x = 1294, // 起点 x 坐标
+  .ui_config.start_y = 480, // 起点 y 坐标
+  .ui_config.end_x = 1324, // 终点 x 坐标
+  .ui_config.end_y = 476, // 终点 y 坐标
+  },
+  [C_PITCH_LINE_N_20] = {
+  /*不变配置*/
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.layer = 0, // 图层数，0~9
+  .ui_config.color = WHITE, // 颜色
+  .ui_config.width = 10, // 线条宽度
+  .ui_config.start_x = 1279, // 起点 x 坐标
+  .ui_config.start_y = 424, // 起点 y 坐标
+  .ui_config.end_x = 1308, // 终点 x 坐标
+  .ui_config.end_y = 413, // 终点 y 坐标
+  },
+  [C_PITCH_LINE_N_30] = {
+  /*不变配置*/
+  .ui_config.ui_type = LINE, // UI内容类型
+  /*可变配置*/
+  .ui_config.layer = 0, // 图层数，0~9
+  .ui_config.color = WHITE, // 颜色
+  .ui_config.width = 10, // 线条宽度
+  .ui_config.start_x = 1254, // 起点 x 坐标
+  .ui_config.start_y = 370, // 起点 y 坐标
+  .ui_config.end_x = 1280, // 终点 x 坐标
+  .ui_config.end_y = 355, // 终点 y 坐标
+  },
+  [C_PITCH_50_CHAR] = {
+  /*不变配置*/
+  .ui_config.ui_type = CHAR, // UI内容类型
+  /*可变配置*/
+  .ui_config.layer = 0, // 图层数，0~9
+  .ui_config.color = CYAN_BLUE, // 颜色
+  .ui_config.size = 20, // 字体大小
+  .ui_config.width = 3, // 线条宽度
+  .ui_config.start_x = 1200, // 起点 x 坐标
+  .ui_config.start_y = 865 , // 起点 y 坐标
+  .ui_config.text = "50", // 显示的文字
+  },
+  [C_PITCH_0_CHAR] = {
+  /*不变配置*/
+  .ui_config.ui_type = CHAR, // UI内容类型
+  /*可变配置*/
+  .ui_config.layer = 0, // 图层数，0~9
+  .ui_config.color = CYAN_BLUE, // 颜色
+  .ui_config.size = 20, // 字体大小
+  .ui_config.width = 3, // 线条宽度
+  .ui_config.start_x = 1340, // 起点 x 坐标
+  .ui_config.start_y = 570 , // 起点 y 坐标
+  .ui_config.text = "0", // 显示的文字
+  },
+  [C_PITCH_N_30_CHAR] = {
+  /*不变配置*/
+  .ui_config.ui_type = CHAR, // UI内容类型
+  /*可变配置*/
+  .ui_config.layer = 0, // 图层数，0~9
+  .ui_config.color = CYAN_BLUE, // 颜色
+  .ui_config.size = 20, // 字体大小
+  .ui_config.width = 3, // 线条宽度
+  .ui_config.start_x = 1290, // 起点 x 坐标
+  .ui_config.start_y = 346 , // 起点 y 坐标
+  .ui_config.text = "-30", // 显示的文字
+  },
+ 
+ 功能函数：
+  float pitch_angel=communicate.car_data0_rx_info->pitch_angel/180.f*3.14;
+  static float  last_pitch_angel;
+  // 旋转线条
+  if(last_pitch_angel!=pitch_angel)
+  {
+	rotate_point(&dynamic_ui_info[D_PITCH_POINTER].ui_config.start_x,
+                    &dynamic_ui_info[D_PITCH_POINTER].ui_config.start_y,
+                    1260,
+                    540,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    pitch_angel);
+    rotate_point(&dynamic_ui_info[D_PITCH_POINTER].ui_config.end_x,
+                    &dynamic_ui_info[D_PITCH_POINTER].ui_config.end_y,
+                    1340,
+                    540,
+                    CLIENT_MID_POSITION_X,
+                    CLIENT_MID_POSITION_Y,
+                    pitch_angel);
+  }
+    last_pitch_angel=pitch_angel;
+    Enqueue_Ui_For_Sending(&dynamic_ui_info[D_PITCH_POINTER]);
+	
+/**
+ 
+ 
