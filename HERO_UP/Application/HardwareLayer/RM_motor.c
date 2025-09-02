@@ -128,21 +128,6 @@ float rm_motor_anglesum_pid_calc(rm_motor_t *motor, int32_t angle)
 }
 
 /**
- * @brief  立即检测是否堵转。
- * @param  motor: 电机结构体
- * @retval 1: 堵转 0: 未堵转
- */
-int8_t Motor_DetectStuck_immediately(rm_motor_t *motor)
-{
-	if(abs(motor->info->speed)<=50 && abs(motor->info->current) > 3000)//达到堵转条件
-	{
-		return 1;
-	}
-	else
-		return 0;
-}
-
-/**
  * @brief  电机检测是否堵转，速度为0且有电流判为堵转。
  * @param  motor: 电机结构体
  * @retval 1: 堵转 0: 未堵转
@@ -171,7 +156,7 @@ int8_t Motor_DetectStuck(rm_motor_t *motor)
  * @param  
  * @retval 1: 堵转 0: 未堵转
  */
-int8_t Motor_DetectStuck_userdef(rm_motor_t *motor,uint16_t speed,uint16_t current,uint16_t time_ms,uint8_t force_direction)
+int8_t Motor_DetectStuck_userdef(rm_motor_t *motor,uint16_t speed,uint16_t current,uint16_t time_ms,int8_t force_direction)
 {
 	//判断电机方向
 	if(abs(motor->info->speed)<=speed && abs(motor->info->current) > current&&force_direction==0)//达到堵转条件
