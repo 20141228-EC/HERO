@@ -2,7 +2,7 @@
  * @file priority_ui.c
  * @author Isaac (1812924685@qq.com)
  * @brief 通过优先队列实现UI优先级调度
- * @version 0.1
+ * @version 1.1.1
  * @date 2024-04-14
  * 
  * @copyright Copyright (c) 2024
@@ -10,11 +10,12 @@
  */
 /* Includes ------------------------------------------------------------------*/
 #include "ui_priority.h"
-#include "rc_sensor.h"
-#include "rp_device_config.h"
-#include "rp_driver_config.h"
-
+#include <stdio.h>
+#include "communicate.h"
 /*用户配置区******************************************************************************************/
+/*功能---------------------------------------------------*/
+#define AUTO_UI_NAME_ENABLE  // 自动命名
+/*参数---------------------------------------------------*/
 #define HIGH_PRIORITY_WEIGHT 1000 // 高优先级权重
 #define MID_PRIORITY_WEIGHT  500  // 中优先级权重
 #define LOW_PRIORITY_WEIGHT  0    // 低优先级权重
@@ -31,55 +32,22 @@
  * @return true 开始初始化
  * @return false 正常发送
  */
+uint8_t init_test;
 bool Init_Ui_Condition()
 {
-//	static uint8_t s1_value_last = 0;	
-//	
-//  if (s1_value_last != rc.base_info->s1.value)
-//  {
-//    return false;
-//  }
-//  else
-//  {
-//    return true;
-//  }
-//	
-//	s1_value_last = rc.base_info->s1.value;
-	
-	  static uint8_t rc_status_last = DEV_OFFLINE;
-	  
-	  if(rc_sensor.work_state == DEV_ONLINE && rc_status_last == DEV_OFFLINE)
-		{
-			rc_status_last = rc_sensor.work_state;
-			return true;
-		}
-		else
-		{
-			rc_status_last = rc_sensor.work_state;
-			return false;
-		}
-
-//    static uint16_t refresh_time = 0;
-//		
-//		refresh_time++;
-//		if(refresh_time >= 1500)//3s初始化一次
-//		{
-//			refresh_time = 0;
-//			return true;
-//		}
-//		else
-//		{
-//			return false;
-//		}
+  static uint8_t last_ctrl_mode;
+  uint8_t current_ctrl_mode = rc_sensor.work_state;   //communicate.car_data0_rx_info->car_state.bit.is_key_ctrl;
+  if (last_ctrl_mode != current_ctrl_mode)
+  {
+    last_ctrl_mode = current_ctrl_mode;
+    return true; 
+  }
+  else
+  {
+    last_ctrl_mode = current_ctrl_mode;
+    return false;
+  }
 }
-
-
-
-
-
-
-
-
 
 /*目录******************************************************************************************/
 
@@ -88,7 +56,8 @@ bool Init_Ui_Condition()
     /*合并两个有序链表*/Node_u *SortedMerge(Node_u *a, Node_u *b);     
     /*将链表分成两半*/void FrontBackSplit(Node_u *source, Node_u **frontRef, Node_u **backRef);
     /*使用分治算法来对链表进行排序*/void mergeSort(Node_u **headRef);    
-    /*将链表中优先级高的ui结构体存储到一个数组中*/ui_status_e Store_High_Priority_UI(Node_u* dynamic_list_head,Node_u* const_list_head,ui_info_t* graphic_priority_buffer, ui_info_t* character_priority_buffer, ui_send_mode_e *ui_send_mode); 
+    /*将链表中优先级高的ui结构体存储到一个数组中*/ui_status_e Store_High_Priority_UI(Node_u* dynamic_list_head,Node_u* const_list_head,ui_info_t* graphic_priority_buffer, ui_info_t* character_priority_buffer, uint8_t* ui_graphic_buffer_num,ui_send_mode_e *ui_send_mode);
+
 
 // 初始化链表函数
     /*初始化优先队列*/ui_status_e Init_Priority_LinkedList(Node_u** headRef, ui_info_t *ui_input, uint8_t num); 
@@ -99,12 +68,12 @@ bool Init_Ui_Condition()
     /*配置图形信息进发送结构体*/ext_client_custom_graphic_seven_t Process_Graphic_To_Buffer(ui_info_t *ui_info, uint8_t ui_info_size, uint8_t add_operate_enable);
 
 // UI发送函数
-    /*UI正常发送*/ui_status_e Ui_Send_Normal(void);
-    /*UI强行发送ADD*/ui_status_e Ui_Send_Add(void);
+    /*UI正常发送*/ui_status_e Ui_Send_Normal();
+    /*UI强行发送ADD*/ui_status_e Ui_Send_Add();
 
 // 用户函数
     /*初始化UI链表*/ui_status_e Init_Ui_List(ui_info_t *dynamic_ui_info, uint8_t dynamic_ui_num, ui_info_t *const_ui_info, uint8_t const_ui_num);
-    /*UI发送函数*/void Ui_Send(void);
+    /*UI发送函数*/void Ui_Send();
     /*添加对应UI到待发送*/ ui_status_e Enqueue_Ui_For_Sending(ui_info_t *ui_info);
 
   
@@ -131,6 +100,7 @@ uint32_t Calculate_Priority(ui_info_t *msg)
   // 根据消息的优先级计算优先级值
   if(msg->ui_config.priority == HIGH_PRIORITY)
   {
+	 
     priority_value = HIGH_PRIORITY_WEIGHT;
   }
   else if(msg->ui_config.priority == MID_PRIORITY)
@@ -152,7 +122,7 @@ uint32_t Calculate_Priority(ui_info_t *msg)
 }
 /**
  * @brief 
- * 
+ * @note 当两个链表中任意一个为空时 递归停止，直接返回另一个链表的剩余部分
  * @param a 
  * @param b 
  * @return Node* 
@@ -229,7 +199,7 @@ void FrontBackSplit(Node_u* source, Node_u** frontRef, Node_u** backRef)
 
 /**
  * @brief 使用分治算法来对链表进行排序
- * 
+ * @note  根据递归的特性，只有分裂到一个节点或者链表为空时才开始排序和合并
  * @param headRef 
  */
 void mergeSort(Node_u** headRef)
@@ -246,11 +216,11 @@ void mergeSort(Node_u** headRef)
    // 使用FrontBackSplit函数将链表分成两半
    FrontBackSplit(head, &a, &b);
  
-   // 对每一半递归地进行归并排序
+   // 分裂后给每一半再分裂，并下一个排序和合并的指令，等递归回来的时候就执行指令
    mergeSort(&a);
    mergeSort(&b);
  
-   // 使用SortedMerge函数将两个已排序的部分合并成一个完整的排序链表
+   // SortedMerge内部先排序后合并，返回合并后的表头
    *headRef = SortedMerge(a, b);
 }
 
@@ -347,6 +317,11 @@ ui_status_e Init_Type_LinkedLists(Node_u** graphic_link, Node_u** char_link, ui_
     }
     newNode->ui = dynamic_ptr;
     newNode->next = NULL;
+    //给当前UI命名
+    #ifdef AUTO_UI_NAME_ENABLE
+      char *name = dynamic_ptr->ui_config.name;
+      sprintf(name, "%d", i);
+    #endif
     //判断当前UI是否为CHAR类型
     if (dynamic_ptr->ui_config.ui_type != CHAR && dynamic_ptr->ui_config.operate_type != DELETE ) 
     {
@@ -392,6 +367,11 @@ ui_status_e Init_Type_LinkedLists(Node_u** graphic_link, Node_u** char_link, ui_
     }
     newNode->ui = const_ptr;
     newNode->next = NULL;
+    //给当前UI命名
+    #ifdef AUTO_UI_NAME_ENABLE
+      char *name = const_ptr->ui_config.name;
+      sprintf(name, "%d", i + dynamic_num + 1);
+    #endif
     //判断当前UI是否为CHAR类型
     if (const_ptr->ui_config.ui_type != CHAR && const_ptr->ui_config.operate_type != DELETE) 
     {
@@ -410,7 +390,7 @@ ui_status_e Init_Type_LinkedLists(Node_u** graphic_link, Node_u** char_link, ui_
       if (*char_link == NULL) //如果链表为空，将新节点设置为链表的头节点
       {
         *char_link = newNode;
-      } 
+      }
       else //如果链表不为空，将新节点添加到链表的末尾
       {
         char_link_cursor->next = newNode;
@@ -430,10 +410,15 @@ ui_status_e Init_Type_LinkedLists(Node_u** graphic_link, Node_u** char_link, ui_
  * @param dynamic_list_head 动态UI链表的头节点
  * @param const_list_head 不变UI链表的头节点
  * @param graphic_buffer 存储ui结构体的数组
+ * @param character_buffer 存储字符ui结构体的数组
+ * @param ui_graphic_buffer_num 图形UI缓存个数
+ * @param ui_send_mode 发送模式 
  * @return ui_status_e UI_ERROR：链表为空,没有初始化链表
  */
-ui_status_e Store_High_Priority_UI(Node_u* dynamic_list_head,Node_u* const_list_head,ui_info_t* graphic_priority_buffer, ui_info_t* character_priority_buffer, ui_send_mode_e *ui_send_mode)
+ui_status_e Store_High_Priority_UI(Node_u* dynamic_list_head,Node_u* const_list_head,ui_info_t* graphic_priority_buffer, ui_info_t* character_priority_buffer, uint8_t* ui_graphic_buffer_num,ui_send_mode_e *ui_send_mode)
 {
+  *ui_graphic_buffer_num = 0;//图形UI缓存个数清零
+
   uint8_t graphic_cnt = 0;
   uint8_t buffer_size = 7;
   Node_u* dynamic_list_cursor = dynamic_list_head;
@@ -450,11 +435,11 @@ ui_status_e Store_High_Priority_UI(Node_u* dynamic_list_head,Node_u* const_list_
   }
 
   //第一个节点为字符，发送字符 PRIORITY_LOW的字符会在第一的时候发送
-  if (dynamic_list_cursor->ui->ui_config.ui_type == CHAR)
+  if (dynamic_list_cursor != NULL && dynamic_list_cursor->ui->ui_config.ui_type == CHAR)
   {
     if (dynamic_list_cursor != NULL)
     {
-      character_priority_buffer = dynamic_list_cursor->ui;
+      *character_priority_buffer = *dynamic_list_cursor->ui;
       dynamic_list_cursor->ui->sent_state = MESSAGE_SENT;
       *ui_send_mode = SEND_CHAR_MODE;
       return UI_OK;
@@ -471,6 +456,7 @@ ui_status_e Store_High_Priority_UI(Node_u* dynamic_list_head,Node_u* const_list_
         graphic_priority_buffer[graphic_cnt] = *(dynamic_list_cursor->ui);//将当前节点的ui信息存储到数组中
         dynamic_list_cursor->ui->sent_state = MESSAGE_SENT;
         graphic_cnt++;//数组下标自增
+        (*ui_graphic_buffer_num)++;//图形UI缓存个数自增
       }
       else if (dynamic_list_cursor->ui->ui_config.priority == HIGH_PRIORITY)//如果当前节点为字符且优先级为高
       {
@@ -484,7 +470,7 @@ ui_status_e Store_High_Priority_UI(Node_u* dynamic_list_head,Node_u* const_list_
             dynamic_list_cursor = dynamic_list_cursor->next;
           }
           //把要发送的字符信息存入buffer
-          character_priority_buffer = dynamic_list_cursor->ui;
+          *character_priority_buffer = *dynamic_list_cursor->ui;
           dynamic_list_cursor->ui->sent_state = MESSAGE_SENT;
           *ui_send_mode = SEND_CHAR_MODE;
           return UI_OK;//发送字符
@@ -502,7 +488,7 @@ ui_status_e Store_High_Priority_UI(Node_u* dynamic_list_head,Node_u* const_list_
             dynamic_list_cursor = dynamic_list_cursor->next;
           }
           //把要发送的字符信息存入buffer
-          character_priority_buffer = dynamic_list_cursor->ui;
+          *character_priority_buffer = *dynamic_list_cursor->ui;
           dynamic_list_cursor->ui->sent_state = MESSAGE_SENT;
           *ui_send_mode = SEND_CHAR_MODE;
           return UI_OK;//发送字符
@@ -527,6 +513,7 @@ ui_status_e Store_High_Priority_UI(Node_u* dynamic_list_head,Node_u* const_list_
         graphic_priority_buffer[graphic_cnt] = *(const_list_cursor->ui);//将当前节点的ui信息存储到数组中
         graphic_priority_buffer[graphic_cnt].ui_config.operate_type = ADD;
         graphic_cnt++;//数组下标自增
+        (*ui_graphic_buffer_num)++;//图形UI缓存个数自增
       }
       //如果下一个节点为空，退出循环
       if(const_list_cursor->next == NULL)
@@ -747,6 +734,7 @@ ui_info_t graphic_priority_buffer[7]; // 优先级最高的7个图形
 ui_info_t character_priority_buffer;  // 优先级最高的字符
 
 ui_send_mode_e ui_send_mode; // 发送模式
+uint8_t ui_graphic_buffer_num = 0;   // 图形UI缓存个数
 
 /**
  * @brief 初始化UI链表 在外部调用 一定要在Ui_Send之前调用
@@ -780,8 +768,7 @@ ui_status_e Init_Ui_List(ui_info_t *dynamic_ui_info, uint8_t dynamic_ui_num, ui_
  * @brief 正常发送UI
  * 
  */
-uint8_t i_test;
-ui_status_e Ui_Send_Normal(void)
+ui_status_e Ui_Send_Normal()
 {
   ext_client_custom_graphic_seven_t graphic_tx_buffer;   // 图像发送缓存
   ext_client_custom_character_t     character_tx_buffer; // 字符发送缓存
@@ -789,7 +776,7 @@ ui_status_e Ui_Send_Normal(void)
   mergeSort(&dynamic_list_head);
   //将优先级最高的UI信息存储到数组中
   
-  if (Store_High_Priority_UI(dynamic_list_head, const_list_head, graphic_priority_buffer, &character_priority_buffer, &ui_send_mode) == UI_ERROR)
+  if (Store_High_Priority_UI(dynamic_list_head, const_list_head, graphic_priority_buffer, &character_priority_buffer, &ui_graphic_buffer_num,&ui_send_mode) == UI_ERROR)
   {
     return UI_ERROR; // 没有初始化链表
   }
@@ -801,7 +788,7 @@ ui_status_e Ui_Send_Normal(void)
     client_send_char(character_tx_buffer);
     break;
   case SEND_GRAPHIC_MODE:
-    graphic_tx_buffer = Process_Graphic_To_Buffer(graphic_priority_buffer, 7, 0);
+    graphic_tx_buffer = Process_Graphic_To_Buffer(graphic_priority_buffer, ui_graphic_buffer_num, 0);
     client_send_seven_graphic(graphic_tx_buffer);
     break;
   default:
@@ -811,12 +798,10 @@ ui_status_e Ui_Send_Normal(void)
 }
 
 /**
- * @brief UI强行发送ADD
- * @note  由于选手端登陆后，每个UI都需要发一次ADD，所以需要强制发送一次ADD
- *        
+ * @brief UI强行发送ADD        
  * @return ui_status_e 0：error 1:发送完了 2:没发送完
  */
-ui_status_e Ui_Send_Add(void)
+ui_status_e Ui_Send_Add()
 {
   static uint8_t is_send_char_finish_flag = false;
   static uint8_t is_send_graphic_finish_flag = false;
@@ -863,7 +848,6 @@ ui_status_e Ui_Send_Add(void)
 
   }
 /*发送图形******************************************/
-	
   if (graphic_list_cursor != NULL && is_send_graphic_finish_flag == false)
   {
     //从链表中取出7个图形信息
@@ -873,19 +857,19 @@ ui_status_e Ui_Send_Add(void)
       {
         graphic_info_buffer[i] = *graphic_list_cursor->ui;
         is_send_graphic_finish_flag = true;
-				i_test = i + 1;
+        ui_graphic_buffer_num = i + 1;
         break;
       }
       graphic_info_buffer[i] = *graphic_list_cursor->ui;
       graphic_list_cursor = graphic_list_cursor->next;
-			i_test = i + 1;
+      ui_graphic_buffer_num = i + 1;
     }
-    graphic_tx_buffer = Process_Graphic_To_Buffer(graphic_info_buffer, i_test, 1);
+    graphic_tx_buffer = Process_Graphic_To_Buffer(graphic_info_buffer, ui_graphic_buffer_num, 1);
     client_send_seven_graphic(graphic_tx_buffer);
     return UI_BUSY;
   }
 	/*判断是否都发完了******************************************/
-	if (is_send_char_finish_flag == true && is_send_graphic_finish_flag == true)//都发完了 
+	if (is_send_char_finish_flag == true && is_send_graphic_finish_flag == true)//都发完了
   {
     //复位，等待下一次发送
     char_list_cursor = char_list_head;//回到头节点
@@ -902,7 +886,7 @@ ui_status_e Ui_Send_Add(void)
  * @brief 发送UI 在外部调用
  * 
  */
-void Ui_Send(void)
+void Ui_Send()
 {
   /*判断是否到了发送时间****************************/
   uint32_t currentTick = HAL_GetTick();
@@ -936,7 +920,7 @@ void Ui_Send(void)
   }
 	else/*正常发送UI*/
 	{		
-    Ui_Send_Normal();
+//    Ui_Send_Normal();
 	}
 	lastTick = HAL_GetTick();
 }

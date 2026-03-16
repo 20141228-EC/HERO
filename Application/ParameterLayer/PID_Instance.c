@@ -10,7 +10,7 @@ pid_ctrl_t My_Link_Length_Pid[Leg_Num] =
     .kd = 0.f,
 		.a = 1.f,
     .integral_max = 2.f,
-    .out_max = 20.f,//30.f,//
+    .out_max = 30.f,//
 	},
 	[L_Leg] = 
 	{
@@ -19,7 +19,7 @@ pid_ctrl_t My_Link_Length_Pid[Leg_Num] =
     .kd = 0.f,
 	.a = 1.f,
     .integral_max = 2.f,
-    .out_max = 20.f,//30.f,//
+    .out_max = 30.f,//
 	},
 };
 
@@ -175,7 +175,7 @@ pid_ctrl_t My_Link_sync_Pid[Leg_Num] =
     .kd = 0.f,
 		.a = 1.f,
     .integral_max = 2.f,
-    .out_max = 8.f,//10.f,//
+    .out_max = 10.f,//10.f,//
 	},
 	[L_Leg] = 
 	{
@@ -184,7 +184,7 @@ pid_ctrl_t My_Link_sync_Pid[Leg_Num] =
     .kd = 0.f,
 	.a = 1.f,
     .integral_max = 2.f,
-    .out_max = 8.f,//10.f,//5
+    .out_max = 10.f,//10.f,//5
 	},
 };
 

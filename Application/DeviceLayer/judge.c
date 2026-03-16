@@ -131,3 +131,23 @@ void judge_update(uint16_t id, uint8_t *rxBuf)
 
 }
 
+//检查自己是否复活
+uint8_t check_hero_revive(My_Judge_t * my_judge)
+{
+	static uint16_t last_robot_HP;
+	uint16_t robot_HP_now;
+	
+	robot_HP_now=my_judge->org_info->game_robot_status.current_HP;
+	
+	if(robot_HP_now!=0&&last_robot_HP==0)//上升沿
+	{
+		last_robot_HP=robot_HP_now;
+		return 1;
+	}
+	else
+	{
+		last_robot_HP=robot_HP_now;
+		return 0;
+	}
+	
+}

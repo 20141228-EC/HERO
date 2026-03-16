@@ -57,6 +57,8 @@ typedef struct Balance_Flag_struct_t
 	bool Jumping_Flag;//跳跃过程中，用于给chassis状态信号量
 	bool Shoot_Flag;
   bool Remedy_Flag;
+	bool Middle_Flag;
+	bool Return_Flag;
 	
 	uint8_t Rescue_step;
 	

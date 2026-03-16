@@ -35,11 +35,28 @@ void Shoot_offline_cheak(shoot_out_t* shoot_out)
 	}
 }
 
+static uint16_t judge_heat,last_judge_heat;
+static uint16_t local_heat;
 /*热量限制*/
 void Shoot_Heat_Limit(shoot_out_t* shoot_out)
-{
+{		
+//	last_judge_heat = judge_heat;
+//	judge_heat = My_Judge.info->shooter_cooling_heat;
+//	
+//	if(last_judge_heat != judge_heat)
+//	{
+//		local_heat = judge_heat;
+//	}
+//	else
+//	{
+//		local_heat = local_heat;
+//	}
+	
+	
 	#ifdef JUDGE_ENABLE
-		if(My_Judge.info->shooter_cooling_limit - My_Judge.info->shooter_cooling_heat <=105
+	if(My_Judge.org_info->game_status.game_progress == 4)
+	{
+		if(My_Judge.info->shooter_cooling_limit - My_Judge.info->shooter_cooling_heat <=105//local_heat <=105         //
 			|| My_Judge.org_info->projectile_allowance.projectile_allowance_42mm <= 0)
 		{
 			shoot_out->base_info.is_heat_allow = 0;
@@ -52,11 +69,35 @@ void Shoot_Heat_Limit(shoot_out_t* shoot_out)
 		if(shoot_out->base_info.is_heat_allow == 1)
 		{
 			shoot.info.rt_rx_info.flag_Info.run_limit_flag = 0;
+		
 		}
 		else
 		{
-			shoot.info.rt_rx_info.flag_Info.run_limit_flag = 1;
+			shoot.info.rt_rx_info.flag_Info.run_limit_flag = 1;		
 		}
+	}
+	else
+	{
+		if(My_Judge.info->shooter_cooling_limit - My_Judge.info->shooter_cooling_heat <=105)
+		{
+			shoot_out->base_info.is_heat_allow = 0;
+		}
+		else
+		{
+			shoot_out->base_info.is_heat_allow = 1;
+		}
+		
+		if(shoot_out->base_info.is_heat_allow == 1)
+		{
+			shoot.info.rt_rx_info.flag_Info.run_limit_flag = 0;
+		
+		}
+		else
+		{
+			shoot.info.rt_rx_info.flag_Info.run_limit_flag = 1;		
+		}
+	}
+	
 	#else
 //	    shoot_out->base_info.is_heat_allow = 1;
 			shoot.info.rt_rx_info.flag_Info.run_limit_flag = 0;
@@ -112,7 +153,7 @@ void Shoot_Ext_Work(shoot_out_t* shoot_out)
 	
 	Shoot_Heat_Limit(shoot_out);                            //热量限制
 	
-  if(Balance.Shoot.Single_Shoot_Flag == 1)           //开发射时判断elec电平高低
+  if(Balance.Shoot.Single_Shoot_Flag == 1/* && My_Judge.info->shooter_cooling_limit - My_Judge.info->shooter_cooling_heat >=180*/)           //开发射时判断elec电平高低
 	{
 		shoot.info.rt_rx_info.flag_Info.elec_level_flag = 1;	
 	}
@@ -120,6 +161,14 @@ void Shoot_Ext_Work(shoot_out_t* shoot_out)
 	{
 		shoot.info.rt_rx_info.flag_Info.elec_level_flag = 0;	
 	} 
+	
+//	static uint8_t last_flag,flag;
+//	last_flag = flag;
+//	flag = Balance.Shoot.Single_Shoot_Flag;
+//	if(last_flag == 0 && flag == 1)
+//	{
+//		local_heat += 100;
+//	}
 	
 	Shoot_Base_Work(&shoot);
 	

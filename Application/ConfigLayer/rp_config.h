@@ -27,7 +27,7 @@
 /*有无超电*/
 #define CAP_ENABLE		1
 /*有无裁判系统*/
-//#define JUDGE_ENABLE 	1
+#define JUDGE_ENABLE 	1
 
 /*有无视觉*/
 //#define VISION

@@ -42,13 +42,13 @@
 #include "stdbool.h"
 
 //1920*1080
-#define Client_mid_position_x 960
-#define Client_mid_position_y 540
+#define CLIENT_MID_POSITION_X 960
+#define CLIENT_MID_POSITION_Y 540
 
 /********************裁判系统帧结构begin********************/
 
 /* 帧头 */
-typedef struct  __attribute__((packed)) 
+typedef struct __attribute__((packed)) 
 {
 	uint8_t  SOF;  //数据帧起始字节，固定值为 0xA5
 	uint16_t data_length;  //数据帧中 data 的长度
@@ -57,12 +57,27 @@ typedef struct  __attribute__((packed))
 }frame_header_t;
 
 /* 数据段头结构 */
-typedef struct  __attribute__((packed)) 
+typedef struct __attribute__((packed)) 
 {
 	uint16_t data_cmd_id;  //内容ID
 	uint16_t sender_ID;  //发送者的 ID
 	uint16_t receiver_ID;  //接收者的 ID
 }ext_student_interactive_header_data_t;
+
+/*自定义消息结构*/
+typedef struct __attribute__((packed)) 
+{   
+	/*帧头*/
+	frame_header_t frame_header;
+	/**命令码ID */
+	uint16_t cmd_id;
+	/**数据段 */
+	uint16_t sender_id; 
+	uint16_t receiver_id; 
+	uint8_t user_data[30];
+	/**帧尾 */
+	uint16_t crc16; 
+}custom_info_t;
 
 /********************裁判系统帧结构end********************/
 
@@ -89,6 +104,7 @@ enum
 	LEN_ID_draw_five_graphic  = 81, //6+15*5
 	LEN_ID_draw_seven_graphic = 111,//6+15*7
 	LEN_ID_draw_char_graphic  = 51, //6+15+30（字符串内容）
+	LEN_ID_draw_custom_info   = 34, 
 };
 
 /* 操作类型 */
@@ -119,55 +135,55 @@ typedef enum
 /********************数据段结构体begin********************/
 
 /* 图形数据 */
-typedef struct  __attribute__((packed)) 
+typedef struct __attribute__((packed)) 
 { 
-	uint8_t graphic_name[3];
-	uint32_t operate_tpye:3;
-	uint32_t graphic_tpye:3;
-	uint32_t layer:4;
-	uint32_t color:4;
-	uint32_t start_angle:9;
-	uint32_t end_angle:9;
-	uint32_t width:10;
-	uint32_t start_x:11;
-	uint32_t start_y:11;
-	uint32_t radius:10;
-	uint32_t end_x:11;
-	uint32_t end_y:11;
+	uint8_t graphic_name[3]; //图形名字，在图形删除、修改等操作中，作为索引
+	uint32_t operate_tpye:3;  //图形操作
+	uint32_t graphic_tpye:3;  //图形类型
+	uint32_t layer:4;			//图层
+	uint32_t color:4;		  //颜色
+	uint32_t start_angle:9;		//对圆弧，起始角度
+	uint32_t end_angle:9;		//对圆弧，终止角度
+	uint32_t width:10;			//线宽，建议字体大小与线宽比例为 10：1
+	uint32_t start_x:11;		//起点/圆心 x 坐标
+	uint32_t start_y:11;		//起点/圆心 y 坐标
+	uint32_t radius:10;  		//对正圆半径
+	uint32_t end_x:11;			//对直线终点 x 坐标
+	uint32_t end_y:11;			//对直线终点 y 坐标
 }graphic_data_struct_t;
 
 /* 客户端绘制一个图形数据段 */
-typedef struct  __attribute__((packed)) 
+typedef struct __attribute__((packed)) 
 {
 	graphic_data_struct_t grapic_data_struct;
 } ext_client_custom_graphic_single_t;
 
 /* 客户端绘制二个图形数据段 */
-typedef struct  __attribute__((packed)) 
+typedef struct __attribute__((packed)) 
 {
 	graphic_data_struct_t grapic_data_struct[2];
 } ext_client_custom_graphic_double_t;
 
 /* 客户端绘制五个图形数据段 */
-typedef struct  __attribute__((packed)) 
+typedef struct __attribute__((packed)) 
 {
 	graphic_data_struct_t grapic_data_struct[5];
 } ext_client_custom_graphic_five_t;
 
 /* 客户端绘制七个图形数据段 */
-typedef struct  __attribute__((packed)) 
+typedef struct __attribute__((packed)) 
 {
 	graphic_data_struct_t grapic_data_struct[7];
 }ext_client_custom_graphic_seven_t;
 
 /* 客户端绘制字符数据段 */
-typedef struct  __attribute__((packed)) 
+typedef struct __attribute__((packed)) 
 {
 	graphic_data_struct_t grapic_data_struct;
 	char data[30];
 }ext_client_custom_character_t;
 
-typedef struct  __attribute__((packed)) 
+typedef struct __attribute__((packed)) 
 {
   uint8_t operate_tpye;
   uint8_t layer;
@@ -179,7 +195,7 @@ typedef struct  __attribute__((packed))
 /********************其他begin********************/
 
 /* 机器人间交互数据专用帧结构 */
-typedef struct  __attribute__((packed)) 
+typedef struct __attribute__((packed)) 
 {
 	frame_header_t frame_header;  //帧头
 	uint16_t cmd_id;  //命令码 ID
@@ -294,6 +310,7 @@ uint8_t client_send_five_graphic(ext_client_custom_graphic_five_t data);
 uint8_t client_send_seven_graphic(ext_client_custom_graphic_seven_t data);
 uint8_t client_send_char(ext_client_custom_character_t data);
 uint8_t client_graphic_delete_update(uint8_t delete_layer);
+uint8_t client_send_custom_info(uint8_t *text);
 
 uint8_t uart_send_data(uint8_t *txbuf, uint16_t length);
 

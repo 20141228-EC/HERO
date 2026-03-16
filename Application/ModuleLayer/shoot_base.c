@@ -740,10 +740,10 @@ void Dial_Work_State_Update(Shoot_t* shoot)
 					if(shoot->info.rt_rx_info.flag_Info.elec_level_flag == 0 
 						|| shoot->info.rt_rx_info.flag_Info.run_limit_flag == 1)       //连发开火停止
 				  {
-					  shoot->cmd.dial_tx_cmd.work_state = WAITING;
-					  shoot->cmd.dial_tx_cmd.mode = DIAL_ANGLE;
-					  shoot->cmd.vision_tx_cmd.is_ready_flag = 1;
-					  work_time = 0;
+//					  shoot->cmd.dial_tx_cmd.work_state = WAITING;
+//					  shoot->cmd.dial_tx_cmd.mode = DIAL_ANGLE;
+//					  shoot->cmd.vision_tx_cmd.is_ready_flag = 1;
+//					  work_time = 0;
             }
 			  	}					
 				
@@ -792,6 +792,7 @@ void Dial_Work_State_Update(Shoot_t* shoot)
 						
 				  	  shoot->cmd.vision_tx_cmd.is_ready_flag = 1;
 
+						shoot->cmd.dial_tx_cmd.angle_sum_target -= shoot->info.cfg_rx_info.base_cfg_info.oneshot_angle;
 			    }
 				  //拨盘完成角度环，停下来才切换等待模式
 				  else if((ABSOLUTE_ANGLE_STOP || RELATIVE_ANGLE_STOP) && shoot->mode == SINGLE_SHOT)

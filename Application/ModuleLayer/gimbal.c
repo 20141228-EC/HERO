@@ -241,9 +241,10 @@ void Gimbal_Save_Update(gimbal_t *gimbal)
 /*ÔÆÌ¨ÍÓÂÝÒÇÄ£Ê½*/
 void Gimbal_Gyro_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 {
-  if(Balance.Vision.Auto_Catch_Flag != 0 && Board_Rx_Info.vision_state == 1)
+  if(Balance.Vision.Auto_Catch_Flag != 0 && Board_Rx_Info.vision_state == 1 && Board_Rx_Info.is_find_Target == 1)
 	{
-    gimbal->base_info.yaw_imu_angle_target = - Board_Rx_Info.vision_yaw_tar / 180.f * PI;
+    gimbal->base_info.yaw_imu_angle_target = - Board_Rx_Info.vision_yaw_tar;
+		gimbal->base_info.pitch_imu_angle_target = Board_Rx_Info.vision_pitch_tar;
 	}
 	else
 	{
@@ -351,18 +352,25 @@ void Gimbal_Lob_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 	}
 	else
 	{
-		if(my_abs((float)rc_sensor.info->ch0)>=10)
+		if(ctrl_mode != KEY_CTRL)
 		{
-			gimbal->base_info.yaw_mec_angle_target += rc_sensor.info->ch0*0.001f*0.0003;
+			if(my_abs((float)rc_sensor.info->ch0)>=10)
+			{
+				gimbal->base_info.yaw_mec_angle_target += rc_sensor.info->ch0*0.001f*0.0003;
+			}
+			if(my_abs((float)rc_sensor.info->ch1)>=10)
+			{
+				gimbal->base_info.pitch_mec_angle_target += rc_sensor.info->ch1*0.001f*0.2;
+			}
 		}
-		if(my_abs((float)rc_sensor.info->ch1)>=10)
+		else
 		{
-			gimbal->base_info.pitch_mec_angle_target += rc_sensor.info->ch1*0.001f*0.2;
+			gimbal->base_info.yaw_mec_angle_target += rc_sensor.info->mouse_x * 0.0003f;
+			gimbal->base_info.pitch_mec_angle_target += rc_sensor.info->mouse_y*0.0003f;
 		}
 	}
 	  gimbal->base_info.yaw_mec_angle_target = half_cycle(gimbal->base_info.yaw_mec_angle_target, 2*PI);
-	
-	
+		
 	  gimbal->base_info.yaw_imu_angle_target = gimbal->base_info.yaw_imu_angle;
 	  gimbal->base_info.pitch_imu_angle_target = Board_Rx_Info.pitch_imu;
 }

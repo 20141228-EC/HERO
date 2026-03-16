@@ -47,6 +47,7 @@ typedef enum {
 typedef enum {
 	DEV_ONLINE,
 	DEV_OFFLINE,
+
 } dev_work_state_t;
 
 

@@ -7,7 +7,7 @@
 #include "judge_protocol.h"
 #include "communicate.h"
 /* Exported macro ------------------------------------------------------------*/
-#define JUDGE_OFFLINE_CNT_MAX 100
+#define JUDGE_OFFLINE_CNT_MAX 1000
 
 typedef struct Judge_Org_Info_struct_t
 {
@@ -60,5 +60,6 @@ void My_Judge_Init(void);
 void My_Judge_Realtime_Task(My_Judge_t* my_judge);
 void My_Judge_Update(My_Judge_t * my_judge);
 void judge_update(uint16_t id, uint8_t *rxBuf);
+uint8_t check_hero_revive(My_Judge_t * my_judge);
 
 #endif

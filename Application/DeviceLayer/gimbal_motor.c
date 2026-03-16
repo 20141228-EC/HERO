@@ -28,7 +28,7 @@ Motor_DM_State_t Yaw_State_t;
 pid_ctrl_t Yaw_Gyro_Ctrl_out = 
 {
 	.kp = 18.f,    //30.f,//
-	.ki = 0.1f,   //0.3f,//0.2f,
+	.ki = 1.f,//0.1f,   //0.3f,//0.2f,
 	.kd = 0.f,
 	.integral_max = 5.f,
 	.out_max = 200.f,   //400.f,
@@ -36,7 +36,7 @@ pid_ctrl_t Yaw_Gyro_Ctrl_out =
 
 pid_ctrl_t Yaw_Gyro_Ctrl_inn = 
 {
-	.kp = 0.05f,   //0.15f,//0.35f,//0.75f,//
+	.kp = 0.08f,//0.05f,   //0.15f,//0.35f,//0.75f,//
 	.ki = 0.f,
 	.kd = 0.f,
 	.integral_max = 0.f,
