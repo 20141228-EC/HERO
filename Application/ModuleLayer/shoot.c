@@ -157,7 +157,7 @@ void Shoot_Work(shoot_t *shoot)
 	if(shoot_count != last_shoot_count)
 	{
     Speed_Statistic();
-//	  Shooting_Fri_Speed_Adapt();
+	  Shooting_Fri_Speed_Adapt();
 	}
 	Shoot_extern_get(shoot);
 	Shoot_pid_cal(shoot);

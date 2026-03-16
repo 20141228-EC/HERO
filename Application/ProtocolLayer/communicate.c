@@ -118,10 +118,10 @@ void Board_Tx_C2(void)
 	
 	uint8_t compressed;
 	
-	Board_Tx_Info.hit_enable |= (Board_Tx_Info.hit_enable << 0);  //  存放在最低位
-	Board_Tx_Info.is_find_base |= (Board_Tx_Info.hit_enable << 1);  //  存放在1
-	Board_Tx_Info.is_find_outpost |= (Board_Tx_Info.hit_enable << 2);  //  存放在2
-	Board_Tx_Info.is_find_Target |= (Board_Tx_Info.hit_enable << 3);  //  存放在3
+	compressed |= (Board_Tx_Info.hit_enable << 0);  //  存放在最低位
+	compressed |= (Board_Tx_Info.is_find_base << 1);  //  存放在1
+	compressed |= (Board_Tx_Info.is_find_outpost << 2);  //  存放在2
+	compressed |= (Board_Tx_Info.is_find_Target << 3);  //  存放在3
 	
 	board_tx_buf_2[0] = (pitch_tar_temp>>8);
 	board_tx_buf_2[1] = pitch_tar_temp;
@@ -167,7 +167,7 @@ void Board_Tx_Update(Board_Tx_Info_t *Board_Tx_Info)
 	{
 		Board_Tx_Info->vision_state = 0;
 	}
-	Board_Tx_Info->vision_pitch_tar = -vision.VtoE->pitch;
+	Board_Tx_Info->vision_pitch_tar = vision.VtoE->pitch;
 //	Board_Tx_Info->launch_timer  = 
 //	Board_Tx_Info->is_find_base  = 
 //	Board_Tx_Info->is_find_outpost = 
@@ -187,14 +187,14 @@ void Board_Rx_C1(uint8_t *rxbuf)
 	Board_Rx_Info.vision_mode = rxbuf[7];//视觉模式
 	
 	Board_Rx_Info.pitch_imu_tar = uint_to_float(pitch_imu_tar_int,-360.f,360.f,16);
-	if(Board_Rx_Info.vision_mode == 5)
-	{
-		Board_Rx_Info.yaw_mec_imu = uint_to_float(yaw_mec_int,-PI,PI,16);//机械yaw
-	}
-	else
-	{
+//	if(Board_Rx_Info.vision_mode == 5)
+//	{
+//		Board_Rx_Info.yaw_mec_imu = uint_to_float(yaw_mec_int,-PI,PI,16);//机械yaw
+//	}
+//	else
+//	{
 		Board_Rx_Info.yaw_mec_imu = uint_to_float(yaw_mec_int,-360.f,360.f,16);//陀螺仪yaw
-	}
+//	}
 }
 
 void Board_Rx_C2(uint8_t *rxbuf)

@@ -150,7 +150,8 @@ void Gimbal_init_action(gimbal_t *gimbal)
 /*ÔÆÌ¨ÍÓÂÝÒÇÄ£Ê½*/
 void Gimbal_Gyro_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 {	
-	if(Board_Rx_Info.video_open == 1)
+	if(Board_Rx_Info.video_open == 1 && vision.status->rx_state == DEV_ONLINE && vision.status->tx_state == DEV_ONLINE
+		 && vision.VtoE->flag_union.bit.is_find_target == 1)
 	{
 		gimbal->base_info.pitch_imu_angle_target = vision.VtoE->pitch;
 	}

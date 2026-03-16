@@ -402,6 +402,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>shoot_statistics,0x0A</ItemText>
         </Ww>
+        <Ww>
+          <count>46</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\My_C\../Application/ProtocolLayer/vision_protocol.c\vision.VtoE-&gt;flag_union.bit.is_find_target</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>

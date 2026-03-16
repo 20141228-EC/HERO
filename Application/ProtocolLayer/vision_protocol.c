@@ -161,15 +161,16 @@ void Vision_Board_Update(void)
     default:
     break;
 	}		
-
-	vision.EtoV->pitch = gimbal.base_info.pitch_motor_angle / 4096.f * 180.f;    //360
+	
 	if(gimbal.gimbal_ctrl_mode.gimbal_mode != 1)
 	{
 	  vision.EtoV->yaw = Board_Rx_Info.yaw_mec_imu / PI * 180.f;
+		vision.EtoV->pitch = gimbal.base_info.pitch_motor_angle / 4096.f * 180.f;    //360
 	}
 	else
 	{
 		vision.EtoV->yaw = Board_Rx_Info.yaw_mec_imu;// / PI * 180.f;
+		vision.EtoV->pitch = gimbal.base_info.pitch_imu_angle;
 	}
   vision.EtoV->roll = (-imu_sensor.info->base_info.pitch - 0.77);
 //	vision.EtoV->pitch_offset = gimbal.offset_info->vision_pitch_offset / 180.f /** 4096.f*/;

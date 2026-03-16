@@ -12,7 +12,7 @@
 /* Exported macro ------------------------------------------------------------*/
 
 //#define YAW_MOTOR_ANGLE_MIDDLE 		(17463.f-1000.f)  		  //YAW电机中值
-#define PITCH_MOTOR_ENCODER_MIDDLE  (1463.f - 85.f)           //(3400.f+2950.f)      //(2950.f)    //pitch电机编码器中值
+#define PITCH_MOTOR_ENCODER_MIDDLE  (1430.f)           //(3400.f+2950.f)      //(2950.f)    //pitch电机编码器中值
 #define GIMBAL_LOB_MEC_ANGEL	 (628.f)      //吊射机械角度 15.6弹速606
 #define GIMBAL_LOB_LOW_MEC_ANGEL	 (536.f)      //吊射底部机械角度  
 #define GIMBAL_MAX_MEC_ANGEL   		(905.f)				//pitch机械角度电控限位最大值 920

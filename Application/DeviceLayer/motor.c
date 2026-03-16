@@ -393,7 +393,7 @@ pid_ctrl_t gim_pitch_Speed_Ctrl_gyro =
 
 pid_ctrl_t gim_pitch_angle_Ctrl_inn_gyro = 
 {
-	.kp = 200.f,       //110.f,//800,700
+	.kp = 280.f,//200.f,       //110.f,//800,700
 	.ki = 0.f,       //2.5f,//8,3
 	.kd = 0.f,//5
 	.integral_max = 3000.f,
@@ -403,9 +403,9 @@ pid_ctrl_t gim_pitch_angle_Ctrl_inn_gyro =
 pid_ctrl_t gim_pitch_angle_Ctrl_out_gyro = 
 {
 	.kp = 25,//40»á¶¶       //15.f,//13
-	.ki = 0.3f,
+	.ki = 1.f,//0.3f,
 	.kd = 0.f,
-	.integral_max = 0.f,
+	.integral_max = 5.f,
 	.out_max = 5000.f,
 };
 
