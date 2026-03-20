@@ -159,7 +159,7 @@
           <Type>0</Type>
           <LineNumber>105</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134253336</Address>
+          <Address>134253464</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -406,6 +406,11 @@
           <count>46</count>
           <WinNumber>1</WinNumber>
           <ItemText>\\My_C\../Application/ProtocolLayer/vision_protocol.c\vision.VtoE-&gt;flag_union.bit.is_find_target</ItemText>
+        </Ww>
+        <Ww>
+          <count>47</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>compressed,0x10</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>

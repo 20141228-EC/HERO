@@ -116,13 +116,53 @@ void Board_Tx_C2(void)
 	pitch_tar_temp = float_to_uint(Board_Tx_Info.vision_pitch_tar,-180.f,180.f,16);
 	yaw_tar_temp = float_to_uint(Board_Tx_Info.vision_yaw_tar,-180.f,180.f,16);
 	
-	uint8_t compressed;
-	
-	compressed |= (Board_Tx_Info.hit_enable << 0);  //  存放在最低位
-	compressed |= (Board_Tx_Info.is_find_base << 1);  //  存放在1
-	compressed |= (Board_Tx_Info.is_find_outpost << 2);  //  存放在2
-	compressed |= (Board_Tx_Info.is_find_Target << 3);  //  存放在3
-	
+	uint8_t compressed = 0;
+	uint8_t a,b,c,d = 0;
+//	compressed |= (Board_Tx_Info.hit_enable << 0);  //  存放在最低位
+//	compressed |= (Board_Tx_Info.is_find_base << 1);  //  存放在1
+//	compressed |= (Board_Tx_Info.is_find_outpost << 2);  //  存放在2
+//	compressed |= (Board_Tx_Info.is_find_Target << 3);  //  存放在3
+	if(Board_Tx_Info.hit_enable == 1)
+	{
+		a = 1;
+	}
+	else
+	{
+		a = 0;
+	}
+	if(Board_Tx_Info.is_find_base == 1)
+	{
+		b = 1;
+	}
+	else
+	{
+		b = 0;
+	}
+	if(Board_Tx_Info.is_find_outpost == 1)
+	{
+		c = 1;
+	}
+	else
+	{
+		c = 0;
+	}
+	if(Board_Tx_Info.is_find_Target == 1)
+	{
+		d = 1;
+	}
+	else
+	{
+		d = 0;
+	}
+	compressed |= (a << 0);  //  存放在最低位
+	compressed |= (b << 1);  //  存放在1
+	compressed |= (c << 2);  //  存放在2
+	compressed |= (d << 3);  //  存放在3
+//compressed |= ((Board_Tx_Info.hit_enable ? 1 : 0) << 0);       // bit0
+//compressed |= ((Board_Tx_Info.is_find_base ? 1 : 0) << 1);     // bit1
+//compressed |= ((Board_Tx_Info.is_find_outpost ? 1 : 0) << 2);  // bit2
+//compressed |= ((Board_Tx_Info.is_find_Target ? 1 : 0) << 3);   // bit3
+//	
 	board_tx_buf_2[0] = (pitch_tar_temp>>8);
 	board_tx_buf_2[1] = pitch_tar_temp;
 	board_tx_buf_2[2] = (yaw_tar_temp>>8);
