@@ -28,12 +28,12 @@ void StartCtrlTask(void const * argument)
 		
 		Yaw_Motor.single_set_torque(&Yaw_Motor);
 		
-				Chassis.Sd->motor[R_F_Sd_M]->tx_info->torque = 0;//往前
-				Chassis.Sd->motor[R_B_Sd_M]->tx_info->torque = 0;//往前
-				Chassis.Sd->motor[L_F_Sd_M]->tx_info->torque = 0;//负往前
-				Chassis.Sd->motor[L_B_Sd_M]->tx_info->torque = 0;//负往前
-				Chassis.Wheel->motor[R_WHEEL_M]->tx_info->torque = 0;//正往前
-				Chassis.Wheel->motor[L_WHEEL_M]->tx_info->torque = 0;//正往后
+//				Chassis.Sd->motor[R_F_Sd_M]->tx_info->torque = 0;//往前
+//				Chassis.Sd->motor[R_B_Sd_M]->tx_info->torque = 0;//往前
+//				Chassis.Sd->motor[L_F_Sd_M]->tx_info->torque = 0;//负往前
+//				Chassis.Sd->motor[L_B_Sd_M]->tx_info->torque = 0;//负往前
+//				Chassis.Wheel->motor[R_WHEEL_M]->tx_info->torque = 0;//正往前
+//				Chassis.Wheel->motor[L_WHEEL_M]->tx_info->torque = 0;//正往后
 		  if (Balance.Flag->Chassis_Online_Flag != true)
 		  {
 				Chassis.Sd->motor[R_F_Sd_M]->tx_info->torque = 0;//往前
@@ -43,6 +43,7 @@ void StartCtrlTask(void const * argument)
 				Chassis.Wheel->motor[R_WHEEL_M]->tx_info->torque = 0;//正往前
 				Chassis.Wheel->motor[L_WHEEL_M]->tx_info->torque = 0;//正往后
 				Balance.mode = Sleep_Mode;
+				
 		  }
 			
 	  Sd_Group.group_set_torque(&Sd_Group); 

@@ -270,10 +270,14 @@ void Board_Rx_D2(uint8_t *rxbuf)
 	Board_Rx_Info.vision_state = rxbuf[4];
   Board_Rx_Info.launch_timer = (rxbuf[6]<<8 | rxbuf[7]);
 	
-	Board_Rx_Info.hit_enable = (compressed >> 0) & 0x01;
-	Board_Rx_Info.is_find_base = (compressed >> 1) & 0x01;
-	Board_Rx_Info.is_find_outpost = (compressed >> 2) & 0x01;
-	Board_Rx_Info.is_find_Target = (compressed >> 3) & 0x01;
+//	Board_Rx_Info.hit_enable = (compressed >> 0) & 0x01;
+//	Board_Rx_Info.is_find_base = (compressed >> 1) & 0x01;
+//	Board_Rx_Info.is_find_outpost = (compressed >> 2) & 0x01;
+//	Board_Rx_Info.is_find_Target = (compressed >> 3) & 0x01;
+	Board_Rx_Info.hit_enable = (compressed & (1 << 0)) ? true : false;       // 只看bit0
+Board_Rx_Info.is_find_base = (compressed & (1 << 1)) ? true : false;     // 只看bit1
+Board_Rx_Info.is_find_outpost = (compressed & (1 << 2)) ? true : false;  // 只看bit2
+Board_Rx_Info.is_find_Target = (compressed & (1 << 3)) ? true : false;   // 只看bit3
 	Board_HeartBeat.offline_cnt_2 = 0;
 }
 

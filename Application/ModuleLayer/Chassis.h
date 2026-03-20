@@ -301,6 +301,7 @@ typedef struct
 {
 	float Minimum_l0_range;
 	float Max_l0_range;
+	float Idle_tick;
 	float Max_Stand_High_tick;
 	float Max_RETRACT_tick;
 	

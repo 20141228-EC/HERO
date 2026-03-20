@@ -73,6 +73,7 @@ void Balance_Init(Balance_t* balance)
 //}
 static void Balance_Status_Update(Balance_t* balance)
 {
+	Balance.last_mode = Balance.mode;
 	Balance_Init_Judge(balance);//初始化完成判断
 	
 	if(rc_sensor.work_state == DEV_OFFLINE)
@@ -83,12 +84,13 @@ static void Balance_Status_Update(Balance_t* balance)
 
 		//RC_Offline_Flag_Clean
 	}
-	else if((Chassis.Posture->info->pitch <= -0.5f || Chassis.Posture->info->pitch >= 0.5f 
+	else if(check_hero_revive(&My_Judge) == 1 
+		     || ((Chassis.Posture->info->pitch <= -0.5f || Chassis.Posture->info->pitch >= 0.5f 
 		     || (Chassis.Posture->info->roll >= 1.5f && Chassis.Posture->info->roll <= 2.9f)
 		     || (Chassis.Posture->info->roll <= -1.5f && Chassis.Posture->info->roll >= -2.9f)//60
-	       || ((Chassis.Leg_Unit[L_Leg]->Link->info->angle->vir_phi0_ <= -80.f || Chassis.Leg_Unit[R_Leg]->Link->info->angle->vir_phi0_ <= -80.f) && balance->Flag->Knee_Strike_1_Flag == false)
-				 || ((Chassis.Leg_Unit[L_Leg]->Link->info->angle->vir_phi0_ >= 80.f || Chassis.Leg_Unit[R_Leg]->Link->info->angle->vir_phi0_ >= 80.f) && balance->Flag->Knee_Strike_1_Flag == false))
-	       && (balance->mode != Init_Mode && balance->mode != Sleep_Mode && balance->mode != Handle_Mode))
+	       || ((Chassis.Leg_Unit[L_Leg]->Link->info->angle->vir_phi0_ <= -60.f || Chassis.Leg_Unit[R_Leg]->Link->info->angle->vir_phi0_ <= -60.f) && (Chassis.Leg_Unit[L_Leg]->Link->info->length->l0 >= 0.3f || Chassis.Leg_Unit[R_Leg]->Link->info->length->l0 >= 0.3f) && balance->Flag->Knee_Strike_1_Flag == false)
+				 || ((Chassis.Leg_Unit[L_Leg]->Link->info->angle->vir_phi0_ >= 60.f || Chassis.Leg_Unit[R_Leg]->Link->info->angle->vir_phi0_ >= 60.f) && (Chassis.Leg_Unit[L_Leg]->Link->info->length->l0 >= 0.3f || Chassis.Leg_Unit[R_Leg]->Link->info->length->l0 >= 0.3f) && balance->Flag->Knee_Strike_1_Flag == false))
+	       && (balance->mode != Init_Mode && balance->mode != Sleep_Mode && balance->mode != Handle_Mode)))
 	{
 		balance->mode = Sleep_Mode;
 		balance->Flag->Rescue_Flag = true;
@@ -104,6 +106,10 @@ static void Balance_Status_Update(Balance_t* balance)
 		balance->reset_struct.reset_cnt=0;
 		balance->mode = Imu_Mode;
 		balance->Flag->Rescue_Flag = false;
+	    if(fabsf(gimbal.base_info.yaw_motor_angle) >= 0.7f)
+	    {
+		    balance->Flag->Turn_Flag = true;//起立头回正
+	    }
 	}
 	else
 	{
@@ -415,6 +421,7 @@ static void RC_Move_Mode_Update(Balance_t* balance)
 			if(rc_info->s1 == 1 && rc_info->s2 == 3 && last_wheel_up != wheel_up)
 			{
 				balance->mode = Cycle_Mode;
+				balance->Flag->Cycle_Flag = true;
 			}
 			if(rc_info->s1 == 1 && rc_info->s2 == 3 && last_wheel_dn != wheel_dn)
 			{
@@ -425,14 +432,14 @@ static void RC_Move_Mode_Update(Balance_t* balance)
 				balance->Flag->Shoot_Flag =! balance->Flag->Shoot_Flag;
 			}	
 			
-			if(balance->Flag->Shoot_Flag == 1 && rc_info->s1 == 3 && rc_info->s2_last == 3 && rc_info->s2 == 2)//开关自瞄
+			if(/*balance->Flag->Shoot_Flag == 1 && */rc_info->s1 == 3 && rc_info->s2_last == 3 && rc_info->s2 == 2)//开关自瞄
 			{
 				balance->Vision.Auto_Catch_Flag = !balance->Vision.Auto_Catch_Flag;			
 			}
-			if(balance->Flag->Shoot_Flag == 0)
-			{
-				balance->Vision.Auto_Catch_Flag = 0;
-			}
+//			if(balance->Flag->Shoot_Flag == 0)
+//			{
+//				balance->Vision.Auto_Catch_Flag = 0;
+//			}
 			if(balance->Flag->Shoot_Flag == 1 && balance->Vision.Auto_Catch_Flag == 0)//无自瞄手打
 			{
 				if(rc_info->s1 == 1 && rc_info->s2 == 1 && cnt>=600)
@@ -561,7 +568,7 @@ static void RC_Move_Mode_Update(Balance_t* balance)
 			}	
 			else if(balance->Flag->Shoot_Flag == 1 && balance->Vision.Auto_Catch_Flag == 1 && rc_info->s1 == 2)//给视觉打
 			{
-				if(Board_Rx_Info.hit_enable == 1 && cnt >= 100)
+				if(Board_Rx_Info.hit_enable == 1 && cnt >= 300)
 				{
 					balance->Shoot.Single_Shoot_Flag = 1;
 					cnt = 0;
@@ -570,9 +577,9 @@ static void RC_Move_Mode_Update(Balance_t* balance)
 				{
 					balance->Shoot.Single_Shoot_Flag = 0;
 					cnt++;
-					if(cnt >= 100)
+					if(cnt >= 300)
 					{
-						cnt = 100;
+						cnt = 300;
 					}
 				}
 			}
@@ -583,6 +590,7 @@ static void RC_Move_Mode_Update(Balance_t* balance)
 			if(rc_info->s1 == 1 && rc_info->s2 == 3 && last_wheel_up != wheel_up)
 			{
 				balance->mode = Imu_Mode;
+				balance->Flag->Cycle_Flag = false;
 			}
 			if(rc_info->s1 == 1 && rc_info->s2 == 3 && last_wheel_dn != wheel_dn)
 			{
@@ -746,9 +754,13 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 //		{
 //			balance->Flag->Jumping_Flag = true;
 //		}
-		if(balance->command[KNEE_STRIKE_1].cmd_value==true &&  balance->Flag->Knee_Strike_1_Flag != true)//x
+		if(balance->command[KNEE_STRIKE_1].cmd_value==true &&  balance->Flag->Knee_Strike_1_Flag != true && my_abs(gimbal.base_info.yaw_motor_angle) <= 0.7f)//x
 		{
 			balance->Flag->Knee_Strike_1_Flag = true;
+		}
+		else if(balance->command[KNEE_STRIKE_1].cmd_value==true &&  balance->Flag->Knee_Strike_1_Flag != true && my_abs(gimbal.base_info.yaw_motor_angle) >= 0.7f)
+		{
+			balance->Flag->Return_Flag = true;
 		}
 		else if(balance->command[KNEE_STRIKE_1].cmd_value == true && balance->Flag->Knee_Strike_1_Flag == true)
 		{
@@ -770,7 +782,7 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 	}
 	
 		
-	if(rc_info->C.status == release_to_press)//小陀螺
+	if(rc_info->Shift.status == release_to_press)//小陀螺
 	{
 			if(balance->mode != Cycle_Mode)
 			{
@@ -783,44 +795,57 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 				balance->Flag->Cycle_Flag = false;
 			}
 	}
-  if(rc_info->C.status == release_to_press && rc_info->Shift.status == release_to_press)//变速
-	{
-			if(balance->mode != Vary_Cycle_Mode)
-			{
-				balance->mode = Vary_Cycle_Mode;
-				balance->Flag->Cycle_Flag = true;
-			}
-			else
-			{
-				balance->mode = Imu_Mode;
-				balance->Flag->Cycle_Flag = false;
-			}
-	}	
+//  if(rc_info->C.status == release_to_press && rc_info->Shift.status == release_to_press)//变速
+//	{
+//			if(balance->mode != Vary_Cycle_Mode)
+//			{
+//				balance->mode = Vary_Cycle_Mode;
+//				balance->Flag->Cycle_Flag = true;
+//			}
+//			else
+//			{
+//				balance->mode = Imu_Mode;
+//				balance->Flag->Cycle_Flag = false;
+//			}
+//	}	
 	
-  if(rc_info->Z.status == release_to_press)//机械
+//  if(rc_info->Z.status == release_to_press)//机械
+//	{
+//		if(balance->mode != Lob_Mode)
+//		{
+//			balance->mode = Lob_Mode;
+//		}
+//		else
+//		{
+//			balance->mode = Imu_Mode;
+//		}
+//	}
+  check_z_key_5times();
+
+//		balance->mode = Handle_Mode;
+//		Chassis.chassis_PID->phi0_cal[L_Leg]->out_max = 20.f;
+//		Chassis.chassis_PID->phi0_cal[R_Leg]->out_max = 20.f;
+
+  if(rc_info->Ctrl.status == release_to_press && Balance.mode == Handle_Mode)
 	{
-		if(balance->mode != Lob_Mode)
-		{
-			balance->mode = Lob_Mode;
-		}
-		else
-		{
-			balance->mode = Imu_Mode;
-		}
+		Balance.mode = Sleep_Mode;
+		balance->Flag->Rescue_Flag = true;
+		balance->reset_struct.reset_cnt=0;
+		balance->reset_struct.reset_state=Balance_reset_NO;
 	}
-		
-	if(rc_info->Ctrl.status == long_press && rc_info->Shift.status == long_press && balance->mode != Handle_Mode)
+	else if(rc_info->Ctrl.status == release_to_press && balance->Flag->Knee_Strike_1_Flag == true)
 	{
-		balance->mode = Handle_Mode;
-		Chassis.chassis_PID->phi0_cal[L_Leg]->out_max = 40.f;
-		Chassis.chassis_PID->phi0_cal[R_Leg]->out_max = 40.f;
+		Chassis.knee_strike_info->step1 = Knee_RETRACT;
+		Chassis.knee_strike_info->RETRACT_tick = Chassis.knee_strike_info->Max_RETRACT_tick;
 	}
-	if(rc_info->Ctrl.status == long_press && rc_info->Shift.status == long_press && balance->mode == Handle_Mode)
+	else if(rc_info->Ctrl.status == release_to_press)
 	{
-		balance->mode = Sleep_Mode;
-		Chassis.chassis_PID->phi0_cal[L_Leg]->out_max = 15.f;
-		Chassis.chassis_PID->phi0_cal[R_Leg]->out_max = 15.f;
+		Balance.Flag->Cycle_Flag = false;
+		Balance.Flag->Rescue_Flag = false;
+		Balance.Flag->Return_Flag = true;
+		balance->Flag->Middle_Flag = false;	
 	}
+	
 
 	if((balance->mode == Imu_Mode || balance->mode == Mec_Mode || balance->mode == Lob_Mode////////////////////////////开发射
 	  || balance->mode == Cycle_Mode || balance->mode == Vary_Cycle_Mode) && balance->Flag->Shoot_Flag == 0
@@ -829,32 +854,28 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 		balance->Flag->Shoot_Flag = 1;
 	}
 	
-//  if((balance->mode == Imu_Mode || balance->mode == Mec_Mode || balance->mode == Lob_Mode////////////////////////////开发射
-//	 || balance->mode == Cycle_Mode || balance->mode == Vary_Cycle_Mode) && rc_info->B.status == release_to_press)
-//  {  	
-//		balance->Flag->Shoot_Flag =! balance->Flag->Shoot_Flag;
-//  }
-  if((balance->mode == Imu_Mode || balance->mode == Mec_Mode || balance->mode == Lob_Mode) //底盘归正
-		&& rc_info->B.status == release_to_press)
+  if((balance->mode == Imu_Mode || balance->mode == Mec_Mode || balance->mode == Lob_Mode////////////////////////////开发射
+	 || balance->mode == Cycle_Mode || balance->mode == Vary_Cycle_Mode) && rc_info->B.status == release_to_press
+	 && balance->Flag->Shoot_Flag == true)
   {  	
-		balance->Flag->Return_Flag = 1;
+		balance->Flag->Shoot_Flag = false;
   }
-	
-	if(balance->Flag->Shoot_Flag == 0)
-	{
-		balance->Vision.Auto_Catch_Flag = 0;
-	}
-  if(rc_info->Z.status == release_to_press && rc_info->Shift.status == long_press)//吊射
-	{
-		if(balance->mode != Mec_Mode)
-		{
-		  balance->mode = Mec_Mode;
-		}
-		else
-		{
-			balance->mode = Imu_Mode;
-		}
-	}
+ 
+//	if(balance->Flag->Shoot_Flag == 0)
+//	{
+//		balance->Vision.Auto_Catch_Flag = 0;
+//	}
+//  if(rc_info->Z.status == release_to_press && rc_info->Shift.status == long_press)//吊射
+//	{
+//		if(balance->mode != Mec_Mode)
+//		{
+//		  balance->mode = Mec_Mode;
+//		}
+//		else
+//		{
+//			balance->mode = Imu_Mode;
+//		}
+//	}
 	
 		if(rc_info->mouse_btn_r.status == long_press)//开关自瞄
 		{
@@ -919,7 +940,7 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 		balance->Flag->Middle_Flag =! balance->Flag->Middle_Flag;	
 	}
 			
-  if(rc_info->Z.status == long_press && rc_info->X.status == long_press && rc_info->C.status == long_press)//软复位
+  if(rc_info->Z.status == press_to_release && rc_info->X.status == press_to_release && rc_info->C.status == press_to_release)//软复位
 	{
 		balance->mode = Sleep_Mode;
 		Chassis.reset_struct->reset_state = Chassis_reset_NO;
@@ -932,4 +953,67 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 		__set_FAULTMASK(1); // 屏蔽中断
 		HAL_NVIC_SystemReset();
 	}
+}
+
+static uint8_t key_count = 0;          // 连续按Z键的计数
+static uint32_t last_z_press_time = 0; // 上一次按Z键的时间（ms）
+/**
+ * @brief 检测Z键是否按下
+ * @return true：Z键按下，false：未按下
+ */
+bool is_z_key_pressed(void)
+{
+	if(rc_sensor.info->Z.status == release_to_press)
+	{
+		return true;
+	}
+	else
+	{
+    return false;
+	}
+}
+
+/**
+ * @brief Z键连续按5次检测逻辑（需周期性调用，如10ms/次）
+ */
+void check_z_key_5times(void)
+{
+    uint32_t current_time = HAL_GetTick();
+    static bool last_z_state = false;  // 上一次Z键状态（用于检测上升沿）
+
+    // 1. 检测Z键上升沿（只在按下瞬间处理，避免长按重复计数）
+    bool current_z_state = is_z_key_pressed();
+    if (current_z_state && !last_z_state)
+    {
+        // 2. 判断与上一次按Z键的间隔是否≤1000ms
+        if ((current_time - last_z_press_time) <= 1000 || key_count == 0)
+        {
+            key_count++;  // 间隔符合，计数+1
+            last_z_press_time = current_time;  // 更新上次按键时间
+
+            // 3. 计数达到5次，触发flag1
+            if (key_count >= 5)
+            {
+                Balance.mode = Handle_Mode;          // 触发标志位
+                key_count = 0;         // 重置计数，避免重复触发
+                last_z_press_time = 0; // 重置时间
+            }
+        }
+        else
+        {
+            // 间隔超过1s，重置计数
+            key_count = 1;            // 本次按下算第1次
+            last_z_press_time = current_time;
+        }
+    }
+    // 4. 超过1s未按Z键，自动重置计数（避免计数残留）
+    else if (!current_z_state && (current_time - last_z_press_time) > 1000)
+    {
+        key_count = 0;
+        last_z_press_time = 0;
+    }
+		
+    // 更新上一次按键状态（用于下一次上升沿检测）
+    last_z_state = current_z_state;
+
 }

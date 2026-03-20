@@ -272,7 +272,7 @@ void Gimbal_Gyro_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 //		gimbal->base_info.yaw_mec_angle_target = 0 ;
 //	}
 	gimbal->base_info.yaw_mec_angle_target = gimbal->base_info.yaw_motor_angle;
-	gimbal->base_info.pitch_mec_angle_target = Board_Rx_Info.pitch_mec;;
+	gimbal->base_info.pitch_mec_angle_target = Board_Rx_Info.pitch_mec;
 
 	
 	if(Balance.Flag->Turn_Flag == 1)//»»Í·

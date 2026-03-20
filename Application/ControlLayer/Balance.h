@@ -162,6 +162,6 @@ typedef struct Balance_struct_t
 }Balance_t;
 
 extern Balance_t Balance;
-
+void check_z_key_5times(void);
 
 #endif

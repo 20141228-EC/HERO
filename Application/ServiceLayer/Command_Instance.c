@@ -108,7 +108,7 @@ void Command_Update(void)
 		{
 //			command[JUMP].update(&command[JUMP],rc_info->V.status == release_to_press );
 			
-			command[KNEE_STRIKE_1].update(&command[KNEE_STRIKE_1],rc_info->X.status == release_to_press);
+			command[KNEE_STRIKE_1].update(&command[KNEE_STRIKE_1],rc_info->C.status == release_to_press);
 			
 //			command[KNEE_STRIKE_2].update(&command[KNEE_STRIKE_2],rc_info->X.status == release_to_press && rc_info->Shift.status == release_to_press);
 
