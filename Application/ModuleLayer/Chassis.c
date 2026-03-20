@@ -3561,8 +3561,9 @@ static void Chassis_Power_Limit(void)
 		Link = Chassis.Leg_Unit[R_Leg]->Link;
 //		Link = &Link[R_Leg];
 	}
+	//
 	
-	Power_Limit.Nf = (Power_Limit.Tw_Enable / WHEEL_RADIUS) - ((2*Power_Limit.Tp_Big / Chassis.target->leg_length_l) * fabsf(arm_cos_f32(Link->info->angle->vir_phi0))) \
+	Power_Limit.Nf = (My_Judge.info->chassis_power_limit/24.f* _3508_SELFMADE_TORQUE_CONSTANT/ WHEEL_RADIUS) - ((2*Power_Limit.Tp_Big / Chassis.target->leg_length_l) * fabsf(arm_cos_f32(Link->info->angle->vir_phi0))) \
 		                                    - (float)(mb*g*(Chassis.target->leg_length_l) * fabsf(arm_sin_f32(Link->info->angle->vir_phi0))) \
 																				- (float)(mb*g*fabsf(arm_cos_f32(Link->info->angle->vir_phi0)) * fabsf(arm_sin_f32(Link->info->angle->vir_phi0)));
 	

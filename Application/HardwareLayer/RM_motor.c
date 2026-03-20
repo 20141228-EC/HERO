@@ -379,7 +379,7 @@ static void Torque_to_Raw_Current(Motor_RM_t *motor)
 			motor->tx_info->torque_current_raw = (int16_t)((motor->tx_info->torque_current));
 			break;
 			case _3508_Reduction:
-			motor->tx_info->torque_current = motor->tx_info->torque / _3508_TORQUE_CONSTANT;
+			motor->tx_info->torque_current = motor->tx_info->torque / _3508_SELFMADE_TORQUE_CONSTANT;
 			motor->tx_info->torque_current = constrain(motor->tx_info->torque_current, -_3508_MAX_CURRENT*0.9f, _3508_MAX_CURRENT*0.9f);//最大电流限幅
 			/*3508减速箱转矩电流转化为电流数值*/
 			motor->tx_info->torque_current_raw = (int16_t)((motor->tx_info->torque_current / _3508_MAX_CURRENT) * 16384.f);
@@ -537,5 +537,5 @@ static float RPM_to_Rads(Motor_RM_t *motor)
 static void Raw_Current_to_Torque(Motor_RM_t* motor)
 {
 		motor->rx_info->torque_current = (motor->rx_info->torque_current_raw / 16384.f)*20.f;
-		motor->rx_info->torque = motor->rx_info->torque_current * _3508_TORQUE_CONSTANT;
+		motor->rx_info->torque = motor->rx_info->torque_current * _3508_SELFMADE_TORQUE_CONSTANT;
 }
