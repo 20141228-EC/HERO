@@ -5,7 +5,7 @@
 #include "chassis.h"
 
 #include "Command_Instance.h"
-#define BALANCE_INIT_CNT_MAX 16000  //自己加上的
+#define BALANCE_INIT_CNT_MAX 12000  //自己加上的
 
 typedef enum
 {
@@ -163,5 +163,6 @@ typedef struct Balance_struct_t
 
 extern Balance_t Balance;
 void check_z_key_5times(void);
+void my_time(void);
 
 #endif

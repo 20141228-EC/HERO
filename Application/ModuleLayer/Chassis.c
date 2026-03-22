@@ -2052,7 +2052,7 @@ static void Chassis_Wheel_Turn_Cal(Chassis_t* My_Chassis)
 {
 	static float yaw_tar;
 	static float flag1,flag2 = 0;
-	
+	static float limit = 0;
 	if(My_Chassis->mode == C_Turn || My_Chassis->mode == C_Init || Balance.Flag->Return_Flag == 1)
 	{
 		flag1 = 0;
@@ -2192,9 +2192,17 @@ static void Chassis_Wheel_Turn_Cal(Chassis_t* My_Chassis)
 	pid_err_cal(My_Chassis->chassis_PID->yaw_speed_cal[L_Leg]);
 	single_pid_ctrl(My_Chassis->chassis_PID->yaw_speed_cal[R_Leg]);
 	single_pid_ctrl(My_Chassis->chassis_PID->yaw_speed_cal[L_Leg]);
-	
+
 	My_Chassis->Leg_Unit[R_Leg]->force->Tw_turn= R_TURN_ORDER_CORRECT* My_Chassis->chassis_PID->yaw_speed_cal[R_Leg]->out;
 	My_Chassis->Leg_Unit[L_Leg]->force->Tw_turn= L_TURN_ORDER_CORRECT* My_Chassis->chassis_PID->yaw_speed_cal[L_Leg]->out;
+
+	if(My_Judge.info->chassis_power_buffer <= 30.f)
+	{
+		limit = My_Judge.info->chassis_power_buffer/60.f;
+		
+		My_Chassis->Leg_Unit[R_Leg]->force->Tw_turn *= limit;
+		My_Chassis->Leg_Unit[L_Leg]->force->Tw_turn *= limit;
+	}
 	
 }   
 /**
@@ -3291,11 +3299,11 @@ static void Cycle_Target_Process(Chassis_t* My_Chassis)
 		
 	  if(fabsf(My_Chassis->target->velocity_y) >= 0.1f)
 		{
-	   	Cycle_Speed = 4.f;
+	   	Cycle_Speed = 6.f;
 	  }
-	  if(Cycle_Speed >= 6.f)
+	  if(Cycle_Speed >= 10.f)
 	  {
-	 	  Cycle_Speed = 6.f;
+	 	  Cycle_Speed = 10.f;
 	  }	
 	}		
   else if(My_Chassis->mode == C_Vary_Cycle)
@@ -3326,7 +3334,7 @@ static void Cycle_Target_Process(Chassis_t* My_Chassis)
 	}
 	else
 	{
-		Cycle_Speed = 5.f;
+		Cycle_Speed = 7.f;
 	}
 
 	if(fabsf(My_Chassis->target->yaw) > PI)//∑¿÷π∑Ë≥µ

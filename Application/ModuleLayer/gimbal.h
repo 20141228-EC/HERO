@@ -15,7 +15,7 @@
 #include "rp_device_config.h"
 #include "rp_math.h"
 #include "communicate.h"
-#define YAW_MOTOR_ANGLE_MIDDLE 		(-1.48515582f)       //(1.57075f-0.f)  		  //YAW电机中值
+#define YAW_MOTOR_ANGLE_MIDDLE 		(-1.54958391f)       //(1.57075f-0.f)  		  //YAW电机中值
 #define PITCH_MOTOR_ENCODER_MIDDLE  (3400.f+2950.f)      //(2950.f)    //pitch电机编码器中值
 #define GIMBAL_LOB_MEC_ANGEL	 (628.f)      //吊射机械角度 15.6弹速606
 #define GIMBAL_LOB_LOW_MEC_ANGEL	 (536.f)      //吊射底部机械角度  

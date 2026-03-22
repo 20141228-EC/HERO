@@ -7,6 +7,9 @@ static void KEY_Move_Mode_Update(Balance_t* balance);
 void Rescue_Check(void);
 Chassis_Command_t Chassis_Command;
 uint8_t last_step[4];
+static uint32_t now_time = 0;
+static uint32_t disable_start = 0;
+static uint8_t flag_now,flag_last = 0;
 Balance_Remote_Ctrl Balance_Rc = 
 {
 	.sensor = &rc_sensor,
@@ -75,7 +78,8 @@ static void Balance_Status_Update(Balance_t* balance)
 {
 	Balance.last_mode = Balance.mode;
 	Balance_Init_Judge(balance);//初始化完成判断
-	
+	my_time();
+
 	if(rc_sensor.work_state == DEV_OFFLINE)
 	{
 		balance->mode=Sleep_Mode;
@@ -84,23 +88,28 @@ static void Balance_Status_Update(Balance_t* balance)
 
 		//RC_Offline_Flag_Clean
 	}
-	else if(check_hero_revive(&My_Judge) == 1 
-		     || ((Chassis.Posture->info->pitch <= -0.5f || Chassis.Posture->info->pitch >= 0.5f 
-		     || (Chassis.Posture->info->roll >= 1.5f && Chassis.Posture->info->roll <= 2.9f)
-		     || (Chassis.Posture->info->roll <= -1.5f && Chassis.Posture->info->roll >= -2.9f)//60
-	       || ((Chassis.Leg_Unit[L_Leg]->Link->info->angle->vir_phi0_ <= -60.f || Chassis.Leg_Unit[R_Leg]->Link->info->angle->vir_phi0_ <= -60.f) && (Chassis.Leg_Unit[L_Leg]->Link->info->length->l0 >= 0.3f || Chassis.Leg_Unit[R_Leg]->Link->info->length->l0 >= 0.3f) && balance->Flag->Knee_Strike_1_Flag == false)
-				 || ((Chassis.Leg_Unit[L_Leg]->Link->info->angle->vir_phi0_ >= 60.f || Chassis.Leg_Unit[R_Leg]->Link->info->angle->vir_phi0_ >= 60.f) && (Chassis.Leg_Unit[L_Leg]->Link->info->length->l0 >= 0.3f || Chassis.Leg_Unit[R_Leg]->Link->info->length->l0 >= 0.3f) && balance->Flag->Knee_Strike_1_Flag == false))
-	       && (balance->mode != Init_Mode && balance->mode != Sleep_Mode && balance->mode != Handle_Mode)))
+	else if(balance->mode==Sleep_Mode)//开控但是sleep就初始化
+	{
+		balance->mode = Init_Mode;
+	}
+	else if(((now_time - disable_start >= 2000)
+		     && check_hero_revive(&My_Judge) == 1) 
+		          || ((Chassis.Posture->info->pitch <= -0.5f || Chassis.Posture->info->pitch >= 0.5f 
+		         || (Chassis.Posture->info->roll >= 1.5f && Chassis.Posture->info->roll <= 2.9f)
+		         || (Chassis.Posture->info->roll <= -1.5f && Chassis.Posture->info->roll >= -2.9f)//60
+	           || ((Chassis.Leg_Unit[L_Leg]->Link->info->angle->vir_phi0_ <= -60.f || Chassis.Leg_Unit[R_Leg]->Link->info->angle->vir_phi0_ <= -60.f)&& balance->Flag->Knee_Strike_1_Flag == false)
+				     || ((Chassis.Leg_Unit[L_Leg]->Link->info->angle->vir_phi0_ >= 60.f || Chassis.Leg_Unit[R_Leg]->Link->info->angle->vir_phi0_ >= 60.f) && balance->Flag->Knee_Strike_1_Flag == false))
+	       && (balance->mode != Init_Mode/* && balance->mode != Sleep_Mode*/ && balance->mode != Handle_Mode)))
 	{
 		balance->mode = Sleep_Mode;
 		balance->Flag->Rescue_Flag = true;
 		balance->reset_struct.reset_cnt=0;
 		balance->reset_struct.reset_state=Balance_reset_NO;
 	}
-	else if(balance->mode==Sleep_Mode)//开控但是sleep就初始化
-	{
-		balance->mode = Init_Mode;
-	}
+//	else if(balance->mode==Sleep_Mode)//开控但是sleep就初始化
+//	{
+//		balance->mode = Init_Mode;
+//	}
 	else if(balance->mode==Init_Mode && balance->reset_struct.reset_state == Balance_reset_OK)
 	{
 		balance->reset_struct.reset_cnt=0;
@@ -775,7 +784,7 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 //		{
 //			balance->Flag->Fly_Flag = true;
 //		}
-		if(balance->command[TURN].cmd_value==true)//r
+		if(balance->command[TURN].cmd_value==true && my_abs(Chassis.chassis_PID->yaw_cal[R_Leg]->err) <= 0.2f)//r
 		{
 			balance->Flag->Turn_Flag = true;
 		}
@@ -1016,4 +1025,15 @@ void check_z_key_5times(void)
     // 更新上一次按键状态（用于下一次上升沿检测）
     last_z_state = current_z_state;
 
+}
+
+void my_time(void)
+{
+	now_time = HAL_GetTick();
+	flag_now = Balance.Flag->Knee_Strike_1_Flag;
+	if(flag_now == false && flag_last == true)
+	{
+		disable_start = now_time;
+	}
+	flag_last = flag_now; 
 }

@@ -43,6 +43,9 @@ void StartCtrlTask(void const * argument)
 				Chassis.Wheel->motor[R_WHEEL_M]->tx_info->torque = 0;//正往前
 				Chassis.Wheel->motor[L_WHEEL_M]->tx_info->torque = 0;//正往后
 				Balance.mode = Sleep_Mode;
+		    Balance.Flag->Rescue_Flag = true;
+		    Balance.reset_struct.reset_cnt=0;
+		    Balance.reset_struct.reset_state=Balance_reset_NO;
 				
 		  }
 			
@@ -59,7 +62,7 @@ void StartCtrlTask(void const * argument)
     Dail_Motor.single_set_torque(&Dail_Motor);
 		
 		CAN3_SEND();
-		Cap_Tx_Data_Update(&Cap_Tx_Info);
+//		Cap_Tx_Data_Update(&Cap_Tx_Info);
 		
 		rc_sensor_s_last_update(&rc_sensor);
 	}	
