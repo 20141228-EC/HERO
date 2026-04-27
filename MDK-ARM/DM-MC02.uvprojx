@@ -761,6 +761,16 @@
               <FileType>5</FileType>
               <FilePath>..\Application\AlgorithmLayer\crc.h</FilePath>
             </File>
+            <File>
+              <FileName>LaserRanging_kalman.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\AlgorithmLayer\LaserRanging_kalman.c</FilePath>
+            </File>
+            <File>
+              <FileName>LaserRanging_kalman.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Application\AlgorithmLayer\LaserRanging_kalman.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -880,6 +890,26 @@
               <FileName>ui_protocol.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Application\ProtocolLayer\ui_protocol.h</FilePath>
+            </File>
+            <File>
+              <FileName>LaserRanging_Protocol.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\ProtocolLayer\LaserRanging_Protocol.c</FilePath>
+            </File>
+            <File>
+              <FileName>LaserRanging_Protocol.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Application\ProtocolLayer\LaserRanging_Protocol.h</FilePath>
+            </File>
+            <File>
+              <FileName>RP_Log.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\ProtocolLayer\RP_Log.c</FilePath>
+            </File>
+            <File>
+              <FileName>RP_Log.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Application\ProtocolLayer\RP_Log.h</FilePath>
             </File>
           </Files>
         </Group>

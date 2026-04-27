@@ -15,6 +15,7 @@
  
 /* Includes ------------------------------------------------------------------*/
 #include "driver.h"
+#include "usart.h"
 #include "WL_debug_uart.h"
 /* Private macro -------------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -35,3 +36,12 @@ void DRIVER_Init(void)
 	CAN2_Filter_Init();
 	CAN3_Filter_Init();
 }
+
+int RP_Log_Transmit(const uint8_t *data, uint16_t length)
+{
+    if (HAL_UART_Transmit_DMA(&huart7, data, length) == HAL_OK) {
+        return 0;
+    }
+    return -1;
+}
+

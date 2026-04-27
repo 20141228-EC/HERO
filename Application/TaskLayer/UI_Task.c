@@ -5,7 +5,7 @@
   ******************************************************************************
   */
 #include "Ui_Task.h"
-
+#include "RP_Log.h"
 //float sin_value;
 uint32_t t;
 void StartUITask(void const * argument)
@@ -19,7 +19,9 @@ void StartUITask(void const * argument)
 //		Chassis.Leg_Unit[L_Leg]->force->F_support);
 		//SCB_CleanDCache_by_Addr((uint32_t*)t_buf, sizeof(t_buf));
 	//	HAL_UART_Transmit_DMA(&huart7, (uint8_t *)t_buf, sizeof(t_buf));
-
+		
+		
+//    g_rp_log.work(&g_rp_log);
 		osDelay(1);
 	}
 }

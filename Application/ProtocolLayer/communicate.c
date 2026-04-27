@@ -131,7 +131,7 @@ void Board_Tx_D2(void)
 	v_y_temp = float_to_uint(Board_Tx_Info.v_y,-10.f,10.f,16);
 	
 	uint16_t pitch_mec_temp;
-	pitch_mec_temp = float_to_uint(Board_Tx_Info.pitch_mec_tar,-2000.f,2000.f,16);
+	pitch_mec_temp = float_to_uint(Board_Tx_Info.pitch_mec_tar,-PI,PI,16);
 		
 	uint8_t compressed = 0;  // 用来存储压缩后的结果
 	// 将每个 bool 变量映射到 uint8_t 的不同位上
@@ -177,6 +177,25 @@ void Board_Tx_D4(void)
 	board_tx_buf_4[0] = (bullet>>8);
 	board_tx_buf_4[1] = bullet;
 	
+	uint16_t pitch_offset;
+//	
+	pitch_offset = float_to_uint(Board_Tx_Info.pitch_offset,-10.f,10.f,16);
+//	mea = float_to_uint(Board_Tx_Info.mea,-10.f,10.f,16);
+
+	board_tx_buf_4[2] = (pitch_offset>>8);
+	board_tx_buf_4[3] = pitch_offset;
+//	board_tx_buf_4[4] = (mea>>8);
+//	board_tx_buf_4[5] = mea;
+	
+//	uint16_t pitch_offset;
+//	
+//	board_tx_buf_4[6] = (pitch_offset>>8);
+//	board_tx_buf_4[7] = pitch_offset;
+
+//	
+//	pitch_offset = float_to_uint(Board_Tx_Info.pitch_offset,-30.f,30.f,16);
+	
+	
 	CAN_SendData(&hfdcan3,0xD4,board_tx_buf_4);
 }
 
@@ -187,6 +206,7 @@ void Board_Tx_Update(Board_Tx_Info_t *Board_Tx_Info)
 	Board_Tx_Info->is_ready_shoot = shoot_out.base_info.is_enable_shoot;
 	Board_Tx_Info->pitch_imu_tar = gimbal.base_info.pitch_imu_angle_target;
 	Board_Tx_Info->pitch_mec_tar = gimbal.base_info.pitch_mec_angle_target;
+	Board_Tx_Info->pitch_offset = gimbal.offset_info->lob_pitch_gyro_offset;
 	if(gimbal.yaw_pid_mode != MEC_PID)
 	{
 		Board_Tx_Info->yaw_mec_imu = gimbal.base_info.yaw_imu_angle;//180
@@ -221,22 +241,33 @@ void Board_Tx_Update(Board_Tx_Info_t *Board_Tx_Info)
 		Board_Tx_Info->my_color = My_Judge.info->car_color;
 //	  Board_Tx_Info->is_handle_shoot = 
   
-	if(Balance.Vision.Auto_Catch_Flag == 1)
+	if(Balance.Vision.Auto_Catch_Flag == true)
 	{
 	  Board_Tx_Info->vision_mode = 1;
+	}
+	else if(Balance.Chassis_Com->COMMON_OUTPOST_SHOOT == true)
+	{
+	  Board_Tx_Info->vision_mode = 2;
+	}
+	else if(Balance.Chassis_Com->COMMON_BASE_SHOOT == true)
+	{
+	  Board_Tx_Info->vision_mode = 3;
 	}
 	else
 	{
 	  Board_Tx_Info->vision_mode = 0;
 	}
 	
-	if(Balance.Vision.Auto_Catch_Flag == 1 || Balance.Vision.Auto_Base_Flag == 1 ||Balance.Vision.Auto_Catch_Engi_Flag == 1)
+	if(Balance.Vision.Auto_Catch_Flag == 1 || Balance.Vision.Auto_Base_Flag == 1 ||Balance.Vision.Auto_Outpost_Flag == 1)
 	{
 	  Board_Tx_Info->video_open = 1;
 	}
 	else{
 		Board_Tx_Info->video_open = 0;
 	}
+	
+	Board_Tx_Info->mea = Chassis.chassis_PID->yaw_speed_cal[L_Leg]->measure;
+	Board_Tx_Info->tar = Chassis.chassis_PID->yaw_speed_cal[L_Leg]->target;
 
 }
 
@@ -253,7 +284,7 @@ void Board_Rx_D1(uint8_t *rxbuf)
 	Board_Rx_Info.pitch_imu = uint_to_float(pitch_imu_int,-360.f,360.f,16);
 	Board_Rx_Info.yaw_imu = uint_to_float(yaw_imu_int,-360.f,360.f,16);
 	Board_Rx_Info.yaw_v = uint_to_float(yaw_v_int,-5000.f,+5000.f,16);//考虑到角速度可能会非常大，故把映射范围调大
-	Board_Rx_Info.pitch_mec= uint_to_float(pitch_mec_int,-2000.f,2000.f,16);
+	Board_Rx_Info.pitch_mec= uint_to_float(pitch_mec_int,-PI,PI,16);
 	Board_HeartBeat.offline_cnt_1 = 0;
 }
 
@@ -268,7 +299,8 @@ void Board_Rx_D2(uint8_t *rxbuf)
 	Board_Rx_Info.vision_pitch_tar = uint_to_float(vision_pitch_int,-180.f,180.f,16);
 	Board_Rx_Info.vision_yaw_tar = uint_to_float(vision_yaw_int,-180.f,180.f,16);
 	Board_Rx_Info.vision_state = rxbuf[4];
-  Board_Rx_Info.launch_timer = (rxbuf[6]<<8 | rxbuf[7]);
+	Board_Rx_Info.detect_num = rxbuf[6];
+//  Board_Rx_Info.launch_timer = (rxbuf[6]<<8 | rxbuf[7]);
 	
 //	Board_Rx_Info.hit_enable = (compressed >> 0) & 0x01;
 //	Board_Rx_Info.is_find_base = (compressed >> 1) & 0x01;
@@ -278,13 +310,24 @@ void Board_Rx_D2(uint8_t *rxbuf)
 Board_Rx_Info.is_find_base = (compressed & (1 << 1)) ? true : false;     // 只看bit1
 Board_Rx_Info.is_find_outpost = (compressed & (1 << 2)) ? true : false;  // 只看bit2
 Board_Rx_Info.is_find_Target = (compressed & (1 << 3)) ? true : false;   // 只看bit3
+	Board_Rx_Info.is_fric_speed = (compressed & (1 << 4)) ? true : false; 
+	Board_Rx_Info.is_fric_work = (compressed & (1 << 5)) ? true : false; 
+	
+	
 	Board_HeartBeat.offline_cnt_2 = 0;
 }
 
-//void Board_Rx_D3(uint8_t *rxbuf)
-//{
-//	Board_Rx_Info.launch_timer = (rxbuf[0]<<8 | rxbuf[1]);
-//}
+void Board_Rx_D3(uint8_t *rxbuf)
+{
+	uint16_t kp,kd;
+	
+	kp = (rxbuf[0]<<8 | rxbuf[1]);
+	kd = (rxbuf[2]<<8 | rxbuf[3]);
+	Board_Rx_Info.kp = uint_to_float(kp,-360.f,360.f,16);
+	Board_Rx_Info.kd = uint_to_float(kd,-2000.f,2000.f,16);
+//	Board_HeartBeat.offline_cnt_3 = 0;
+	Board_Rx_Info.detect_num = rxbuf[4];
+}
 
 void CAN3_SEND(void)
 {

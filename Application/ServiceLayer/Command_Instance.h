@@ -12,6 +12,7 @@ enum
 	FLY,
 	Op_FLY,
 	TURN,
+	DOWN_TWO_STEP,
   COMMAND_LIST,
 };
 

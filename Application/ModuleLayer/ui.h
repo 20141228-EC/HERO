@@ -153,6 +153,7 @@
 
 #include "stm32h7xx_hal.h"
 #include "rp_math.h"
+#include "filter.h"
 typedef enum{
 	TOP_FRAME,
 	FLY_FRAME,
@@ -160,6 +161,10 @@ typedef enum{
 	UPSTEP_NUM,//上台阶数字
 	BUFF_FRAME,//发现buff
 	BUFF_NUM,//buff序号
+	FRIC_FRAME,
+	JUMP_FRAME,
+	SAVE_FRAME,
+
 //	POWER,
 //	POWER_FRAME,
 	BULLET_NUM,
@@ -176,7 +181,13 @@ typedef enum{
 	CAR_SPEED,//车体速度
 	LENGTH_FRAME,//腿长模式框
 	
+	FRONT_LEG_R,
+	FRONT_LEG_L,
+	BACK_LEG_R,
+	BACK_LEG_L,
 	
+	PITCH_OFFSET_NUM,
+	VISION_TAR,
 	DYNAMIC_NUM,
 }dynamic_ui_cnt_e;
 
@@ -185,6 +196,10 @@ typedef enum{
 	UPSTEP_CHAR,
 	FLY_CHAR,
 	BUFF_CHAR,
+	FRIC_CHAR,
+	VISION_CHAR,
+	JUMP_CHAR,
+	SAVE_CHAR,
 //	VISION_CHAR,
 //	AUTO_CATCH_FRAME,//自瞄框
 	CHAS_CIRCLE,//底盘圆盘
@@ -200,6 +215,8 @@ typedef enum{
 	CAP_DIVISION_1,//超电分割线
 	CAP_DIVISION_2,
 	
+	PITCH_OFFSET,
+	VISION_MODE,
 	CONST_NUM,
 }const_ui_cnt_e;
 

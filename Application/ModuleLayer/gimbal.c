@@ -5,6 +5,7 @@ gimbal_offset_info_t offset_info =
 {
 	.vision_yaw_offset = 0, //视觉偏置 
 	.lob_yaw_mec_offset = 0,    //吊射偏置
+	.lob_pitch_gyro_offset = 0,
 };
 
 gimbal_t gimbal=
@@ -84,7 +85,7 @@ void Gimbal_Pitch_Mec_Angle_Limit(gimbal_t *gimbal)
 
 	
 /*云台信息更新*/
-static float k=0.13;
+static float k=0.f;
 static float add ;//零漂补偿
 void Gimbal_Extern_Updata(gimbal_t *gimbal)
 {
@@ -93,7 +94,7 @@ void Gimbal_Extern_Updata(gimbal_t *gimbal)
 	add += k*0.001;//零漂补偿
 	if(Board_HeartBeat.status == DEV_ONLINE)
 	{
-		gimbal->base_info.yaw_imu_angle = -Board_Rx_Info.yaw_imu + add;
+		gimbal->base_info.yaw_imu_angle = Board_Rx_Info.yaw_imu + add;
 		gimbal->base_info.yaw_imu_speed = Board_Rx_Info.yaw_v;
 		gimbal->base_info.pitch_motor_angle = Board_Rx_Info.pitch_mec;
 		gimbal->base_info.pitch_motor_speed = Board_Rx_Info.pitch_v;
@@ -127,9 +128,9 @@ void Gimbal_Extern_Updata(gimbal_t *gimbal)
   gimbal->base_info.yaw_imu_angle = half_cycle(gimbal->base_info.yaw_imu_angle, 360.f);
 	
 	/*yaw轴电机角度更新*/
-	gimbal->base_info.yaw_motor_angle = YAW_MOTOR_ANGLE_MIDDLE - (float)gimbal->gimbal_y->rx_info->motor_angle;
+	gimbal->base_info.yaw_motor_angle = -(YAW_MOTOR_ANGLE_MIDDLE - (float)gimbal->gimbal_y->rx_info->motor_angle);
 	gimbal->base_info.yaw_motor_angle = half_cycle(gimbal->base_info.yaw_motor_angle, 2*PI);
-	gimbal->base_info.yaw_motor_speed = -(float)gimbal->gimbal_y->rx_info->speed;
+	gimbal->base_info.yaw_motor_speed = (float)gimbal->gimbal_y->rx_info->speed;
 	
 //	gimbal->gimbal_reset_state = Board_Rx_Info.gimbal_state;
 //	gimbal->gimbal_ctrl_mode.gimbal_mode = Board_Rx_Info.gimbal_mode;
@@ -165,7 +166,7 @@ void Gimbal_Yaw_Pid_Cal(gimbal_t *gimbal)
 		gyro_meas_in = gimbal->base_info.yaw_imu_speed	;			  //内环
 		gyro_target = gimbal->base_info.yaw_imu_angle_target;  //目标值
 		
-		gimbal->base_info.output_gimbal_y = -gimbal->all_pid_calc( gimbal->gimbal_y->ctrl->angle_ctrl_outer,gimbal->gimbal_y->ctrl->angle_ctrl_inner,gyro_target,gyro_meas_out,gyro_meas_in,-1,3);
+		gimbal->base_info.output_gimbal_y = gimbal->all_pid_calc( gimbal->gimbal_y->ctrl->angle_ctrl_outer,gimbal->gimbal_y->ctrl->angle_ctrl_inner,gyro_target,gyro_meas_out,gyro_meas_in,-1,3);
 		break;
 
 	case MEC_PID:
@@ -173,7 +174,7 @@ void Gimbal_Yaw_Pid_Cal(gimbal_t *gimbal)
 		mec_meas_in = gimbal->base_info.yaw_imu_speed;			            	   //内环 
 		mec_target = gimbal->base_info.yaw_mec_angle_target / PI * 180.f;
 		
-		gimbal->base_info.output_gimbal_y = -gimbal->all_pid_calc( gimbal->gimbal_y->ctrl->position_out,gimbal->gimbal_y->ctrl->position_inn,mec_target,mec_meas_out,mec_meas_in,-1,3);
+		gimbal->base_info.output_gimbal_y = gimbal->all_pid_calc( gimbal->gimbal_y->ctrl->position_out,gimbal->gimbal_y->ctrl->position_inn,mec_target,mec_meas_out,mec_meas_in,-1,3);
 		break;
 	
 	case SPEED_PID:
@@ -241,21 +242,22 @@ void Gimbal_Save_Update(gimbal_t *gimbal)
 /*云台陀螺仪模式*/
 void Gimbal_Gyro_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 {
-  if(Balance.Vision.Auto_Catch_Flag != 0 && Board_Rx_Info.vision_state == 1 && Board_Rx_Info.is_find_Target == 1)
+  if((Balance.Vision.Auto_Catch_Flag == true || Balance.Vision.Auto_Outpost_Flag == true || Balance.Vision.Auto_Base_Flag == true)
+		&& Board_Rx_Info.vision_state == 1 && Board_Rx_Info.is_find_Target == 1)
 	{
-    gimbal->base_info.yaw_imu_angle_target = - Board_Rx_Info.vision_yaw_tar;
+    gimbal->base_info.yaw_imu_angle_target = Board_Rx_Info.vision_yaw_tar;
 		gimbal->base_info.pitch_imu_angle_target = Board_Rx_Info.vision_pitch_tar;
 	}
 	else
 	{
 		if(ctrl_mode != KEY_CTRL)
 		{
-			gimbal->base_info.yaw_imu_angle_target += rc_sensor.info->ch0*0.001f*0.2;
+			gimbal->base_info.yaw_imu_angle_target -= rc_sensor.info->ch0*0.001f*0.2;
 			gimbal->base_info.pitch_imu_angle_target += rc_sensor.info->ch1*0.001f*0.1;
 		}
 		else
 		{
-			gimbal->base_info.yaw_imu_angle_target += rc_sensor.info->mouse_x * 0.001f;
+			gimbal->base_info.yaw_imu_angle_target -= rc_sensor.info->mouse_x * 0.001f;
 			gimbal->base_info.pitch_imu_angle_target += rc_sensor.info->mouse_y*0.001f;
 		}
 	}
@@ -322,33 +324,10 @@ void Gimbal_Gyro_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 /*云台吊射模式*/
 void Gimbal_Lob_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 {
-//	//标志位清零
-//	gimbal->lob_info.lob_init_angle_flag=0;
-//	
-//	if(car.car_ctrl_mode==RC_CTRL_MODE)
-//	{
-//		if(my_abs((float)rc_sensor.info->ch1)>=10)
-//		{
-//			gimbal->base_info.pitch_imu_angle_target+=rc_sensor.info->ch1*0.001f*0.01;
-//		}	
-//		if(my_abs((float)rc_sensor.info->ch0)>=10)
-//		{
-//			gimbal->base_info.yaw_mec_angle_target+=rc_sensor.info->ch0*0.001f*0.2;
-//		}	
-//	}
-//	else
-//	{
-//		gimbal->base_info.pitch_imu_angle_target+=rc_sensor.info->mouse_y*0.00005f;
-//////		gimbal->base_info.yaw_mec_angle_target+=rc_sensor.info->mouse_x*0.0005f;
-//	}
-//////	  gimbal->base_info.yaw_imu_angle_target=gimbal->base_info.yaw_imu_angle;
 	
-	//以下是用的
-	
-	
-  if(Balance.Vision.Auto_Catch_Flag != 0 && Board_Rx_Info.vision_state == 1)
+  if(Balance.Vision.Auto_Base_Flag == 1 && Board_Rx_Info.vision_state == 1)
 	{
-    gimbal->base_info.yaw_mec_angle_target = - Board_Rx_Info.vision_yaw_tar / 180.f * PI + gimbal->offset_info->lob_yaw_mec_offset ;
+    gimbal->base_info.yaw_mec_angle_target = Board_Rx_Info.vision_yaw_tar / 180.f * PI + gimbal->offset_info->lob_yaw_mec_offset ;
 	}
 	else
 	{
@@ -356,22 +335,23 @@ void Gimbal_Lob_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 		{
 			if(my_abs((float)rc_sensor.info->ch0)>=10)
 			{
-				gimbal->base_info.yaw_mec_angle_target += rc_sensor.info->ch0*0.001f*0.0003;
+				gimbal->base_info.yaw_mec_angle_target -= rc_sensor.info->ch0*0.001f*0.0003f;
 			}
 			if(my_abs((float)rc_sensor.info->ch1)>=10)
 			{
-				gimbal->base_info.pitch_mec_angle_target += rc_sensor.info->ch1*0.001f*0.2;
+				gimbal->base_info.pitch_mec_angle_target += rc_sensor.info->ch1*0.001f*0.2f*0.005f;
 			}
 		}
 		else
 		{
-			gimbal->base_info.yaw_mec_angle_target += rc_sensor.info->mouse_x * 0.0003f;
+			gimbal->base_info.yaw_mec_angle_target -= rc_sensor.info->mouse_x * 0.0003f;
 			gimbal->base_info.pitch_mec_angle_target += rc_sensor.info->mouse_y*0.0003f;
 		}
 	}
 	  gimbal->base_info.yaw_mec_angle_target = half_cycle(gimbal->base_info.yaw_mec_angle_target, 2*PI);
 		
 	  gimbal->base_info.yaw_imu_angle_target = gimbal->base_info.yaw_imu_angle;
+	  gimbal->base_info.yaw_imu_angle_target = half_cycle(gimbal->base_info.yaw_imu_angle_target,360.f);
 	  gimbal->base_info.pitch_imu_angle_target = Board_Rx_Info.pitch_imu;
 }
 
@@ -436,8 +416,8 @@ void Gimbal_Work(gimbal_t *gimbal)
 		#else
 		gimbal->base_info.yaw_imu_angle_target+=rc_sensor.info->ch0*0.001f*0.3;
 		gimbal->base_info.pitch_imu_angle_target+=rc_sensor.info->ch1*0.001f*0.1;
-		gimbal->base_info.pitch_mec_angle_target+=rc_sensor.info->ch1*0.001f*0.5;
-		
+//		gimbal->base_info.pitch_mec_angle_target+=rc_sensor.info->ch1*0.001f*0.5;
+		gimbal->base_info.pitch_mec_angle_target = 0.f;
 		gimbal->yaw_pid_mode = MEC_PID;
 		Gimbal_Yaw_Pid_Cal(gimbal);
 		if(RC_ONLINE)

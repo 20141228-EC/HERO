@@ -58,7 +58,9 @@ typedef struct Balance_Flag_struct_t
 	bool Shoot_Flag;
   bool Remedy_Flag;
 	bool Middle_Flag;
+	bool Middle_To_Short_Flag;
 	bool Return_Flag;
+	bool Down_Two_Step_Flag;
 	
 	uint8_t Rescue_step;
 	
@@ -93,6 +95,8 @@ typedef struct Vision_Command_struct_t
 	
 	bool Auto_Catch_Engi_Flag;//自动锁定工程
 	
+	bool Auto_Outpost_Flag;
+	
 	bool Auto_Base_Flag;//
 }Vision_Flag_t;
 
@@ -113,6 +117,12 @@ typedef struct Chassis_Command_struct_t
 	bool Mid_Length_Flag;
 	
 	bool Knee_Strike_Flag;
+	
+	bool COMMON_AUTO_SHOOT;
+	
+	bool COMMON_OUTPOST_SHOOT;
+	
+	bool COMMON_BASE_SHOOT;
 	
 	bool Power_Limit_Flag;//功率限制标志位
 	

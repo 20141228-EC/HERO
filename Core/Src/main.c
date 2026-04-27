@@ -31,6 +31,9 @@
 /* USER CODE BEGIN Includes */
 #include "device.h"
 #include "driver.h"
+#include "LaserRanging_Protocol.h"
+#include "LaserRanging_kalman.h"
+#include "RP_Log.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,7 +43,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -72,6 +74,7 @@ void MX_FREERTOS_Init(void);
   * @retval int
   */
 int main(void)
+
 {
 
   /* USER CODE BEGIN 1 */
@@ -119,10 +122,10 @@ int main(void)
   MX_USART1_UART_Init();
   MX_UART8_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);  // Æô¶¯ PWM
 	DEVICE_Init();
 	DRIVER_Init();
-
+  LaserRange_KF_Init(&LR_Speed_KF);
   /* USER CODE END 2 */
 
   /* Init scheduler */

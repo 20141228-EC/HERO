@@ -9,10 +9,11 @@
 #include "monitor_task.h"
 #include "device.h"
 #include "Ui_Task.h"
+#include "LaserRanging_kalman.h"
 
 uint16_t open_ui = 0;
-uint32_t test_time;
-uint32_t test_flag;
+//uint32_t test_time;
+//uint32_t test_flag;
 
 //float tar,mea,out;
 void StartMonitorTask(void const * argument)
@@ -30,7 +31,7 @@ void StartMonitorTask(void const * argument)
 		Cmd_Heartbeat();
 		HAL_IWDG_Refresh(&hiwdg1);
 		D_Board_HeartBeat();
-		
+    LaserRange_heart_beat_list();		
 //		tar = chassis_PID.length_cal[R_Leg]->target;
 //		mea = chassis_PID.length_cal[R_Leg]->measure;
 //		out = chassis_PID.length_speed_cal[R_Leg]->out;
@@ -43,12 +44,12 @@ void StartMonitorTask(void const * argument)
 			{
 			  Ui_Info_Update();
         Ui_Send();
-				test_time++;
-				
-				if(test_time>=1498)
-				{
-					test_flag++;
-				}
+//				test_time++;
+//				
+//				if(test_time>=1498)
+//				{
+//					test_flag++;
+//				}
 			}
 		osDelay(1);
 	}

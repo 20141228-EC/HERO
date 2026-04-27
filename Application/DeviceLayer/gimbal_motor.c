@@ -12,9 +12,9 @@ Motor_DM_Born_Info_t Yaw_Born_Info =
 #else
 Motor_DM_Born_Info_t Yaw_Born_Info =
 {
-	.stdId = 0x01,
+	.stdId = 0x03,
 	
-	.hcan = &hfdcan1,
+	.hcan = &hfdcan2,
 
 };
 #endif
@@ -27,16 +27,16 @@ Motor_DM_State_t Yaw_State_t;
 
 pid_ctrl_t Yaw_Gyro_Ctrl_out = 
 {
-	.kp = 18.f,    //30.f,//
-	.ki = 1.f,//0.1f,   //0.3f,//0.2f,
+	.kp = 14.f,////15.f,//18.f,    //30.f,//
+	.ki = 2.f,//0.1f,   //0.3f,//0.2f,
 	.kd = 0.f,
 	.integral_max = 5.f,
-	.out_max = 200.f,   //400.f,
+	.out_max = 600.f,   //400.f,
 };
 
 pid_ctrl_t Yaw_Gyro_Ctrl_inn = 
 {
-	.kp = 0.08f,//0.05f,   //0.15f,//0.35f,//0.75f,//
+	.kp = 0.06f,//0.08f,   //0.05f,   //0.15f,//0.35f,//0.75f,//
 	.ki = 0.f,
 	.kd = 0.f,
 	.integral_max = 0.f,
@@ -45,8 +45,8 @@ pid_ctrl_t Yaw_Gyro_Ctrl_inn =
 
 pid_ctrl_t Yaw_Lob_Ctrl_out = 
 {
-	.kp = 20.f,  //30.f,//
-	.ki = 0.1f,   //0.3f,
+	.kp = 23.f,//20.f,  //30.f,//
+	.ki = 1.f,//0.1f,   //0.3f,
 	.kd = 0.f,
 	.integral_max = 5.f,
 	.out_max = 200.f,   //400.f,
@@ -54,7 +54,7 @@ pid_ctrl_t Yaw_Lob_Ctrl_out =
 
 pid_ctrl_t Yaw_Lob_Ctrl_inn = 
 {
-	.kp = 0.05f,   //0.08f,//
+	.kp = 0.06f,//0.05f,   //0.08f,//
 	.ki = 0.f,
 	.kd = 0.f,
 	.integral_max = 0.f,

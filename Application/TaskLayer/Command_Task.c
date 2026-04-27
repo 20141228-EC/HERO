@@ -12,8 +12,13 @@ void StartCommandTask(void const * argument)
 	for(;;)
 	{
 		keyboard_update(rc_sensor.info);
-		Balance.update(&Balance);
+#ifdef TEST_DAIL
+//		Balance.update(&Balance);
 		
+		Balance.mode = Imu_Mode;
+#else
+  Balance.update(&Balance);	
+#endif
 		osDelay(1);
 	}
 }

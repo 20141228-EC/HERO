@@ -26,9 +26,11 @@ typedef enum
 	C_Handle_Rescue,//手动自救
 	C_Cycle,        //小陀螺
 	C_Vary_Cycle,   //变速小陀螺
+	C_Down_Two_Step,//下台阶
 	C_Jump,
 	C_Knee_Strike_1,
 	C_Knee_Strike_2,
+	
 	C_Fly,
 	C_Turn,
 	C_Op_Fly,
@@ -253,6 +255,7 @@ typedef struct
 	uint16_t RETRACT_tick;
 	uint16_t PRE_LANDING_tick;
 	uint16_t LANDING_tick;
+	float Jump_F;
 	
 	uint16_t Max_COMPRESS_tick;
 	uint16_t Max_EXTEND_tick;
@@ -310,7 +313,9 @@ typedef struct
 	float Stand_High_tick;
 	float RETRACT_tick;
 	float thetal_threshold;
+	float down_thetal_threshold;
 	float IDLE_length_kp;
+	float STAND_length_kp;
 	float RETRACT_length_kp;
 	
 	Knee_Strike_1_Step_e step1;

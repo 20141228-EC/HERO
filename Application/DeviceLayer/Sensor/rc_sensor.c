@@ -30,9 +30,9 @@ drv_uart_t	rc_sensor_driver = {
 // 遥控器信息
 rc_sensor_info_t 	rc_sensor_info = {
 	//顺序:相同符号之间按绝对值从大到小
-	.tw_step_value[RC_TB_UP] = -650,
+	.tw_step_value[RC_TB_UP] = -500,
 	.tw_step_value[RC_TB_MU] = -200,
-	.tw_step_value[RC_TB_DN] = +650,
+	.tw_step_value[RC_TB_DN] = +500,
 	.tw_step_value[RC_TB_MD] = +200,	
 	.offline_max_cnt = 60,
 };

@@ -5,7 +5,7 @@
 /*左驱动轮*/
 Motor_RM_Born_Info_t L_Wheel_Born = 
 {
-	.rxId = 1,
+	.rxId = 0,
 	
 	.hcan = &hfdcan2,
 	
@@ -88,7 +88,7 @@ Motor_RM_Group_t Wheel_Group =
 /*右前关节*/
 Motor_DM_Born_Info_t R_F_Sd_Born_Info =
 {
-	.stdId = 0x004,
+	.stdId = 0x001,
 	
 	.hcan = &hfdcan1,
 	.order_correction = R_F_SD_ANGLESUM_ORDER_CORRECT,
@@ -118,7 +118,7 @@ Motor_DM_t R_F_Sd =
 /*右后关节*/
 Motor_DM_Born_Info_t R_B_Sd_Born_Info =
 {
-	.stdId = 0x003,
+	.stdId = 0x002,
 	.hcan = &hfdcan1,
 	.order_correction = R_B_SD_ANGLESUM_ORDER_CORRECT,
 };

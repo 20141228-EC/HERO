@@ -13,7 +13,7 @@ Motor_DM_Born_Info_t Dail_Born_Info =
 {
 	.stdId = 0x08,
 	
-	.hcan = &hfdcan2,
+	.hcan = &hfdcan1,
 
 };
 #endif
@@ -35,16 +35,16 @@ pid_ctrl_t Dail_Speed_Ctrl =
 
 pid_ctrl_t Dail_Pos_Ctrl_out = 
 {
-	.kp = 70.f,//
-	.ki = 0.1f,
+	.kp = 30.f,//70.f,//
+	.ki = 0.2f,//0.1f,
 	.kd = 0.f,
-	.integral_max = 0.f,
-	.out_max = 30.f,
+	.integral_max = 2.f,
+	.out_max = 30.f,//30.f,
 };
 
 pid_ctrl_t Dail_Pos_Ctrl_inn = 
 {
-	.kp = 0.6f,//2.5f,//
+	.kp = 0.6f,//0.05f,//0.2f,//0.6f,//2.5f,//
 	.ki = 0.f,
 	.kd = 0.f,
 	.integral_max = 0.f,

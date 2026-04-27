@@ -60,7 +60,7 @@ typedef struct __attribute__((packed))shoot_out_t{
 
 
 extern shoot_out_t shoot_out;
-
+void Dail_Pid_Cal(shoot_out_t* shoot_out);
 
 
 #endif

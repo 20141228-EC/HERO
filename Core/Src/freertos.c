@@ -59,7 +59,7 @@ const osThreadAttr_t MonitorTask_attributes = {
 osThreadId_t CtrlTaskHandle;
 const osThreadAttr_t CtrlTask_attributes = {
   .name = "CtrlTask",
-  .stack_size = 512 * 4,
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for CommandTask */

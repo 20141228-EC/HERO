@@ -271,7 +271,7 @@ void Shoot_Init(Shoot_t* shoot)
 	//	//拨盘基本配置      自己加上的
 	shoot->info.cfg_rx_info.base_cfg_info.reset_angle_work_time_max =3000; 
 	
-	shoot->info.cfg_rx_info.base_cfg_info.oneshot_angle =-2.7025f;       //齿数比31:120，九爪拨盘   PI/9/齿数比      
+	shoot->info.cfg_rx_info.base_cfg_info.oneshot_angle =-2.538658f;       //齿数比33:120，九爪拨盘   PI/9/齿数比      
 	shoot->info.cfg_rx_info.base_cfg_info.reload_speed =0;    
 	shoot->info.cfg_rx_info.base_cfg_info.repeat_shot_mode =1;
 	shoot->info.cfg_rx_info.base_cfg_info.repeat_shot_period =0;
@@ -302,9 +302,9 @@ void Shoot_Init(Shoot_t* shoot)
 	
 	shoot->info.cfg_rx_info.angle_block_cfg_info.block_judge_type =0;
 	                                             
-	shoot->info.cfg_rx_info.angle_block_cfg_info.speed_max = 0.3;
-	shoot->info.cfg_rx_info.angle_block_cfg_info.current_min =6;
-	shoot->info.cfg_rx_info.angle_block_cfg_info.block_time_max =200;
+	shoot->info.cfg_rx_info.angle_block_cfg_info.speed_max = 0.3f;
+	shoot->info.cfg_rx_info.angle_block_cfg_info.current_min =1.f;//5.4f;//6;
+	shoot->info.cfg_rx_info.angle_block_cfg_info.block_time_max =150;//200
 	                                             
 	shoot->info.cfg_rx_info.angle_block_cfg_info.integral_value =1;
 	
@@ -324,7 +324,7 @@ void Shoot_Init(Shoot_t* shoot)
 	#else
 	//		//拨盘基本配置 
 		shoot->info.cfg_rx_info.base_cfg_info.reset_speed =-10;               
-	    shoot->info.cfg_rx_info.base_cfg_info.reset_adjust_angle =-0.2f;        
+	    shoot->info.cfg_rx_info.base_cfg_info.reset_adjust_angle =-0.85f;        
 	    shoot->info.cfg_rx_info.base_cfg_info.reset_speed_work_time_max =5000; 
 		//拨盘复位堵转配置
 		shoot->info.cfg_rx_info.reset_speed_block_cfg_info.angle_sum_err_integral_max =0;

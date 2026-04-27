@@ -62,7 +62,11 @@ void Cap_Tx_Data_Update(capboard_tx_info_t *cap)
 	cap->chassis_power_buffer = My_Judge.org_info->power_heat_data.buffer_energy;
 	cap->cap_power_out_limit = -300;
 	cap->cap_power_in_limit = 300;
+	#ifdef CAP_ENABLE
 	cap->bit_control.cap_switch = 1;
+	#else
+	cap->bit_control.cap_switch = 0;
+	#endif
 	cap->bit_control.turbo_mode = 0;
 	
 	memcpy(Cap_Tx_Buf,cap,sizeof(capboard_tx_info_t));

@@ -66,7 +66,7 @@ void Shoot_Heat_Limit(shoot_out_t* shoot_out)
 			shoot_out->base_info.is_heat_allow = 1;
 		}
 		
-		if(shoot_out->base_info.is_heat_allow == 1)
+		if(shoot_out->base_info.is_heat_allow == 1 && Board_Rx_Info.is_fric_speed == 1 && Board_Rx_Info.is_fric_work == 1)
 		{
 			shoot.info.rt_rx_info.flag_Info.run_limit_flag = 0;
 		
@@ -78,7 +78,7 @@ void Shoot_Heat_Limit(shoot_out_t* shoot_out)
 	}
 	else
 	{
-		if(My_Judge.info->shooter_cooling_limit - My_Judge.info->shooter_cooling_heat <=105)
+		if(My_Judge.info->shooter_cooling_limit - My_Judge.info->shooter_cooling_heat <=110)
 		{
 			shoot_out->base_info.is_heat_allow = 0;
 		}
@@ -87,7 +87,7 @@ void Shoot_Heat_Limit(shoot_out_t* shoot_out)
 			shoot_out->base_info.is_heat_allow = 1;
 		}
 		
-		if(shoot_out->base_info.is_heat_allow == 1)
+		if(shoot_out->base_info.is_heat_allow == 1 && Board_Rx_Info.is_fric_speed == 1 && Board_Rx_Info.is_fric_work == 1)
 		{
 			shoot.info.rt_rx_info.flag_Info.run_limit_flag = 0;
 		
@@ -144,10 +144,10 @@ void Shoot_Ext_Work(shoot_out_t* shoot_out)
 	
 	shoot.info.rt_rx_info.flag_Info.fire_mode_flag = 0;     //单发0
 	
-	if(shoot.info.rt_rx_info.flag_Info.is_sleep_flag == 0 && rc_sensor.info->s1 == 1 && rc_sensor.info->s2 == 2 && rc_sensor.info->s2_last == 3)
-	{
-	  shoot.info.rt_rx_info.flag_Info.init_flag = 0;		//拨盘复位，未完善
-	}
+//	if(shoot.info.rt_rx_info.flag_Info.is_sleep_flag == 0 && rc_sensor.info->s1 == 1 && rc_sensor.info->s2 == 2 && rc_sensor.info->s2_last == 3)
+//	{
+//	  shoot.info.rt_rx_info.flag_Info.init_flag = 0;		//拨盘复位，未完善
+//	}
 	
 	Shoot_offline_cheak(shoot_out);                         //离线
 	

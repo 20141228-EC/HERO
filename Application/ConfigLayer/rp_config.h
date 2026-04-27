@@ -25,8 +25,8 @@
 
 /* Exported macro ------------------------------------------------------------*/
 /*有无超电*/
-#define CAP_ENABLE		1
-/*有无裁判系统*/
+#define CAP_ENABLE		
+/*有无裁判系统*****************8*/
 #define JUDGE_ENABLE 	1
 
 /*有无视觉*/
@@ -41,16 +41,28 @@
 /*不自救*/
 #define NO_RESCUE
 
+/*无底盘*************************/
+#define NO_CHASSIS
+
 ///*跳跃不进行伸腿缓冲*/
 //#define NO_PRE_LANDING
 
 /*用串口通信定义*/
 //#define UART_COMMUNICATE
 
+//走下2级台阶**************************
+#define WALK_DOWN_2
+
+//********************************
 //#define TEST
+
+//***********************************8
+#define PITCH_4310
 
 #define Power_limit     1
 #define OFF_GROUND_TEST 0
+
+//#define TEST_DAIL
 
 /*选择IMU解算算法为Mahony*/
 #define IMU_USE_MAHONY  0

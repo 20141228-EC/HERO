@@ -34,6 +34,11 @@ command_t command[COMMAND_LIST] =
     .run_time_max = OUT_TIME_OFF,  
 	.init = Cmd_Class_Init,
 	},
+  [DOWN_TWO_STEP] = {
+    .cmd_type = RISE_TRIGER_C,
+    .run_time_max = OUT_TIME_OFF,  
+	.init = Cmd_Class_Init,
+	},
 };
 
 /**
@@ -86,14 +91,20 @@ void Command_Update(void)
 		if(Balance.ctrl != KEY_CTRL)
 		{
 			/*命令更新填这里*/
-//			command[JUMP].update(&command[JUMP],rc_info->s1 == RC_SW_DOWN && rc_info->s2==RC_SW_UP &&
-//			wheel_dn != last_wheel_dn);
-			
-			command[KNEE_STRIKE_1].update(&command[KNEE_STRIKE_1],rc_info->s1 == RC_SW_DOWN && rc_info->s2==RC_SW_UP &&
+//			command[JUMP].update(&command[JUMP],rc_info->s1 == RC_SW_UP && rc_info->s2==RC_SW_UP &&
+//			wheel_up != last_wheel_up);
+		
+			command[DOWN_TWO_STEP].update(&command[DOWN_TWO_STEP],rc_info->s1 == RC_SW_UP && rc_info->s2==RC_SW_UP &&
 			wheel_up != last_wheel_up);
 			
+//			command[TURN].update(&command[TURN],rc_info->s1 == RC_SW_UP && rc_info->s2==RC_SW_UP &&
+//			wheel_up != last_wheel_up);
+//			
+			command[KNEE_STRIKE_1].update(&command[KNEE_STRIKE_1],rc_info->s1 == RC_SW_UP && rc_info->s2==RC_SW_UP &&
+			wheel_dn != last_wheel_dn);
+			
 //			command[KNEE_STRIKE_2].update(&command[KNEE_STRIKE_2],rc_info->s1 == RC_SW_DOWN && rc_info->s2==RC_SW_UP &&
-//			rc_info->thumbwheel.step_change[RC_MD_TO_UP] == 1);
+//			rc_info->thumbwheel.step_change[RC_MD_TO_UP] 	== 1);
 
 //			command[FLY].update(&command[FLY],rc_info->s1 == RC_SW_DOWN && rc_info->s2==RC_SW_DOWN &&
 //			rc_info->thumbwheel.step_change[RC_MD_TO_UP] == 1);
@@ -101,12 +112,13 @@ void Command_Update(void)
 //			command[Op_FLY].update(&command[Op_FLY],rc_info->s1 == RC_SW_DOWN && rc_info->s2==RC_SW_DOWN &&
 //			rc_info->thumbwheel.step_change[RC_MD_TO_DO] == 1);
 			
-			command[TURN].update(&command[TURN],rc_info->s1 == RC_SW_DOWN && rc_info->s2==RC_SW_MID &&
-			wheel_up != last_wheel_up);
+			
 		}
 		else
 		{
-//			command[JUMP].update(&command[JUMP],rc_info->V.status == release_to_press );
+//			command[JUMP].update(&command[JUMP],rc_info->Q.status == release_to_press );
+			
+			command[DOWN_TWO_STEP].update(&command[DOWN_TWO_STEP],rc_info->Q.status == release_to_press );
 			
 			command[KNEE_STRIKE_1].update(&command[KNEE_STRIKE_1],rc_info->C.status == release_to_press);
 			

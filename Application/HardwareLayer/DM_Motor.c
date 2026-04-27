@@ -129,23 +129,23 @@ void Motor_Set_Angle_Position_DM(Motor_DM_t *motor)
 	pid_ctrl_t* my_angle_ctrl = motor->ctrl->position_out;
 	pid_ctrl_t* my_speed_ctrl = motor->ctrl->position_inn;
 	/*Íâ»·¼ÆËã*/
-	if(motor->ctrl->Angle_Input_Flag == false)
-	{
+//	if(motor->ctrl->Angle_Input_Flag == false)
+//	{
 	my_angle_ctrl->measure = motor->rx_info->motor_angle_sum;
-	}
+//	}
 	my_angle_ctrl->err=my_angle_ctrl->target-my_angle_ctrl->measure;
 //	if(motor->ctrl->Nearest_Return == true)
 //	{
 //		if(motor->ctrl->Angle_Input_Flag == false)
 //		{
-			if(my_angle_ctrl->err < P_MAX_8009)
-			{
-				my_angle_ctrl->err += 2.0f*PI;
-			}
-			if(my_angle_ctrl->err > P_MIN_8009)
-			{
-				my_angle_ctrl->err -= 2.0f*PI;
-			}
+//			if(my_angle_ctrl->err < P_MAX_8009)
+//			{
+//				my_angle_ctrl->err += 2.0f*PI;
+//			}
+//			if(my_angle_ctrl->err > P_MIN_8009)
+//			{
+//				my_angle_ctrl->err -= 2.0f*PI;
+//			}
 //		}
 //		else
 //		{
@@ -162,7 +162,7 @@ void Motor_Set_Angle_Position_DM(Motor_DM_t *motor)
 	single_pid_ctrl(my_angle_ctrl);
 	
 	my_speed_ctrl->target = my_angle_ctrl->out;
-	if(motor->ctrl->Speed_Input_Flag == false)
+//	if(motor->ctrl->Speed_Input_Flag == false)
 	my_speed_ctrl->measure = motor->rx_info->speed;
 	my_speed_ctrl->err=my_speed_ctrl->target-my_speed_ctrl->measure;
 	single_pid_ctrl(my_speed_ctrl);

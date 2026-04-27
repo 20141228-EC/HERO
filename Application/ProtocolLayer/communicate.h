@@ -115,6 +115,8 @@
 		
 		/*视觉信息,发射更新*/
 		uint8_t vision_state;
+		uint8_t is_fric_speed;
+	  uint8_t is_fric_work;
 		bool hit_enable;
 		bool is_find_Target;
 		bool is_find_outpost;
@@ -123,6 +125,11 @@
 		float vision_pitch_tar;
 		float vision_yaw_tar;
 		
+		uint8_t detect_num;
+
+		
+		float kp;
+		float kd;
 	}Board_Rx_Info_t;
 
 	//下板给上板发送的结构体
@@ -133,10 +140,13 @@
 		float pitch_imu_tar;//**遥控转360发下去
 		float yaw_mec_imu;//**
 		float pitch_mec_tar;//?//**遥控转360发下去
+		float pitch_offset;
 		
 		int8_t gimbal_mode;//**三种模式
 		
 		bool gimbal_state;//**初始化
+		
+
 		bool is_ready_shoot;//拨盘复位,热量限制//**
 		bool is_on_lob;//吊//**
 		bool is_handle_shoot;//是否操作手手打		//**
@@ -160,6 +170,8 @@
 		uint8_t blood_7;//**
 		float v_x;//**
 		float v_y;//**
+		float mea;
+		float tar;
 	}Board_Tx_Info_t;
 
 	typedef struct
@@ -181,10 +193,10 @@
 	void Board_Tx_D1(void);
 	void Board_Tx_D2(void);
 	void Board_Tx_D3(void);
-//	void Board_Tx_B4(void);
+	void Board_Tx_D4(void);
 	void Board_Rx_D1(uint8_t *rxbuf);
 	void Board_Rx_D2(uint8_t *rxbuf);
-//	void Board_Rx_C3(uint8_t *rxbuf);
+	void Board_Rx_D3(uint8_t *rxbuf);
   void CAN3_SEND(void);
 
 #endif
