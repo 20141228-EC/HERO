@@ -129,6 +129,8 @@ typedef struct __attribute__((packed))shooting_struct{
   hit_target_e	        target;
 	
 	bool is_on_fric;
+	uint8_t is_fric_speed;
+	uint8_t is_fric_work;
 
 	shooting_shake_angle_t   shooting_shake_angle;
 	

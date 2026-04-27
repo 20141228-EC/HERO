@@ -71,7 +71,7 @@ void DM_Single_Motor_Set_Torque(Motor_DM_t *motor)
 				motor_tx_info->Kp = 0;
 				motor_tx_info->Kd = 0;
 				Motor_SetControlPara(motor);
-				motor->tx_info->torque = 0;
+//				motor->tx_info->torque = 0;
 			}
 		}
 }
@@ -134,7 +134,7 @@ static void Motor_ReceiveData(Motor_DM_t *motor, uint8_t *rxBuf)
 	Motor_ERR_Check(motor, rxBuf[0] >> 4);
 	motor_rx_info->motor_angle = uint_to_float((uint16_t)((rxBuf[1] << 8) | rxBuf[2]), P_MIN, P_MAX, 16);
 	motor_rx_info->speed = uint_to_float((uint16_t)((rxBuf[3] << 4) | (rxBuf[4] >> 4)), V_MIN, V_MAX, 12);
-	if(my_abs(motor_rx_info->speed) == 0.0109901428f)
+	if(fabs(motor_rx_info->speed) == -0.0073261261f)
 	{
 		motor_rx_info->speed = 0;
 	}
@@ -421,7 +421,7 @@ static void Motor_SetControlPara(Motor_DM_t *motor)
 	buf[4] = kp&0xFF;
 	buf[5] = kd>>4;
 	buf[6] = ((kd&0xF)<<4)|(t>>8);
-	buf[7] = t&0xff;
+	buf[7] = t&0xFF;
 	
 	Motor_Send_Data(motor, buf);
 }

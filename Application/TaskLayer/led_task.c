@@ -6,7 +6,6 @@ void StartLedTask(void const * argument)
 	
   for(;;)
   {		
-	  
 		osDelay(1);
   }
 }

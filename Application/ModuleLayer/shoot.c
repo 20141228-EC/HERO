@@ -9,7 +9,7 @@ shoot_t shoot=
 	.work=Shoot_Work,
 	
 	.config.target_bullet_speed=11.7f,	
-	.config.target_B_friction_speed=3040,     //3050//4550,4350,4452（21度16.04），4320（22度16.2）,4290,4530,3585
+	.config.target_B_friction_speed=2880,//    3040,     //3050//4550,4350,4452（21度16.04），4320（22度16.2]）,4290,4530,3585
 	
 	.target = 0,
 
@@ -74,10 +74,26 @@ void Shoot_extern_get(shoot_t *shoot)
 	}
 }
 
+
 /*离线保护*/
 void Shoot_offline_detect(shoot_t *shoot)
 {
-	
+	if(shoot->fric_b_l->rx_info->encoder_speed >= 2500 && shoot->fric_b_r->rx_info->encoder_speed <= -2500 && shoot->fric_b_up->rx_info->encoder_speed <= -2500)
+	{
+		shoot->is_fric_speed = 1;
+	}
+	else
+	{
+		shoot->is_fric_speed = 0;
+	}
+	if(shoot->fric_b_l->state->status == DEV_ONLINE && shoot->fric_b_r->state->status == DEV_ONLINE && shoot->fric_b_up->state->status == DEV_ONLINE)
+	{
+		shoot->is_fric_work = 1;
+	}
+	else
+	{
+		shoot->is_fric_work = 0;
+	}
 }
 
 /**

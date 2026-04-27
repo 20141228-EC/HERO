@@ -96,7 +96,7 @@ void Board_Tx_C1(void)
 	pitch_imu_temp = float_to_uint(Board_Tx_Info.pitch_imu,-360.f,360.f,16);
 	yaw_imu_temp = float_to_uint(Board_Tx_Info.yaw_imu,-360.f,360.f,16);
 	yaw_v_temp = float_to_uint(Board_Tx_Info.yaw_v,-5000.f,+5000.f,16);
-	pitch_mec_temp = float_to_uint(Board_Tx_Info.pitch_mec,-2000.f,2000.f,16);
+	pitch_mec_temp = float_to_uint(Board_Tx_Info.pitch_mec,-PI,PI,16);
 	
 	board_tx_buf_1[0] = (pitch_imu_temp>>8);
 	board_tx_buf_1[1] = pitch_imu_temp;
@@ -158,8 +158,8 @@ void Board_Tx_C2(void)
 	compressed |= (b << 1);  //  存放在1
 	compressed |= (c << 2);  //  存放在2
 	compressed |= (d << 3);  //  存放在3
-//compressed |= ((Board_Tx_Info.hit_enable ? 1 : 0) << 0);       // bit0
-//compressed |= ((Board_Tx_Info.is_find_base ? 1 : 0) << 1);     // bit1
+  compressed |= (Board_Tx_Info.is_fric_speed << 4);       // bit0
+  compressed |= (Board_Tx_Info.is_fric_work << 5);     // bit1
 //compressed |= ((Board_Tx_Info.is_find_outpost ? 1 : 0) << 2);  // bit2
 //compressed |= ((Board_Tx_Info.is_find_Target ? 1 : 0) << 3);   // bit3
 //	
@@ -169,11 +169,31 @@ void Board_Tx_C2(void)
 	board_tx_buf_2[3] = yaw_tar_temp;
 	board_tx_buf_2[4] = Board_Tx_Info.vision_state;
  	board_tx_buf_2[5] = compressed;
-	board_tx_buf_2[6] = (Board_Tx_Info.launch_timer>>8);
-	board_tx_buf_2[7] = Board_Tx_Info.launch_timer;
 	
+	board_tx_buf_2[6] = Board_Tx_Info.detect_num;
+	
+//	board_tx_buf_2[6] = (Board_Tx_Info.launch_timer>>8);
+//	board_tx_buf_2[7] = Board_Tx_Info.launch_timer;
+//	
 	CAN_SendData(&hcan2,0xC2,board_tx_buf_2);
 }
+
+void Board_Tx_C3(void)
+{
+	uint16_t kp,kd;
+	kp = float_to_uint(Board_Tx_Info.kp,-360.f,360.f,16);
+	kd = float_to_uint(Board_Tx_Info.kd,-2000.f,2000.f,16);
+	
+	board_tx_buf_3[0] = (kp>>8);
+	board_tx_buf_3[1] = kp;
+	board_tx_buf_3[2] = (kd>>8);
+	board_tx_buf_3[3] = kd;
+	
+//	board_tx_buf_3[4] = Board_Tx_Info.detect_num;
+	
+	CAN_SendData(&hcan2,0xC3,board_tx_buf_3);
+}
+
 
 //void Board_Tx_C3(void)
 //{
@@ -198,7 +218,9 @@ void Board_Tx_Update(Board_Tx_Info_t *Board_Tx_Info)
 	Board_Tx_Info->pitch_v = gimbal.base_info.pitch_imu_speed;
 	Board_Tx_Info->yaw_v = imu_sensor.info->base_info.rate_yaw;
 	Board_Tx_Info->yaw_imu = imu_sensor.info->base_info.yaw;
-	Board_Tx_Info->vision_yaw_tar = -vision.VtoE->yaw;
+	Board_Tx_Info->vision_yaw_tar = vision.VtoE->yaw;
+	Board_Tx_Info->is_fric_speed = shoot.is_fric_speed;
+	Board_Tx_Info->is_fric_work = shoot.is_fric_work;
 	if(vision.status->rx_state == DEV_ONLINE)
 	{
 	  Board_Tx_Info->vision_state = 1;
@@ -208,6 +230,7 @@ void Board_Tx_Update(Board_Tx_Info_t *Board_Tx_Info)
 		Board_Tx_Info->vision_state = 0;
 	}
 	Board_Tx_Info->vision_pitch_tar = vision.VtoE->pitch;
+	Board_Tx_Info->detect_num = vision.VtoE->flag_union.bit.detect_num;
 //	Board_Tx_Info->launch_timer  = 
 //	Board_Tx_Info->is_find_base  = 
 //	Board_Tx_Info->is_find_outpost = 
@@ -257,7 +280,7 @@ void Board_Rx_C2(uint8_t *rxbuf)
 	Board_Rx_Info.shoot_count = (rxbuf[0]);
 	Board_Rx_Info.v_x = uint_to_float(v_x_int,-10.f,10.f,16);
 	Board_Rx_Info.v_y = uint_to_float(v_y_int,-10.f,10.f,16);
-	Board_Rx_Info.pitch_mec_tar = uint_to_float(pitch_mec_temp,-2000.f,2000.f,16);
+	Board_Rx_Info.pitch_mec_tar = uint_to_float(pitch_mec_temp,-PI,PI,16);
 }
 
 void Board_Rx_C3(uint8_t *rxbuf)
@@ -279,6 +302,20 @@ void Board_Rx_C4(uint8_t *rxbuf)
 	bullet = (rxbuf[0]<<8|rxbuf[1]);
 	
 	Board_Rx_Info.bullet_speed = uint_to_float(bullet,-20.f,20.f,16);
+	
+	uint16_t mea,pitch_offset;
+	
+//	mea = (rxbuf[4]<<8 | rxbuf[5]);
+	pitch_offset = (rxbuf[2]<<8 | rxbuf[3]);
+//	Board_Rx_Info.mea = uint_to_float(mea,-10.f,10.f,16);
+	Board_Rx_Info.pitch_offset = uint_to_float(pitch_offset,-10.f,10.f,16);
+//Board_Rx_Info.err = Board_Rx_Info.tar-Board_Rx_Info.mea;
+	
+//	uint16_t pitch_offset;
+//	
+//	pitch_offset = (rxbuf[6]<<8|rxbuf[7]);
+//	
+//	Board_Rx_Info.pitch_offset = uint_to_float(pitch_offset,-30.f,30.f,16);
 }
 
 

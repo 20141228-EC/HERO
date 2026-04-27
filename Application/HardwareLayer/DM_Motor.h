@@ -27,8 +27,8 @@ typedef enum Motor_MIT_Command_enum_e
 #define KP_MAX 500.0f
 #define KD_MIN 0.0f     // N-m/rad/s
 #define KD_MAX 5.0f
-#define T_MIN -10.0f    // N.m
-#define T_MAX 10.0f
+#define T_MIN -12.f    // N.m
+#define T_MAX 12.f
 #define C_MIN -10.0f    // A
 #define C_MAX 10.0f
 
@@ -91,6 +91,8 @@ typedef struct Motor_DM_Ctrl_Info_struct_t
 	pid_ctrl_t* angle_ctrl_outer;//角度环外环
 	
 	pid_ctrl_t* speed_ctrl;//速度环
+	pid_ctrl_t* angle_ctrl_inner_gyro;//速度环
+	pid_ctrl_t* angle_ctrl_outer_gyro;//速度环
 	pid_ctrl_t* position_inn;
 	pid_ctrl_t* position_out;
 }Motor_DM_Ctrl_Info_t;

@@ -36,9 +36,15 @@ arm_matrix_instance_f32 Dst;
  *  @arx
  *      陀螺仪y轴与yaw轴之间的夹角，单位为度
  */
+//gimbal_transform_t gim_trans = {
+//	.arz = 90.0f,
+//	.ary = 0.0f,
+//	.arx = 0.0f,
+//	.trans = {0.0f},
+//};
 gimbal_transform_t gim_trans = {
-    .arz = 90.0f,
-    .ary = 0.0f,
+    .arz = 180.0f,
+    .ary = 180.0f,
     .arx = 0.0f,
     .trans = {0.0f},
 };
@@ -53,7 +59,7 @@ gimbal_transform_t gim_trans = {
 bmi_t bmi = {
     .Kp = 1000.0f,//太大的话初始化会抬头
     .norm = 0.0f,
-    .halfT = 0.00025f,
+    .halfT = 0.0005f,
     .gx = 0.0f, .gy = 0.0f, .gz = 0.0f,
     .ax = 0.0f, .ay = 0.0f, .az = 0.0f,
     .vx = 0.0f, .vy = 0.0f, .vz = 0.0f,

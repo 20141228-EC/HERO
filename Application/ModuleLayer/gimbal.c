@@ -12,7 +12,11 @@ gimbal_offset_info_t offset_info =
 
 gimbal_t gimbal = 
 {
+	#ifdef PITCH_4310
+	.gimbal_p=&PITCH,
+	#else
 	.gimbal_p=&rm_motor[gim_pitch],
+	#endif
 //	.gimbal_y=&kt_motor[0],
 //	.lob_info.pre_aim_yaw_angle = 0,
 //	.lob_info.pre_aim_pitch_angle = 35,
@@ -72,20 +76,26 @@ void Gimbal_Pitch_Gravity_Offset(gimbal_t *gimbal)
 /*云台信息更新*/
 void Gimbal_External_Date_Update(gimbal_t *gimbal)
 {
-	gimbal->base_info.pitch_imu_angle = -imu_sensor.info->base_info.roll+sgn(imu_sensor.info->base_info.roll)*180;
-	gimbal->base_info.pitch_imu_speed = -imu_sensor.info->base_info.ave_rate_roll;//后续增加一个service层posture
-	
-	gimbal->gimbal_reset_state = Board_Rx_Info.gimbal_state;
-	gimbal->gimbal_ctrl_mode.gimbal_mode = Board_Rx_Info.gimbal_mode;//优化 找个地方更新自瞄不自瞄？
-	gimbal->base_info.pitch_mec_angle_target = Board_Rx_Info.pitch_mec_tar;
-	gimbal->base_info.pitch_imu_angle_target = Board_Rx_Info.pitch_imu_tar;
-	/*pitch轴电机角度更新*/
-	gimbal->base_info.pitch_motor_angle =  (float)gimbal->gimbal_p->rx_info->encoder- PITCH_MOTOR_ENCODER_MIDDLE;
-	gimbal->base_info.pitch_motor_angle = motor_half_cycle(gimbal->base_info.pitch_motor_angle, 8192.f);
-	gimbal->base_info.pitch_motor_speed = (float)gimbal->gimbal_p->rx_info->speed;
+//		gimbal->base_info.pitch_imu_angle = -imu_sensor.info->base_info.roll+sgn(imu_sensor.info->base_info.roll)*180;
+//		gimbal->base_info.pitch_imu_speed = -imu_sensor.info->base_info.ave_rate_roll;//后续增加一个service层posture
+		gimbal->base_info.pitch_imu_angle = imu_sensor.info->base_info.pitch;
+		gimbal->base_info.pitch_imu_speed = imu_sensor.info->base_info.ave_rate_pitch;//后续增加一个service层posture
 
-	/*360度标准化角度*/
-	gimbal->base_info.pitch_mec_360_angle=gimbal->base_info.pitch_motor_angle/8192.f*360.f;	
+	gimbal->gimbal_reset_state = Board_Rx_Info.gimbal_state;
+		gimbal->gimbal_ctrl_mode.gimbal_mode = Board_Rx_Info.gimbal_mode;//优化 找个地方更新自瞄不自瞄？
+		gimbal->base_info.pitch_mec_angle_target = Board_Rx_Info.pitch_mec_tar;
+		gimbal->base_info.pitch_imu_angle_target = Board_Rx_Info.pitch_imu_tar;
+		/*pitch轴电机角度更新*/
+	#ifdef PITCH_4310
+		gimbal->base_info.pitch_motor_angle =  -((float)gimbal->gimbal_p->rx_info->motor_angle- PITCH_MOTOR_ENCODER_MIDDLE);
+	#else
+		gimbal->base_info.pitch_motor_angle =  (float)gimbal->gimbal_p->rx_info->encoder- PITCH_MOTOR_ENCODER_MIDDLE;
+	#endif
+		gimbal->base_info.pitch_motor_angle = motor_half_cycle(gimbal->base_info.pitch_motor_angle, 2*PITCH_MOTOR_HALF_ENCODER);
+		gimbal->base_info.pitch_motor_speed = -((float)gimbal->gimbal_p->rx_info->speed);
+
+		/*360度标准化角度*/
+		gimbal->base_info.pitch_mec_360_angle=gimbal->base_info.pitch_motor_angle/(2*PITCH_MOTOR_HALF_ENCODER)*360.f;	
 }
 
 /*云台自救模式*/
@@ -120,7 +130,7 @@ void Gimbal_Lob_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 	
 	if(Board_Rx_Info.vision_mode != 0 && vision.status->rx_state == DEV_ONLINE)
 	{
-	  gimbal->base_info.pitch_mec_angle_target = vision.VtoE->pitch / 180.f * 4096.f;//Board_Rx_Info.pitch_mec_tar;
+	  gimbal->base_info.pitch_mec_angle_target = vision.VtoE->pitch;// / 180.f * PITCH_MOTOR_HALF_ENCODER;//Board_Rx_Info.pitch_mec_tar;
 	}
 	else
 	{
@@ -140,11 +150,6 @@ void Gimbal_init_action(gimbal_t *gimbal)
 		gimbal->base_info.pitch_mec_angle_target = Board_Rx_Info.pitch_mec_tar;
 		gimbal->base_info.pitch_imu_angle_target = Board_Rx_Info.pitch_imu_tar;
 	}
-//	else
-//	{
-//		gimbal->base_info.pitch_mec_angle_target = gimbal
-//		gimbal->base_info.pitch_imu_angle_target = Board_Rx_Info.pitch_imu_tar;
-//	}
 }
 
 /*云台陀螺仪模式*/
@@ -153,7 +158,7 @@ void Gimbal_Gyro_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 	if(Board_Rx_Info.video_open == 1 && vision.status->rx_state == DEV_ONLINE && vision.status->tx_state == DEV_ONLINE
 		 && vision.VtoE->flag_union.bit.is_find_target == 1)
 	{
-		gimbal->base_info.pitch_imu_angle_target = vision.VtoE->pitch;
+		gimbal->base_info.pitch_imu_angle_target = vision.VtoE->pitch + Board_Rx_Info.pitch_offset;
 	}
 	else
 	{
@@ -183,17 +188,17 @@ void Gimbal_Pitch_Pid_Cal(gimbal_t *gimbal)
 		
 //		shoot_offset_current=shoot.shooting_shake_angle.shoot_pitch_offset_current;//发射抖动补偿电流
 
-		gimbal->base_info.output_gimbal_p = feedforward_pid_calc(gimbal->gimbal_p->ctrl->angle_ctrl_outer_gyro,gimbal->gimbal_p->ctrl->angle_ctrl_inner_gyro,gyro_target,gyro_meas_out,gyro_meas_in,-1,0);
+		gimbal->base_info.output_gimbal_p = -feedforward_pid_calc(gimbal->gimbal_p->ctrl->angle_ctrl_outer_gyro,gimbal->gimbal_p->ctrl->angle_ctrl_inner_gyro,gyro_target,gyro_meas_out,gyro_meas_in,-1,0);
 		break;
 
 	case MEC_PID:
-		mec_meas_out = gimbal->base_info.pitch_motor_angle;		        //外环
+		mec_meas_out = gimbal->base_info.pitch_motor_angle / PI * 180.f;		        //外环
 		mec_meas_in = gimbal->base_info.pitch_imu_speed;			      //内环  
-		mec_target = gimbal->base_info.pitch_mec_angle_target;				//目标值 	
+		mec_target = gimbal->base_info.pitch_mec_angle_target / PI * 180.f;				//目标值 	
 	
 //		shoot_offset_current=shoot.shooting_shake_angle.shoot_pitch_offset_current;//发射抖动补偿电流		
 
-		gimbal->base_info.output_gimbal_p = feedforward_pid_calc(gimbal->gimbal_p->ctrl->angle_ctrl_outer,gimbal->gimbal_p->ctrl->angle_ctrl_inner,mec_target,mec_meas_out,mec_meas_in,-1,0);
+		gimbal->base_info.output_gimbal_p = -feedforward_pid_calc(gimbal->gimbal_p->ctrl->angle_ctrl_outer,gimbal->gimbal_p->ctrl->angle_ctrl_inner,mec_target,mec_meas_out,mec_meas_in,-1,0);
 		break;
 
 	case SPEED_PID:
@@ -264,10 +269,10 @@ void Gimbal_Work(gimbal_t *gimbal)
 	}
 	#else
 	/*调试*/
-	gimbal->ptich_pid_mode = GYRO_PID;
+	gimbal->ptich_pid_mode = MEC_PID;
 	Gimbal_Pitch_Pid_Cal(gimbal);
 	gimbal->gimbal_p->tx_info->torque=gimbal->base_info.output_gimbal_p;
-	gimbal->gimbal_p->tx_info->torque=0;
+//	gimbal->gimbal_p->tx_info->torque=0;
 	#endif
 }
 

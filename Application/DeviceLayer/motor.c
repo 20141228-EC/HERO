@@ -65,60 +65,123 @@ extern CAN_HandleTypeDef hcan2;
 //};
 ///*HT_end*/
 
-///*DM_start*/
-//Motor_DM_Born_Info_t DAIL_Born_Info =
-//{
-//	.stdId = 0x001,//电机控制报文ID
-//	
-//	.hcan = &hcan1,//使用的Can总线
+/*DM_start*/
+Motor_DM_Born_Info_t PITCH_Born_Info =
+{
+	.stdId = 0x001,//电机控制报文ID
+	
+	.hcan = &hcan1,//使用的Can总线
 
-//};
+};
 
-//pid_ctrl_t DAIL_position_Ctrl_out = 
-//{
-//	.kp = 6.5f,//
-//	.ki = 0.f,
-//	.kd = 0.f,
-//	.integral_max = 0.f,
-//	.out_max = 50.f,
-//};
+pid_ctrl_t PITCH_position_Ctrl_out = 
+{
+	.kp = 0.f,//
+	.ki = 0.f,
+	.kd = 0.f,
+	.integral_max = 0.f,
+	.out_max = 0.f,
+};
 
-//pid_ctrl_t DAIL_position_Ctrl_inn = 
-//{
-//	.kp = 1.f,//
-//	.ki = 0.f,
-//	.kd = 0.f,
-//	.integral_max = 0.f,
-//	.out_max = 7.f,
-//};
+pid_ctrl_t PITCH_position_Ctrl_inn = 
+{
+	.kp = 0.f,//
+	.ki = 0.f,
+	.kd = 0.f,
+	.integral_max = 0.f,
+	.out_max = 0.f,
+};
 
-//Motor_DM_Ctrl_Info_t DAIL_Ctrl = 
-//{
-//	.position_inn=&DAIL_position_Ctrl_inn,
-//	.position_out=&DAIL_position_Ctrl_out,
-//};
+pid_ctrl_t pitch_Speed_Ctrl = 
+{
+	.kp = 0.f,//
+	.ki = 0.f,
+	.kd = 0.f,
+	.integral_max = 0.f,
+	.out_max = 0.f,
+};
 
-//Motor_DM_Rx_Info_t DAIL_Rx_Info_t;
+pid_ctrl_t pitch_angle_Ctrl_inn = 
+{
+	.kp = 0.1f,//
+	.ki = 0.f,
+	.kd = 0.f,
+	.integral_max = 0.f,
+	.out_max = 12.f,
+};
 
-//Motor_DM_Tx_Info_t DAIL_Tx_Info_t;
+pid_ctrl_t pitch_angle_Ctrl_out = 
+{
+	.kp = 20.f,//
+	.ki = 2.f,
+	.kd = 0.f,
+	.integral_max = 4.f,
+	.out_max = 200.f,
+};
 
-//Motor_DM_State_t DAIL_State_t;
+pid_ctrl_t pitch_Speed_Ctrl_gyro = 
+{
+	.kp = 0.f,//
+	.ki = 0.f,
+	.kd = 0.f,
+	.integral_max = 0.f,
+	.out_max = 0.f,
+};
 
-//Motor_DM_t DAIL = 
-//{
-//	.born_info = &DAIL_Born_Info,
-//	
-//	.rx_info = &DAIL_Rx_Info_t,
-//	
-//	.tx_info = &DAIL_Tx_Info_t,
-//	
-//	.state = &DAIL_State_t,
-//	
-//	.ctrl = &DAIL_Ctrl,
-//	
-//	.single_init = &DM_Single_Motor_Init,
-//};
-///*DM_end*/
+pid_ctrl_t pitch_angle_Ctrl_inn_gyro = 
+{
+	.kp = 0.12f,//0.15f,//
+	.ki = 0.f,
+	.kd = 0.f,
+	.integral_max = 0.f,
+	.out_max = 12.f,
+};
+
+pid_ctrl_t pitch_angle_Ctrl_out_gyro = 
+{
+	.kp = 20.f,//
+	.ki = 1.f,
+	.kd = 0.f,
+	.integral_max = 5.f,
+	.out_max = 200.f,
+};
+
+
+Motor_DM_Ctrl_Info_t PITCH_Ctrl = 
+{
+	.speed_ctrl = &pitch_Speed_Ctrl,
+	.angle_ctrl_inner=&pitch_angle_Ctrl_inn,
+	.angle_ctrl_outer=&pitch_angle_Ctrl_out,
+	.angle_ctrl_inner_gyro=&pitch_angle_Ctrl_inn_gyro,
+	.angle_ctrl_outer_gyro=&pitch_angle_Ctrl_out_gyro,
+
+	.position_inn=&PITCH_position_Ctrl_inn,
+	.position_out=&PITCH_position_Ctrl_out,
+};
+
+Motor_DM_Rx_Info_t PITCH_Rx_Info_t;
+
+Motor_DM_Tx_Info_t PITCH_Tx_Info_t;
+
+Motor_DM_State_t PITCH_State_t;
+
+Motor_DM_t PITCH = 
+{
+	.born_info = &PITCH_Born_Info,
+	
+	.rx_info = &PITCH_Rx_Info_t,
+	
+	.tx_info = &PITCH_Tx_Info_t,
+	
+	.state = &PITCH_State_t,
+	
+	.ctrl = &PITCH_Ctrl,
+	
+	.single_init = &DM_Single_Motor_Init,
+};
+/*DM_end*/
+
+
 
 /*RM START*/
 Motor_RM_Born_Info_t B_R_Fric_Born = 
@@ -714,7 +777,11 @@ void rm_motor_list_init()
 //	RM_Group_3.group_init(&RM_Group_3);
 	RM_Group_F1.group_init(&RM_Group_F1);
 //	RM_Group_F2.group_init(&RM_Group_F2);
+	#ifdef PITCH_4310
+	
+	#else
 	rm_motor[gim_pitch].single_init(&rm_motor[gim_pitch]);
+	#endif
 
 }
 
@@ -724,11 +791,11 @@ void rm_motor_list_init()
 //	motor_pid_init(&kt_motor[0].motor_all_pid.mec_pid, GIMB_Y_mec);
 //	motor_pid_init(&kt_motor[0].motor_all_pid.gyro_pid, GIMB_Y_gyro);
 //}
-//void dm_motor_list_init()
-//{
-//	DAIL.single_init(&DAIL);
-//	
-//}
+void dm_motor_list_init()
+{
+	PITCH.single_init(&PITCH);
+	
+}
 
 //void ht_motor_list_init()
 //{
@@ -741,7 +808,15 @@ void rm_motor_list_heart_beat()
 	RM_Group_F1.group_heartbeat(&RM_Group_F1);
 //	RM_Group_F2.group_heartbeat(&RM_Group_F2);
 //	RM_Group_3.group_heartbeat(&RM_Group_3);
+	#ifdef PITCH_4310
+	
+	#else
 	rm_motor[gim_pitch].single_heart_beat(&rm_motor[gim_pitch]);
+	#endif
 }
 
+void dm_motor_list_heart_beat()
+{
+	PITCH.single_init(&PITCH);
+}
 

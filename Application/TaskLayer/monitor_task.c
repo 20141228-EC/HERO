@@ -12,11 +12,13 @@
 int16_t a;
 void StartMonitorTask(void const *argument)
 {
-
-
 	for (;;)
 	{
 		rm_motor_list_heart_beat();
+	#ifdef PITCH_4310
+			dm_motor_list_heart_beat();
+	#else
+	#endif
 //		DAIL.single_heart_beat(&DAIL);
 //		L_Wheel.single_heart_beat(&L_Wheel);
 		C_Board_HeartBeat();

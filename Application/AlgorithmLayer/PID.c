@@ -125,7 +125,7 @@ float feedforward_pid_calc(pid_ctrl_t *out,pid_ctrl_t *inn,float target,float me
 	 feed_val=constrain(feed_val, -feedforward_outmax, feedforward_outmax);
 	//计算前馈pid总输出:前馈项+pid计算输出
 	
-	float output=feed_val+all_pid_calc (out,inn,target,mea_out,mea_in,inner_kp,err_cal_mode);
+	float output=/*feed_val+*/all_pid_calc (out,inn,target,mea_out,mea_in,inner_kp,err_cal_mode);
 	val_pre=val_last;
 	val_last=val_now;
 		return output;

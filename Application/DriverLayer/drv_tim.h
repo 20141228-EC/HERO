@@ -25,7 +25,7 @@
 //void Telescope_Sleep(void);
 void TIM1_Init(void);
 void TIM4_Init(void);
-
-
+void buzzer_on(uint16_t psc, uint16_t pwm);
+void buzzer_off(void);
 /* Servo functions */
 #endif

@@ -282,6 +282,20 @@ void Speed_Statistic(void)
     {
         // 计算平均值
         shoot_statistics.mean = (
+			shoot_statistics.speed_110 * 11.0f +
+			shoot_statistics.speed_111 * 11.1f +
+			shoot_statistics.speed_112 * 11.2f +
+			shoot_statistics.speed_113 * 11.3f +
+			shoot_statistics.speed_114 * 11.4f +
+			shoot_statistics.speed_115 * 11.5f +
+			shoot_statistics.speed_116 * 11.6f +
+			shoot_statistics.speed_117 * 11.7f +
+			shoot_statistics.speed_118 * 11.8f +
+			shoot_statistics.speed_119 * 11.9f +
+						shoot_statistics.speed_120 * 12.0f +
+						shoot_statistics.speed_121 * 12.1f +
+						shoot_statistics.speed_122 * 12.2f +
+						shoot_statistics.speed_123 * 12.3f +
             shoot_statistics.speed_150 * 15.0f +
             shoot_statistics.speed_151 * 15.1f +
             shoot_statistics.speed_152 * 15.2f +
@@ -296,11 +310,25 @@ void Speed_Statistic(void)
 			shoot_statistics.speed_161 * 16.1f +
 			shoot_statistics.speed_162 * 16.2f +
 			shoot_statistics.speed_163 * 16.3f +
-			shoot_statistics.speed_164 * 16.14 ) / (float)shoot_statistics.num;
+			shoot_statistics.speed_164 * 16.4f ) / (float)shoot_statistics.num;
 
         // 计算方差
         float sum_of_squares = (
-            shoot_statistics.speed_150 * ((15.0f - shoot_statistics.mean) * (15.0f - shoot_statistics.mean)) +
+            shoot_statistics.speed_110 * ((11.0f - shoot_statistics.mean) * (11.0f - shoot_statistics.mean)) +
+            shoot_statistics.speed_111 * ((11.1f - shoot_statistics.mean) * (11.1f - shoot_statistics.mean)) +
+            shoot_statistics.speed_112 * ((11.2f - shoot_statistics.mean) * (11.2f - shoot_statistics.mean)) +
+            shoot_statistics.speed_113 * ((11.3f - shoot_statistics.mean) * (11.3f - shoot_statistics.mean)) +
+            shoot_statistics.speed_114 * ((11.4f - shoot_statistics.mean) * (11.4f - shoot_statistics.mean)) +
+            shoot_statistics.speed_115 * ((11.5f - shoot_statistics.mean) * (11.5f - shoot_statistics.mean)) +
+            shoot_statistics.speed_116 * ((11.6f - shoot_statistics.mean) * (11.6f - shoot_statistics.mean)) +
+            shoot_statistics.speed_117 * ((11.7f - shoot_statistics.mean) * (11.7f - shoot_statistics.mean)) +
+            shoot_statistics.speed_118 * ((11.8f - shoot_statistics.mean) * (11.8f - shoot_statistics.mean)) +
+            shoot_statistics.speed_119 * ((11.9f - shoot_statistics.mean) * (11.9f - shoot_statistics.mean)) +
+            shoot_statistics.speed_120 * ((12.0f - shoot_statistics.mean) * (12.0f - shoot_statistics.mean)) +
+            shoot_statistics.speed_121 * ((12.1f - shoot_statistics.mean) * (12.1f - shoot_statistics.mean)) +
+            shoot_statistics.speed_122 * ((12.2f - shoot_statistics.mean) * (12.2f - shoot_statistics.mean)) +
+            shoot_statistics.speed_123 * ((12.3f - shoot_statistics.mean) * (12.3f - shoot_statistics.mean)) +
+				shoot_statistics.speed_150 * ((15.0f - shoot_statistics.mean) * (15.0f - shoot_statistics.mean)) +
             shoot_statistics.speed_151 * ((15.1f - shoot_statistics.mean) * (15.1f - shoot_statistics.mean)) +
             shoot_statistics.speed_152 * ((15.2f - shoot_statistics.mean) * (15.2f - shoot_statistics.mean)) +
             shoot_statistics.speed_153 * ((15.3f - shoot_statistics.mean) * (15.3f - shoot_statistics.mean)) +

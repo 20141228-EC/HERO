@@ -70,9 +70,15 @@ void CAN1_rxDataHandler(uint32_t rxId, uint8_t *rxBuf)
 {
 	switch (rxId)
 	{
+		#ifdef PITCH_4310
+		case 0x11:
+			PITCH.rx(&PITCH,rxBuf);
+		break;
+		#else
 		case ID_GIMB_P:
 			rm_motor[gim_pitch].rx(&rm_motor[gim_pitch],rxBuf);
 		break;
+		#endif
 		case ID_FRIC_B_L:
 			rm_motor[B_L_Fric].rx(&rm_motor[B_L_Fric],rxBuf);
 		break;
@@ -118,20 +124,60 @@ void CAN_BOARD_send(void)
 	if(Board_Rx_Info.is_rc_online == 0)
 	{
     RM_Group_F1.group_set_torque(&RM_Group_F1);
+		#ifdef PITCH_4310
+		
+//				PITCH.single_sleep(&PITCH);
+
+		PITCH.single_set_torque(&PITCH);
+		#else
 		rm_motor[gim_pitch].single_set_torque(&rm_motor[gim_pitch]);
+		#endif
 		Board_Tx_Update(&Board_Tx_Info);
+		
+//		if (hcan2.ErrorCode != 0)
+//    {
+//    // 停止 → 复位 → 重新初始化 → 启动
+//    HAL_CAN_Stop(&hcan2);
+//    HAL_CAN_ResetError(&hcan2);
+//    HAL_CAN_Init(&hcan2);
+//    HAL_CAN_Start(&hcan2);
+
+//    // 清除错误
+//    hcan2.ErrorCode = 0;
+//    }
+//		
 		Board_Tx_C1();
 		Board_Tx_C2();
+//		Board_Tx_C3();
 	}
 	else 
 	{
 		RM_Group_F1.group_sleep(&RM_Group_F1);
 		RM_Group_F1.group_set_torque(&RM_Group_F1);
+		#ifdef PITCH_4310
+		PITCH.single_sleep(&PITCH);
+		PITCH.single_set_torque(&PITCH);
+		#else
 		rm_motor[gim_pitch].single_sleep(&rm_motor[gim_pitch]);
 		rm_motor[gim_pitch].single_set_torque(&rm_motor[gim_pitch]);
+		#endif
 		Board_Tx_Update(&Board_Tx_Info);
+		
+//		if (hcan2.ErrorCode != 0)
+//    {
+//    // 停止 → 复位 → 重新初始化 → 启动
+//    HAL_CAN_Stop(&hcan2);
+//    HAL_CAN_ResetError(&hcan2);
+//    HAL_CAN_Init(&hcan2);
+//    HAL_CAN_Start(&hcan2);
+
+//    // 清除错误
+//    hcan2.ErrorCode = 0;
+//    }
+		
 		Board_Tx_C1();
 		Board_Tx_C2();
+//		Board_Tx_C3();
 	}
 	
 }

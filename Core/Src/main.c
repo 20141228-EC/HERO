@@ -34,6 +34,7 @@
 #include "driver.h"
 #include "device.h"
 #include "rc_protocol.h"
+#include "stm32f4xx_hal.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -214,7 +215,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		if ((imu_sensor.work_state.err_code == IMU_NONE_ERR) || \
 				(imu_sensor.work_state.err_code == IMU_DATA_CALI))
 		{
-			imu_sensor.update(&imu_sensor);
+//			imu_sensor.update(&imu_sensor);
 			
 		}
 		

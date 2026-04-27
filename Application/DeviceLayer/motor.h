@@ -34,7 +34,7 @@
 #define ID_FRIC_UP 	0x208 //0x1FF  67
 extern  KT_motor_t kt_motor[1];
 extern  Motor_HT_t L_Wheel;
-extern  Motor_DM_t DAIL;
+extern  Motor_DM_t PITCH;
 
 
 extern  Motor_RM_Group_t RM_Group_F1;
@@ -46,6 +46,8 @@ void rm_motor_list_heart_beat(void);
 void kt_motor_list_init(void);
 void ht_motor_list_init(void);
 void dm_motor_list_init(void);
+void dm_motor_list_heart_beat(void);
+
 uint8_t rm_motor_list_workstate(void);
 
 #endif

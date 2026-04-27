@@ -10,8 +10,18 @@
 #include "bmi.h"
 
 /* Exported macro ------------------------------------------------------------*/
-
-//#define YAW_MOTOR_ANGLE_MIDDLE 		(17463.f-1000.f)  		  //YAW电机中值
+#ifdef PITCH_4310
+#define PITCH_MOTOR_HALF_ENCODER  (PI)        
+#define PITCH_MOTOR_ENCODER_MIDDLE  (-2.65464234f)           //(3400.f+2950.f)      //(2950.f)    //pitch电机编码器中值
+#define GIMBAL_LOB_MEC_ANGEL	 (0.f)      //吊射机械角度 15.6弹速606
+#define GIMBAL_LOB_LOW_MEC_ANGEL	 (0.f)      //吊射底部机械角度  
+#define GIMBAL_MAX_MEC_ANGEL   		(0.58f)				//pitch机械角度电控限位最大值 920  0.60
+#define GIMBAL_MIN_MEC_ANGEL  		(-0.27f)			//pitch机械角度电控限位最小值 -338  0.33
+#define GIMBAL_MAX_GYRO_ANGEL		(gimbal->base_info.pitch_imu_angle + (GIMBAL_MAX_MEC_ANGEL - gimbal->base_info.pitch_motor_angle) / (2*PI) * 360.f)
+//pitch陀螺仪角度电控限位最小值       
+#define GIMBAL_MIN_GYRO_ANGEL		(gimbal->base_info.pitch_imu_angle - (gimbal->base_info.pitch_motor_angle - GIMBAL_MIN_MEC_ANGEL) / (2*PI) * 360.f)
+#else
+#define PITCH_MOTOR_HALF_ENCODER  (4096.f)        
 #define PITCH_MOTOR_ENCODER_MIDDLE  (1430.f)           //(3400.f+2950.f)      //(2950.f)    //pitch电机编码器中值
 #define GIMBAL_LOB_MEC_ANGEL	 (628.f)      //吊射机械角度 15.6弹速606
 #define GIMBAL_LOB_LOW_MEC_ANGEL	 (536.f)      //吊射底部机械角度  
@@ -21,7 +31,7 @@
 #define GIMBAL_MAX_GYRO_ANGEL		(gimbal->base_info.pitch_imu_angle + (GIMBAL_MAX_MEC_ANGEL - gimbal->base_info.pitch_motor_angle) / 8192.f * 360.f)
 //pitch陀螺仪角度电控限位最小值       
 #define GIMBAL_MIN_GYRO_ANGEL		(gimbal->base_info.pitch_imu_angle - (gimbal->base_info.pitch_motor_angle - GIMBAL_MIN_MEC_ANGEL) / 8192.f * 360.f)
-
+#endif
 /*云台pid计算类型*/
 typedef enum
 {
@@ -94,7 +104,11 @@ typedef struct __attribute__((packed))
 
 typedef struct gimbal_class_t
 {
+	#ifdef PITCH_4310
+	Motor_DM_t         *gimbal_p;
+	#else
 	Motor_RM_t 		     *gimbal_p;
+	#endif
 	KT_motor_t         *gimbal_y;
 	gimbal_gravity_offset_info_t gravity_offset_info;
 	gimbal_base_info_t   	base_info;

@@ -116,6 +116,8 @@ typedef struct
 	
 	/*视觉信息,发射更新*/
 	uint8_t vision_state;//**
+	uint8_t is_fric_speed;
+	uint8_t is_fric_work;
 	bool hit_enable;
 	bool is_find_Target;
 	bool is_find_outpost;
@@ -123,6 +125,12 @@ typedef struct
 	uint16_t launch_timer;//发射主动等待时间//**
 	float vision_pitch_tar;//**
 	float vision_yaw_tar;//**
+	
+	uint8_t detect_num;
+	
+	float kp;
+	float kd;
+
 	
 }Board_Tx_Info_t;
 
@@ -134,6 +142,7 @@ typedef struct
 	float pitch_imu_tar;//**
 	float yaw_mec_imu;//_tar;//*******
 	float pitch_mec_tar;//?//**
+	float pitch_offset;
 	int8_t gimbal_mode;//**
 	
 	bool gimbal_state;//**
@@ -159,6 +168,10 @@ typedef struct
 	uint8_t blood_7;//**
 	float v_x;//**
 	float v_y;//**
+	
+	float mea;
+	float tar;
+	float err;
 }Board_Rx_Info_t;
 
 typedef struct

@@ -11,7 +11,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "drv_tim.h"
-
+#include "main.h"
 /* Private macro -------------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Private typedef -----------------------------------------------------------*/
@@ -40,14 +40,24 @@ void TIM4_Init(void)
 {
 	HAL_TIM_Base_Init(&htim4);
 	HAL_TIM_Base_Start_IT(&htim4);
+
+//    // 必须加上这段！配置TIM4_CH3为PWM模式
+//    TIM_OC_InitTypeDef sConfigOC = {0};
+//    sConfigOC.OCMode = TIM_OCMODE_PWM1;
+//    sConfigOC.Pulse = 0;  // 初始占空比为0，不响
+//    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+//    if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+//    {
+//        Error_Handler();
+//    }	
+//	  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
 }
 /* Servo functions */
 void buzzer_on(uint16_t psc, uint16_t pwm)
 {
-	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
     __HAL_TIM_PRESCALER(&htim4, psc);
     __HAL_TIM_SetCompare(&htim4, TIM_CHANNEL_3, pwm);
-
+    HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
 }
 void buzzer_off(void)
 {
