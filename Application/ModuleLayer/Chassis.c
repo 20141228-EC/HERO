@@ -306,15 +306,15 @@ void Chassis_Init(Chassis_t* My_Chassis)
 	
 	Chassis_Jump.Max_COMPRESS_tick=800.f; //NO_PRE_LANDING
 	Chassis_Jump.Max_EXTEND_tick=1500.f;	//NO_PRE_LANDING
-	Chassis_Jump.Max_RETRACT_tick=200.f;	//NO_PRE_LANDING 700
-	Chassis_Jump.Max_PRE_LANDING_tick=200.f;//600
+	Chassis_Jump.Max_RETRACT_tick=100.f;	//NO_PRE_LANDING 700
+	Chassis_Jump.Max_PRE_LANDING_tick=1000.f;//600
 	Chassis_Jump.Max_LANDING_tick=2000.f;//400
 	
 	Chassis_Jump.COMPRESS_length_kp=30.f; //40//NO_PRE_LANDING400
 	Chassis_Jump.EXTEND_length_kp=4000.f;  //NO_PRE_LANDING4000
 	Chassis_Jump.RETRACT_length_kp=60.f; //NO_PRE_LANDING4000
-	Chassis_Jump.PRE_LANDING_length_kp=30.f;//500
-	Chassis_Jump.LANDING_length_kp=60.f;//50//200
+	Chassis_Jump.PRE_LANDING_length_kp=100.f;//500
+	Chassis_Jump.LANDING_length_kp=100.f;//50//200
 	Chassis_Jump.LANDING_length_speed_kp=100.f;//200//10000
 	//撞膝上台阶
 	Chassis_Knee_Strike.Idle_tick = 0.f;
@@ -324,8 +324,9 @@ void Chassis_Init(Chassis_t* My_Chassis)
 	Chassis_Knee_Strike.STAND_length_kp=18.f;
 	Chassis_Knee_Strike.RETRACT_length_kp=300.f;
 	Chassis_Knee_Strike.thetal_threshold=25.f;//20//23//
-	Chassis_Knee_Strike.down_thetal_threshold = 18.f;
-	Chassis_Knee_Strike.Max_RETRACT_tick=1000;
+	Chassis_Knee_Strike.down_thetal_threshold = 22.f;
+	Chassis_Knee_Strike.down_thetab_threshold = 0.5f;
+	Chassis_Knee_Strike.Max_RETRACT_tick=200.f;
 	//换头
 	Chassis_Turn.Going_tick = 0 ;
 	Chassis_Turn.Max_GOING_tick = 500; 
@@ -2040,6 +2041,134 @@ static void Walk_Down_2_Target_Process(Chassis_t* My_Chassis)
             break;
 	}
 }
+//static void Walk_Down_2_Target_Process(Chassis_t* My_Chassis)
+//{
+//	Chassis_Knee_Strike_t* knee_strike_info=My_Chassis->knee_strike_info;
+//	Link_t* R_Link=My_Chassis->Leg_Unit[R_Leg]->Link;
+//	Link_t* L_Link=My_Chassis->Leg_Unit[L_Leg]->Link;
+//	knee_strike_info->thetab=Rad2Angle*fabsf(My_Chassis->Posture->info->pitch);
+//	
+//	knee_strike_info->l0_average = 0.5f*(R_Link->info->length->l0+L_Link->info->length->l0);
+//	
+//	switch (knee_strike_info->step1)
+//	{
+//		case Knee_IDLE:
+////			if(my_abs(Chassis.chassis_PID->yaw_cal[L_Leg]->target) >= 0.7f || my_abs(Chassis.Posture->info->yaw - Chassis.target->yaw) >= 0.3f)
+////			{
+////				knee_strike_info->Idle_tick ++;
+////				Balance.Flag->Return_Flag = true;
+////				knee_strike_info->step1=Knee_IDLE;
+////			}
+////			else if(Balance.Flag->Return_Flag == false && my_abs(Chassis.chassis_PID->yaw_cal[L_Leg]->target) <= 0.7f && my_abs(Chassis.Posture->info->yaw - Chassis.target->yaw) <= 0.2f)
+////			{
+//				//动作
+//				knee_strike_info->IDLE_length_kp=My_Chassis->chassis_PID->length_cal[R_Leg]->kp;//保存
+//				knee_strike_info->Stand_High_tick=0;
+//				//事件
+//				knee_strike_info->step1=Knee_THETAB;
+////			}
+////			else if(knee_strike_info->Idle_tick >= 1000.f)
+////			{
+////				knee_strike_info->Idle_tick = 0;
+////				knee_strike_info->step1=Knee_IDLE;
+////				My_Chassis->target->leg_length_l=TAR_LEG_LENGTH_INITIAL;
+////				My_Chassis->target->leg_length_r=TAR_LEG_LENGTH_INITIAL;
+////				
+////				Balance.Flag->Knee_Strike_1_Flag=false;
+////			}
+//			break;
+//			
+//		case Knee_THETAB:
+//			knee_strike_info->Stand_High_tick++;
+//		  My_Chassis->target->thetab = 0.1f;//5.7度
+//		
+//			if(my_abs(knee_strike_info->thetab - 5.5f) <= 0.2f)
+//			{
+//				knee_strike_info->step1=Knee_Stand_High;
+//				knee_strike_info->Stand_High_tick = 0;
+//			}
+//			if(knee_strike_info->Stand_High_tick>=knee_strike_info->Max_Stand_High_tick)
+//			{
+//				knee_strike_info->step1=Knee_IDLE;
+//		  My_Chassis->target->thetab = 0.f;
+//				My_Chassis->target->leg_length_l=TAR_LEG_LENGTH_INITIAL;
+//				My_Chassis->target->leg_length_r=TAR_LEG_LENGTH_INITIAL;
+//				My_Chassis->chassis_PID->length_cal[R_Leg]->kp= knee_strike_info->IDLE_length_kp;
+//				My_Chassis->chassis_PID->length_cal[L_Leg]->kp= knee_strike_info->IDLE_length_kp;
+//				Balance.Flag->Down_Two_Step_Flag = false;
+//			}
+//			break;
+//		
+//		case Knee_Stand_High://立着
+//			//动作
+//			knee_strike_info->Stand_High_tick++;
+//		  My_Chassis->target->thetab = 0.1f;
+//		  if(My_Chassis->target->leg_length_l <= 0.25f)//0.35
+//			{
+//				My_Chassis->target->leg_length_l += 0.5f * TIME_STEP;
+//				My_Chassis->target->leg_length_r += 0.5f * TIME_STEP;
+//			}
+//			if(My_Chassis->target->leg_length_l >= 0.25f)
+//			{
+//				My_Chassis->target->leg_length_l = 0.25f;//MAX_LEG_LENGTH-knee_strike_info->Max_l0_range;
+//				My_Chassis->target->leg_length_r = 0.25f;//MAX_LEG_LENGTH-knee_strike_info->Max_l0_range;
+//			}
+//			My_Chassis->chassis_PID->length_cal[L_Leg]->kp= knee_strike_info->STAND_length_kp;
+//		  My_Chassis->chassis_PID->length_cal[R_Leg]->kp= knee_strike_info->STAND_length_kp;
+//			//事件
+//			if(knee_strike_info->thetab<=knee_strike_info->down_thetab_threshold)
+//			{
+//				knee_strike_info->step1=Knee_RETRACT;
+//				knee_strike_info->RETRACT_tick = 0;
+//			}
+//			if(knee_strike_info->Stand_High_tick>=knee_strike_info->Max_Stand_High_tick)
+//			{
+//				knee_strike_info->step1=Knee_IDLE;
+//		  My_Chassis->target->thetab = 0.f;
+//				My_Chassis->target->leg_length_l=TAR_LEG_LENGTH_INITIAL;
+//				My_Chassis->target->leg_length_r=TAR_LEG_LENGTH_INITIAL;
+//				My_Chassis->chassis_PID->length_cal[R_Leg]->kp= knee_strike_info->IDLE_length_kp;
+//				My_Chassis->chassis_PID->length_cal[L_Leg]->kp= knee_strike_info->IDLE_length_kp;
+//				Balance.Flag->Down_Two_Step_Flag = false;
+//			}
+//			break;
+//			
+//		case Knee_RETRACT://收腿
+//			//动作
+//			knee_strike_info->RETRACT_tick++;
+//		  My_Chassis->target->thetal_l = -0.7f;
+//		  My_Chassis->target->thetal_r = -0.7f;
+//			My_Chassis->target->leg_length_l = MIN_LEG_LENGTH+knee_strike_info->Minimum_l0_range;
+//			My_Chassis->target->leg_length_r = MIN_LEG_LENGTH+knee_strike_info->Minimum_l0_range;
+//			My_Chassis->chassis_PID->length_cal[R_Leg]->kp=knee_strike_info->RETRACT_length_kp;
+//		  My_Chassis->chassis_PID->length_cal[L_Leg]->kp=knee_strike_info->RETRACT_length_kp;
+//		  My_Chassis->chassis_PID->length_speed_cal[R_Leg]->out_max = 600.f;
+//		  My_Chassis->chassis_PID->length_speed_cal[L_Leg]->out_max = 600.f;
+//		My_Chassis->target->s = My_Chassis->Leg_Unit[R_Leg]->Straight->info->s;
+//			//事件
+//			if(knee_strike_info->RETRACT_tick>=knee_strike_info->Max_RETRACT_tick
+//				|| my_abs(knee_strike_info->l0_average-MIN_LEG_LENGTH+knee_strike_info->Minimum_l0_range) <= 0.01)
+//			{
+//				knee_strike_info->Idle_tick = 0;
+//				knee_strike_info->step1=Knee_IDLE;
+//				My_Chassis->target->thetab = 0.f;
+//		    My_Chassis->target->thetal_l = 0.f;
+//		    My_Chassis->target->thetal_r = 0.f;
+//				My_Chassis->target->leg_length_l=TAR_LEG_LENGTH_INITIAL;
+//				My_Chassis->target->leg_length_r=TAR_LEG_LENGTH_INITIAL;
+//				My_Chassis->chassis_PID->length_cal[R_Leg]->kp= knee_strike_info->IDLE_length_kp;
+//				My_Chassis->chassis_PID->length_cal[L_Leg]->kp= knee_strike_info->IDLE_length_kp;
+//		    My_Chassis->chassis_PID->length_speed_cal[R_Leg]->out_max = 200.f;
+//		    My_Chassis->chassis_PID->length_speed_cal[L_Leg]->out_max = 200.f;
+//				
+//				Balance.Flag->Down_Two_Step_Flag = false;
+//			}
+//			break;
+//		
+//		  default:
+//            break;
+//	}
+//}
 
 	
 /**
@@ -2089,7 +2218,7 @@ static void Jump_Down_2_Target_Process(Chassis_t* My_Chassis)
 			jump_info->LANDING_tick=0;
 			knee_strike_info->Stand_High_tick=0;
 			//事件
-			knee_strike_info->step2=JK_COMPRESS;
+			knee_strike_info->step2=JK_EXTEND;
 			break;
 		
 		case JK_COMPRESS://压缩腿  
@@ -2119,7 +2248,7 @@ static void Jump_Down_2_Target_Process(Chassis_t* My_Chassis)
 			#ifdef TIME_ONLY
 			if(jump_info->EXTEND_tick>=jump_info->Max_EXTEND_tick)
 			#else
-				if((jump_info->l0_average>=0.32f)//MAX_LEG_LENGTH -jump_info->Max_l0_range)
+				if((jump_info->l0_average>=0.22f)//MAX_LEG_LENGTH -jump_info->Max_l0_range)
 				||jump_info->EXTEND_tick>=jump_info->Max_EXTEND_tick)
 			#endif
 			{
@@ -2180,8 +2309,8 @@ static void Jump_Down_2_Target_Process(Chassis_t* My_Chassis)
 		 case JK_PRE_LANDING://伸腿准备缓冲
 			//动作
 			jump_info->PRE_LANDING_tick++;
-			My_Chassis->target->leg_length_l = 0.36f;
-			My_Chassis->target->leg_length_r = 0.36f;   // MAX_LEG_LENGTH-jump_info->Max_l0_range;
+			My_Chassis->target->leg_length_l = 0.40f;
+			My_Chassis->target->leg_length_r = 0.40f;   // MAX_LEG_LENGTH-jump_info->Max_l0_range;
 			My_Chassis->chassis_PID->length_cal[R_Leg]->kp=jump_info->PRE_LANDING_length_kp;
 		    My_Chassis->chassis_PID->length_cal[L_Leg]->kp=jump_info->PRE_LANDING_length_kp;
 			//事件
@@ -2198,8 +2327,8 @@ static void Jump_Down_2_Target_Process(Chassis_t* My_Chassis)
 		  case JK_LANDING://缓冲
 			//动作
 			jump_info->LANDING_tick++;
-			My_Chassis->target->leg_length_l -= 0.03f * TIME_STEP;
-			My_Chassis->target->leg_length_r -= 0.03f * TIME_STEP;
+			My_Chassis->target->leg_length_l -= 0.06f * TIME_STEP;
+			My_Chassis->target->leg_length_r -= 0.06f * TIME_STEP;
 			My_Chassis->chassis_PID->length_cal[R_Leg]->kp=jump_info->LANDING_length_kp;
 		    My_Chassis->chassis_PID->length_cal[L_Leg]->kp=jump_info->LANDING_length_kp;
 			My_Chassis->chassis_PID->length_speed_cal[R_Leg]->kp=jump_info->LANDING_length_speed_kp;
@@ -2509,6 +2638,11 @@ static void Chassis_Leg_vir_phi0_Cal(Chassis_t* My_Chassis)
 		My_Chassis->target->vir_phi0_r = 0.f;
 		My_Chassis->target->vir_phi0_l = 0.f;
 	}
+	if(Balance.Flag->Down_Two_Step_Flag==true && (My_Chassis->knee_strike_info->step1 == Knee_RETRACT))
+	{
+		My_Chassis->target->vir_phi0_r = 0.3f;
+		My_Chassis->target->vir_phi0_l = 0.3f;
+	}
 //	else if(Balance.Flag->Jumping_Flag==true && My_Chassis->jump_info->jump_step == J_RETRACT)
 //	{
 //		My_Chassis->target->vir_phi0_r = 0.1f;
@@ -2573,6 +2707,7 @@ static void Chassis_Wheel_Turn_Cal(Chassis_t* My_Chassis)
 	static float yaw_tar;
 	static float flag1,flag2 = 0;
 	static float limit = 0;
+	static uint16_t time = 0;
 	if(My_Chassis->mode == C_Turn || My_Chassis->mode == C_Init || Balance.Flag->Return_Flag == 1)// || My_Chassis->mode == C_Cycle)
 	{
 		flag1 = 0;
@@ -2592,6 +2727,26 @@ static void Chassis_Wheel_Turn_Cal(Chassis_t* My_Chassis)
 		}
 	}
 	
+	if(Balance.Flag->Cycle_To_Imu_Flag == true)
+	{
+		time++;
+		if(time >= 1000)
+		{
+			Balance.Flag->Cycle_To_Imu_Flag = false;
+			time = 0;
+		}
+	}
+	
+	if(Balance.Flag->Cycle_To_Imu_Flag == true)
+	{
+		My_Chassis->chassis_PID->yaw_speed_cal[R_Leg]->out_max = 5.f;
+		My_Chassis->chassis_PID->yaw_speed_cal[L_Leg]->out_max = 5.f;
+	}
+	else
+	{
+		My_Chassis->chassis_PID->yaw_speed_cal[R_Leg]->out_max = 20.f;
+		My_Chassis->chassis_PID->yaw_speed_cal[L_Leg]->out_max = 20.f;
+	}
 //	if((Balance.last_mode == Cycle_Mode && Balance.mode != Cycle_Mode && Balance.mode != Vary_Cycle_Mode)
 //		|| (Balance.last_mode == Vary_Cycle_Mode && Balance.mode != Cycle_Mode && Balance.mode != Vary_Cycle_Mode))
 //	{
@@ -2938,24 +3093,57 @@ static void Chassis_Leg_Length_Strength_Cal(Chassis_t* My_Chassis)
 		}
 	}
 	/*赋予处理后的目标值 begin*/
-	if(Balance.Flag->Middle_Flag == true) //飞坡0.26
+	if(Balance.Flag->Down_Two_Step_Flag == false && Balance.Flag->Knee_Strike_1_Flag == false && Balance.Flag->Jumping_Flag == false)
 	{
-		if(My_Chassis->chassis_PID->length_cal[R_Leg]->target <= 0.30f)
+		if(Balance.Flag->Middle_Flag == true) //飞坡0.26
 		{
-			My_Chassis->chassis_PID->length_cal[R_Leg]->target += 0.15f * TIME_STEP;
-			My_Chassis->chassis_PID->length_cal[L_Leg]->target += 0.15f * TIME_STEP;
+			if(My_Chassis->target->leg_length_r <= 0.28f)
+			{
+				My_Chassis->target->leg_length_r += 0.15f * TIME_STEP;
+				My_Chassis->target->leg_length_l += 0.15f * TIME_STEP;
+			}
+			if(My_Chassis->target->leg_length_r >= 0.28f)
+			{
+				My_Chassis->target->leg_length_r = 0.28f;
+				My_Chassis->target->leg_length_l = 0.28f;
+			}
 		}
-		if(My_Chassis->chassis_PID->length_cal[R_Leg]->target >= 0.30f)
+		else
 		{
-			My_Chassis->chassis_PID->length_cal[R_Leg]->target = 0.30f + My_Chassis->Leg_Unit[R_Leg]->force->F_roll;//0.30f + My_Chassis->Leg_Unit[R_Leg]->force->F_roll;
-			My_Chassis->chassis_PID->length_cal[L_Leg]->target = 0.30f - My_Chassis->Leg_Unit[R_Leg]->force->F_roll;//0.30f - My_Chassis->Leg_Unit[R_Leg]->force->F_roll;
+			if(My_Chassis->target->leg_length_r >= TAR_LEG_LENGTH_INITIAL)
+			{
+				My_Chassis->target->leg_length_r -= 0.15f * TIME_STEP;
+				My_Chassis->target->leg_length_l -= 0.15f * TIME_STEP;
+			}
+			if(My_Chassis->target->leg_length_r <= TAR_LEG_LENGTH_INITIAL)
+			{
+				My_Chassis->target->leg_length_r = TAR_LEG_LENGTH_INITIAL;
+				My_Chassis->target->leg_length_l = TAR_LEG_LENGTH_INITIAL;
+			}
 		}
-		}
-	else
-	{
+	}
+	
 		My_Chassis->chassis_PID->length_cal[R_Leg]->target = My_Chassis->target->leg_length_r + My_Chassis->Leg_Unit[R_Leg]->force->F_roll;
 		My_Chassis->chassis_PID->length_cal[L_Leg]->target = My_Chassis->target->leg_length_l - My_Chassis->Leg_Unit[R_Leg]->force->F_roll;
-	}
+
+//	if(Balance.Flag->Middle_Flag == true) //飞坡0.26
+//	{
+//		if(My_Chassis->chassis_PID->length_cal[R_Leg]->target <= 0.30f)
+//		{
+//			My_Chassis->chassis_PID->length_cal[R_Leg]->target += 0.15f * TIME_STEP;
+//			My_Chassis->chassis_PID->length_cal[L_Leg]->target += 0.15f * TIME_STEP;
+//		}
+//		if(My_Chassis->chassis_PID->length_cal[R_Leg]->target >= 0.30f)
+//		{
+//			My_Chassis->chassis_PID->length_cal[R_Leg]->target = 0.30f + My_Chassis->Leg_Unit[R_Leg]->force->F_roll;//0.30f + My_Chassis->Leg_Unit[R_Leg]->force->F_roll;
+//			My_Chassis->chassis_PID->length_cal[L_Leg]->target = 0.30f - My_Chassis->Leg_Unit[R_Leg]->force->F_roll;//0.30f - My_Chassis->Leg_Unit[R_Leg]->force->F_roll;
+//		}
+//	}
+//	else
+//	{
+//		My_Chassis->chassis_PID->length_cal[R_Leg]->target = My_Chassis->target->leg_length_r + My_Chassis->Leg_Unit[R_Leg]->force->F_roll;
+//		My_Chassis->chassis_PID->length_cal[L_Leg]->target = My_Chassis->target->leg_length_l - My_Chassis->Leg_Unit[R_Leg]->force->F_roll;
+//	}
 	//****************************************************************	//****************************************************************
 //  if(Balance.Flag->Down_Two_Step_Flag == false && Balance.Flag->Jumping_Flag == false && Balance.Flag->Knee_Strike_1_Flag == false && Balance.Chassis_Com->Save_Finish_Flag_2 == true)
 //	{
@@ -3251,6 +3439,22 @@ static void Chassis_Torque_Cal(Chassis_t *My_Chassis)
 		My_Chassis->Leg_Unit[L_Leg]->force->Tp_target = My_Chassis->Leg_Unit[L_Leg]->force->F_Save;
 	}
 	#ifdef WALK_DOWN_2
+	else if(Balance.Flag->Jumping_Flag==true && (My_Chassis->jump_info->jump_step == J_RETRACT || My_Chassis->jump_info->jump_step == J_PRE_LANDING))
+	{
+		My_Chassis->Leg_Unit[R_Leg]->force->Tp_target=My_Chassis->Leg_Unit[R_Leg]->force->Tp_vir_phi0
+		                                             + My_Chassis->Leg_Unit[R_Leg]->force->Tp_sync;
+		My_Chassis->Leg_Unit[L_Leg]->force->Tp_target=My_Chassis->Leg_Unit[L_Leg]->force->Tp_vir_phi0
+		                                             + My_Chassis->Leg_Unit[L_Leg]->force->Tp_sync;		
+	}
+	else if(Balance.Flag->Down_Two_Step_Flag==true && (My_Chassis->knee_strike_info->step1 == Knee_RETRACT))
+	{
+		My_Chassis->Leg_Unit[R_Leg]->force->Tp_target=R_TP_LQR_ORDER_CORRECT* My_Chassis->Leg_Unit[R_Leg]->force->Tp_LQR 
+		                                             + My_Chassis->Leg_Unit[R_Leg]->force->Tp_vir_phi0
+		                                             + My_Chassis->Leg_Unit[R_Leg]->force->Tp_sync;
+		My_Chassis->Leg_Unit[L_Leg]->force->Tp_target=L_TP_LQR_ORDER_CORRECT* My_Chassis->Leg_Unit[L_Leg]->force->Tp_LQR
+		                                             + My_Chassis->Leg_Unit[L_Leg]->force->Tp_vir_phi0
+		                                             + My_Chassis->Leg_Unit[L_Leg]->force->Tp_sync;
+	}
 	else if(Balance.Flag->Jumping_Flag==false
 		     || (Balance.Flag->Jumping_Flag==true && (My_Chassis->jump_info->jump_step == J_COMPRESS || My_Chassis->jump_info->jump_step == J_EXTEND || My_Chassis->jump_info->jump_step == J_LANDING)))               
 	{
@@ -3258,13 +3462,6 @@ static void Chassis_Torque_Cal(Chassis_t *My_Chassis)
 													+My_Chassis->Leg_Unit[R_Leg]->force->Tp_sync;
 		My_Chassis->Leg_Unit[L_Leg]->force->Tp_target= L_TP_LQR_ORDER_CORRECT* My_Chassis->Leg_Unit[L_Leg]->force->Tp_LQR 
 	                      	+My_Chassis->Leg_Unit[L_Leg]->force->Tp_sync;
-	}
-	else if(Balance.Flag->Jumping_Flag==true && (My_Chassis->jump_info->jump_step == J_RETRACT || My_Chassis->jump_info->jump_step == J_PRE_LANDING))
-	{
-		My_Chassis->Leg_Unit[R_Leg]->force->Tp_target=My_Chassis->Leg_Unit[R_Leg]->force->Tp_vir_phi0
-		                                             + My_Chassis->Leg_Unit[R_Leg]->force->Tp_sync;
-		My_Chassis->Leg_Unit[L_Leg]->force->Tp_target=My_Chassis->Leg_Unit[L_Leg]->force->Tp_vir_phi0
-		                                             + My_Chassis->Leg_Unit[L_Leg]->force->Tp_sync;
 	}
 	#else
 	else if((Balance.Flag->Jumping_Flag==false && Balance.Flag->Down_Two_Step_Flag==false) || (Balance.Flag->Jumping_Flag==true && (My_Chassis->jump_info->jump_step == J_COMPRESS || My_Chassis->jump_info->jump_step == J_EXTEND || My_Chassis->jump_info->jump_step == J_LANDING))
@@ -3533,7 +3730,7 @@ static void Chassis_Leg_Fbl_Cal(Chassis_t* My_Chassis)
 		                                                    + My_Chassis->Leg_Unit[L_Leg]->force->F_gravity;
 		}
 		else if((My_Chassis->jump_info->jump_step == J_COMPRESS || My_Chassis->jump_info->jump_step == J_LANDING)
-			      || (My_Chassis->knee_strike_info->step2 == JK_COMPRESS || My_Chassis->knee_strike_info->step2 == JK_LANDING))
+			      || (My_Chassis->knee_strike_info->step2 == JK_COMPRESS || My_Chassis->knee_strike_info->step2 == JK_PRE_LANDING || My_Chassis->knee_strike_info->step2 == JK_LANDING))
 		{
 			My_Chassis->Leg_Unit[R_Leg]->force->F_bl_target = My_Chassis->Leg_Unit[R_Leg]->force->F 
 																												+ My_Chassis->Leg_Unit[R_Leg]->force->F_gravity;
@@ -4290,7 +4487,7 @@ static void Cycle_Target_Process(Chassis_t* My_Chassis)
   static int8_t vary_flag = 1;
 	if(My_Chassis->mode == C_Cycle)
 	{    
- 		Cycle_Speed = Cycle_Speed + 0.1;
+ 		Cycle_Speed = Cycle_Speed + 0.2;
 		
 	  if(fabsf(My_Chassis->target->velocity_y) >= 0.1f || fabsf(My_Chassis->target->sd1) >= 0.1f)
 		{
@@ -4354,15 +4551,15 @@ void My_Spring_Former_Input_Cal(Chassis_t* My_Chassis)
 	feed_b_r = 0.f;
 	if((Balance.Flag->Jumping_Flag==true && My_Chassis->jump_info->jump_step == J_RETRACT) || My_Chassis->Leg_Unit[L_Leg]->Link->info->length->l0 <= 0.16f)
 	{
-		feed_f_l = 4.f;
+		feed_f_l = 7.f;
 	}
 	else
 	{
-		feed_f_l = 3.f;
+		feed_f_l = 7.f;
 	}
 	if((Balance.Flag->Jumping_Flag==true && My_Chassis->jump_info->jump_step == J_RETRACT) || My_Chassis->Leg_Unit[R_Leg]->Link->info->length->l0 <= 0.16f)
 	{
-		feed_f_r = 4.f;
+		feed_f_r = 6.f;
 	}
 	else
 	{

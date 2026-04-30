@@ -2143,9 +2143,9 @@ ui_info_t const_ui_info [CONST_NUM] =
     .ui_config.layer = 1,                // 图层数，0~9
     .ui_config.color = WHITE,            // 颜色
     .ui_config.width = 1,                // 线条宽度
-    .ui_config.start_x = Client_mid_position_x - 334,              // 起点 x 坐标
+    .ui_config.start_x = Client_mid_position_x - 600,//334,              // 起点 x 坐标
     .ui_config.start_y = 0,              // 起点 y 坐标
-    .ui_config.end_x = Client_mid_position_x - 82,                // 终点 x 坐标
+    .ui_config.end_x = Client_mid_position_x - 160,//82,                // 终点 x 坐标
     .ui_config.end_y = Client_mid_position_y - 150 ,                // 终点 y 坐标
 		 
 	 },
@@ -2158,9 +2158,9 @@ ui_info_t const_ui_info [CONST_NUM] =
     .ui_config.layer = 1,                // 图层数，0~9
     .ui_config.color = WHITE,            // 颜色
     .ui_config.width = 1,                // 线条宽度
-    .ui_config.start_x = Client_mid_position_x + 334,              // 起点 x 坐标
+    .ui_config.start_x = Client_mid_position_x + 600,//334,              // 起点 x 坐标
     .ui_config.start_y = 0,              // 起点 y 坐标
-    .ui_config.end_x = Client_mid_position_x + 82,                // 终点 x 坐标
+    .ui_config.end_x = Client_mid_position_x + 160,//82,                // 终点 x 坐标
     .ui_config.end_y = Client_mid_position_y - 150 ,                // 终点 y 坐标
 		 
 	 },

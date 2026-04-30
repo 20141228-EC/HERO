@@ -281,6 +281,7 @@ typedef struct
 typedef enum
 {
 	Knee_IDLE,
+	Knee_THETAB,
 	Knee_Stand_High,
 	Knee_RETRACT,
 	Knee_Strike_Num,
@@ -310,10 +311,12 @@ typedef struct
 	
 	float l0_average;
 	float thetal_average;
+	float thetab;
 	float Stand_High_tick;
 	float RETRACT_tick;
 	float thetal_threshold;
 	float down_thetal_threshold;
+	float down_thetab_threshold;
 	float IDLE_length_kp;
 	float STAND_length_kp;
 	float RETRACT_length_kp;

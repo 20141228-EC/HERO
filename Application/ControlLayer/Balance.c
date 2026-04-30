@@ -815,10 +815,11 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 		{
 			b = 1;
 		}
-		if(b == 1 && gimbal.base_info.yaw_motor_angle <= -4.f*PI/5.f && gimbal.base_info.yaw_motor_angle >= -PI)
+		if(b == 1 && gimbal.base_info.yaw_motor_angle <= 0.f && gimbal.base_info.yaw_motor_angle >= - PI/4.f)
 		{
 			balance->mode = Imu_Mode;
 			balance->Flag->Cycle_Flag = false;
+			balance->Flag->Cycle_To_Imu_Flag = true;
 			b = 0;
 		} 
 		

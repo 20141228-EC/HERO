@@ -48,6 +48,7 @@ typedef struct Balance_Flag_struct_t
 	bool Knee_Strike_2_Flag;
 	bool Op_Fly_Flag;
 	bool Cycle_Flag;
+	bool Cycle_To_Imu_Flag;
 	bool Turn_Flag;
 	bool Fly_Flag;
 	bool Rescue_Flag;
