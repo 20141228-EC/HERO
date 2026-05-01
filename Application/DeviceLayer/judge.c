@@ -8,8 +8,8 @@ void Shooting_Fri_Speed_Adapt(void)
 /*用户定义参数**********************************************************/
 
 #define SPEED_SAVE_NUM 2			  // 速度保存个数
-	const float add_kp = 7.f;		  // 增加增益
-	const float minus_kp = 7.f;		  // 减少增益
+	const float add_kp = 3.f;		  // 增加增益
+	const float minus_kp = 3.f;		  // 减少增益
 	#if HERO_TYPE==2
 	const float over_blind_err = 0.2; // 超过多少内不调整
 	#else
@@ -46,7 +46,7 @@ void Shooting_Fri_Speed_Adapt(void)
 	//超弹速！！！大量下降
 	if(now_speed>12.f)
 	{
-		shoot.config.target_B_friction_speed -= 20;
+		shoot.config.target_B_friction_speed -= 30;
 //		shoot->config.target_F_friction_speed -= 40;
 		return;
 	}

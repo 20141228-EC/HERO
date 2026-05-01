@@ -103,7 +103,7 @@ pid_ctrl_t pitch_Speed_Ctrl =
 
 pid_ctrl_t pitch_angle_Ctrl_inn = 
 {
-	.kp = 0.1f,//
+	.kp = 0.09,//0.1f,//
 	.ki = 0.f,
 	.kd = 0.f,
 	.integral_max = 0.f,
@@ -116,7 +116,7 @@ pid_ctrl_t pitch_angle_Ctrl_out =
 	.ki = 2.f,
 	.kd = 0.f,
 	.integral_max = 4.f,
-	.out_max = 200.f,
+	.out_max = 100.f,//200.f,
 };
 
 pid_ctrl_t pitch_Speed_Ctrl_gyro = 
@@ -207,7 +207,7 @@ pid_ctrl_t B_R_Fric_Speed_Ctrl =
 	.ki = 0.5f,
 	.kd = 0.f,
 	.integral_max = 6000.f,
-	.out_max = 10000.f,//
+	.out_max = 15000.f,//
 };
 
 Motor_RM_Ctrl_Info_t B_R_Fric_Ctrl = 
@@ -238,7 +238,7 @@ pid_ctrl_t B_L_Fric_Speed_Ctrl =
 	.ki = 0.5f,
 	.kd = 0.f,
 	.integral_max = 6000.f,
-	.out_max = 10000.f,//
+	.out_max = 15000.f,//
 };
 
 Motor_RM_Ctrl_Info_t B_L_Fric_Ctrl = 
@@ -269,7 +269,7 @@ pid_ctrl_t B_UP_Fric_Speed_Ctrl =
 	.ki = 0.51f,
 	.kd = 0.f,
 	.integral_max = 6000.f,
-	.out_max = 10000.f,//
+	.out_max = 15000.f,//
 };
 
 Motor_RM_Ctrl_Info_t B_UP_Fric_Ctrl = 
