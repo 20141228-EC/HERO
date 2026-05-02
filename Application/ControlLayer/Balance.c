@@ -6,6 +6,7 @@ static void RC_Move_Mode_Update(Balance_t* balance);
 static void KEY_Move_Mode_Update(Balance_t* balance);
 void Rescue_Check(void);
 Chassis_Command_t Chassis_Command;
+Balance_Flag_t Balnace_Flag;
 uint8_t last_step[4];
 static uint32_t now_time = 0;
 static uint32_t disable_start = 0;
@@ -26,6 +27,8 @@ Balance_t Balance =
 	.init = Balance_Init,
 	
 	.rc = &Balance_Rc,
+	
+	.Flag = &Balnace_Flag,
 	
   .Chassis_Com = &Chassis_Command,
 };
@@ -136,8 +139,8 @@ static void Balance_Status_Update(Balance_t* balance)
 		         || (Chassis.Posture->info->pitch >= 0.7f
 	      	   || ((Chassis.Posture->info->roll >= -1.57f && Chassis.Posture->info->roll <= -0.7f) && (Chassis.Posture->info->pitch >= 0.7f || Chassis.Posture->info->pitch <= -0.7f))
 		         || ((Chassis.Posture->info->roll <= 1.57f && Chassis.Posture->info->roll >= 0.7) && (Chassis.Posture->info->pitch >= 0.7f || Chassis.Posture->info->pitch <= -0.7f)))
-	           || ((Chassis.Leg_Unit[L_Leg]->Link->info->angle->vir_phi0_ <= -60.f || Chassis.Leg_Unit[R_Leg]->Link->info->angle->vir_phi0_ <= -60.f)&& balance->Flag->Knee_Strike_1_Flag == false && balance->Flag->Jumping_Flag == false && balance->Chassis_Com->COMMON_OUTPOST_SHOOT == false)
-				     || ((Chassis.Leg_Unit[L_Leg]->Link->info->angle->vir_phi0_ >= 60.f || Chassis.Leg_Unit[R_Leg]->Link->info->angle->vir_phi0_ >= 60.f) && balance->Flag->Knee_Strike_1_Flag == false && balance->Flag->Jumping_Flag == false && balance->Chassis_Com->COMMON_OUTPOST_SHOOT == false))
+	           || ((Chassis.Leg_Unit[L_Leg]->Link->info->angle->vir_phi0_ <= -60.f || Chassis.Leg_Unit[R_Leg]->Link->info->angle->vir_phi0_ <= -60.f)&& balance->Flag->Knee_Strike_1_Flag == false && balance->Flag->Jumping_Flag == false && balance->Chassis_Com->COMMON_OUTPOST_SHOOT == false && balance->mode != Lob_Mode)
+				     || ((Chassis.Leg_Unit[L_Leg]->Link->info->angle->vir_phi0_ >= 60.f || Chassis.Leg_Unit[R_Leg]->Link->info->angle->vir_phi0_ >= 60.f) && balance->Flag->Knee_Strike_1_Flag == false && balance->Flag->Jumping_Flag == false && balance->Chassis_Com->COMMON_OUTPOST_SHOOT == false && balance->mode != Lob_Mode))
 	           && (balance->mode != Init_Mode && balance->mode != Sleep_Mode && balance->mode != Handle_Mode)))
 	{
 		balance->mode=Sleep_Mode;
@@ -552,7 +555,7 @@ static void RC_Move_Mode_Update(Balance_t* balance)
 			}	
 		break;
 			
-			static uint8_t b = 0;
+		static uint8_t b = 0;
 			
 		case Cycle_Mode:
 //			if(rc_info->s1 == 1 && rc_info->s2 == 3 && last_wheel_up != wheel_up)
@@ -570,7 +573,7 @@ static void RC_Move_Mode_Update(Balance_t* balance)
 			{
 				cnt++;
 			}
-			if(b == 1 && (gimbal.base_info.yaw_motor_angle <= -7.f*PI/8.f && gimbal.base_info.yaw_motor_angle >= -PI || cnt>= 2000))
+			if(b == 1 && (gimbal.base_info.yaw_motor_angle <= 0.f && gimbal.base_info.yaw_motor_angle >= -PI/6.f || cnt>= 1500))
 			{
 				balance->mode = Imu_Mode;
 				balance->Flag->Cycle_Flag = false;
@@ -811,16 +814,22 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 //			}
 //	}
 	static uint8_t b = 0;
+	static uint16_t cntt = 0;
     if(rc_info->Shift.status == release_to_press && balance->mode == Cycle_Mode)
 		{
 			b = 1;
 		}
-		if(b == 1 && gimbal.base_info.yaw_motor_angle <= 0.f && gimbal.base_info.yaw_motor_angle >= - PI/4.f)
+		if(b == 1)
+		{
+			cntt++;
+		}
+		if(b == 1 && (gimbal.base_info.yaw_motor_angle <= 0.f && gimbal.base_info.yaw_motor_angle >= - PI/6.f || cntt >= 1500))
 		{
 			balance->mode = Imu_Mode;
 			balance->Flag->Cycle_Flag = false;
-			balance->Flag->Cycle_To_Imu_Flag = true;
+//			balance->Flag->Cycle_To_Imu_Flag = true;
 			b = 0;
+			cntt = 0;
 		} 
 		
 		if(rc_info->Shift.status == release_to_press && balance->mode != Cycle_Mode)
@@ -843,17 +852,43 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 		gimbal.offset_info->lob_pitch_gyro_offset = 0;
 	}
 
-//	if(rc_info->G.status == release_to_press)//基地
-//	{
-//		if(balance->mode != Lob_Mode)
-//		{
-//			balance->mode = Lob_Mode;
-//		}
-//		else
-//		{
-//			balance->mode = Imu_Mode;
-//		}
-//	}
+	if(rc_info->G.status == release_to_press)//吊基地
+	{
+		if(balance->mode != Lob_Mode)
+		{
+			balance->mode = Lob_Mode;
+		}
+		else
+		{
+			balance->mode = Imu_Mode;
+		  gimbal.offset_info->lob_pitch_mec_offset = 0.f;
+		  gimbal.offset_info->lob_yaw_mec_offset = 0.f;
+		}
+	}
+	
+	if(balance->mode == Lob_Mode)
+	{
+		if(rc_info->Z.status == long_press || rc_info->Z.status == release_to_press || rc_info->Z.status == short_press)
+		{
+			if(rc_info->W.status == release_to_press)
+			{
+				gimbal.offset_info->lob_pitch_mec_offset += 0.1f;
+			}
+			if(rc_info->S.status == release_to_press)
+			{
+				gimbal.offset_info->lob_pitch_mec_offset -= 0.1f;
+			}
+			if(rc_info->A.status == release_to_press)
+			{
+				gimbal.offset_info->lob_yaw_mec_offset += 0.1f;
+			}
+			if(rc_info->D.status == release_to_press)
+			{
+				gimbal.offset_info->lob_yaw_mec_offset -= 0.1f;
+			}
+		}
+
+	}
 
   check_z_key_5times();
 
@@ -869,6 +904,12 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 	{
 		Chassis.knee_strike_info->step1 = Knee_RETRACT;
 		Chassis.knee_strike_info->RETRACT_tick = Chassis.knee_strike_info->Max_RETRACT_tick;
+	}
+	else if(rc_info->Ctrl.status == release_to_press || balance->mode == Lob_Mode)
+	{
+		balance->mode = Imu_Mode;
+		gimbal.offset_info->lob_pitch_mec_offset = 0.f;
+		gimbal.offset_info->lob_yaw_mec_offset = 0.f;
 	}
 	else if(rc_info->Ctrl.status == release_to_press)
 	{
@@ -911,7 +952,8 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 //			balance->mode = Imu_Mode;
 //		}
 //	}
-	
+	if(balance->Chassis_Com->COMMON_OUTPOST_SHOOT == true)
+	{
 	  if(rc_info->Z.status == long_press)
 		{
 			if(rc_info->W.status == release_to_press)
@@ -923,7 +965,7 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 				gimbal.offset_info->lob_pitch_gyro_offset -= 0.1f;
 			}
 		}
-		
+	}
 	
 		if(balance->Chassis_Com->COMMON_OUTPOST_SHOOT == false && (balance->mode == Imu_Mode || balance->mode == Cycle_Mode || balance->mode == Vary_Cycle_Mode)
 			&& (rc_info->mouse_btn_r.status == long_press || rc_info->mouse_btn_r.status == short_press || rc_info->mouse_btn_r.status == release_to_press))//开关自瞄

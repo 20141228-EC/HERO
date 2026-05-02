@@ -1975,6 +1975,38 @@ ui_info_t dynamic_ui_info [DYNAMIC_NUM] =
     .ui_config.int_num = 0,
 		
 	},
+	[YAW_OFFSET_NUM] = {
+		/*******不变配置*********/
+		.ui_config.priority = HIGH_PRIORITY,
+    .ui_config.ui_type = FLOAT,           // UI内容类型
+    .ui_config.name = "d27",              // 图形名称
+    /*******可变配置*********/
+		.ui_config.operate_type = MODIFY,    // 操作类型
+    .ui_config.layer = 1,                // 图层数，0~9
+    .ui_config.color = CYAN_BLUE,            // 颜色
+    .ui_config.size = 15,                // 字体大小
+    .ui_config.width = 2,                // 线条宽度
+    .ui_config.start_x = Client_mid_position_x + 450,              // 起点 x 坐标
+    .ui_config.start_y = Client_mid_position_y + 60,              // 起点 y 坐标
+    .ui_config.int_num = 0,
+		
+	},
+	[LOB_FRAME] = {
+		/*******不变配置*********/
+    .ui_config.priority = MID_PRIORITY, // UI优先级(仅动态UI需要配置)
+    .ui_config.ui_type = RECTANGEL,         // UI内容类型
+    .ui_config.name = "d28",              // 图形名称
+    /*******可变配置*********/
+    .ui_config.operate_type = MODIFY,    // 操作类型
+    .ui_config.layer = 1,                // 图层数，0~9
+    .ui_config.color = WHITE,            // 颜色
+    .ui_config.width = 3,                // 线条宽度
+    .ui_config.start_x = Client_mid_position_x + 630 ,              // 起点 x 坐标
+    .ui_config.start_y = Client_mid_position_y - 50 ,              // 起点 y 坐标
+	  .ui_config.end_x = Client_mid_position_x + 740 ,
+	  .ui_config.end_y = Client_mid_position_y - 110 ,
+	},
+	
 };
 
 ui_info_t const_ui_info [CONST_NUM] = 
@@ -2234,19 +2266,19 @@ ui_info_t const_ui_info [CONST_NUM] =
     .ui_config.end_x = Client_mid_position_x - 250 + 195,                // 终点 x 坐标
     .ui_config.end_y = Client_mid_position_y + 305 ,                // 终点 y 坐标
 	 },
-	[PITCH_OFFSET] = {
-		/*******不变配置*********/
-    .ui_config.ui_type = CHAR,           // UI内容类型
-    .ui_config.name = "g19",              // 图形名称
-    /*******可变配置*********/
-    .ui_config.layer = 1,                // 图层数，0~9
-    .ui_config.color = WHITE,            // 颜色
-    .ui_config.size = 15,                // 字体大小
-    .ui_config.width = 2,                // 线条宽度
-    .ui_config.start_x = Client_mid_position_x + 640,              // 起点 x 坐标
-    .ui_config.start_y = Client_mid_position_y - 50,              // 起点 y 坐标
-    .ui_config.text = "PIT_OFFSET:",            // 显示的文字
-	},
+//	[PITCH_OFFSET] = {
+//		/*******不变配置*********/
+//    .ui_config.ui_type = CHAR,           // UI内容类型
+//    .ui_config.name = "g19",              // 图形名称
+//    /*******可变配置*********/
+//    .ui_config.layer = 1,                // 图层数，0~9
+//    .ui_config.color = WHITE,            // 颜色
+//    .ui_config.size = 15,                // 字体大小
+//    .ui_config.width = 2,                // 线条宽度
+//    .ui_config.start_x = Client_mid_position_x + 640,              // 起点 x 坐标
+//    .ui_config.start_y = Client_mid_position_y - 50,              // 起点 y 坐标
+//    .ui_config.text = "PIT_OFFSET:",            // 显示的文字
+//	},
 	[FRIC_CHAR] = {
 		/*******不变配置*********/
     .ui_config.ui_type = CHAR,           // UI内容类型
@@ -2300,7 +2332,45 @@ ui_info_t const_ui_info [CONST_NUM] =
     .ui_config.start_y = Client_mid_position_y + 27,              // 起点 y 坐标
     .ui_config.text = "OTP",            // 显示的文字
 	},
-
+	[BASE_CHAR] = {
+		/*******不变配置*********/
+    .ui_config.ui_type = CHAR,           // UI内容类型
+    .ui_config.name = "g24",              // 图形名称
+    /*******可变配置*********/
+    .ui_config.layer = 1,                // 图层数，0~9
+    .ui_config.color = WHITE,            // 颜色
+    .ui_config.size = 20,                // 字体大小
+    .ui_config.width = 1,                // 线条宽度,没用
+    .ui_config.start_x = Client_mid_position_x,              // 起点 x 坐标
+    .ui_config.start_y = Client_mid_position_y - 360,              // 起点 y 坐标
+    .ui_config.text = "T",            // 显示的文字
+	},
+	[YAW_OFFSET] = {
+		/*******不变配置*********/
+    .ui_config.ui_type = CHAR,           // UI内容类型
+    .ui_config.name = "g25",              // 图形名称
+    /*******可变配置*********/
+    .ui_config.layer = 1,                // 图层数，0~9
+    .ui_config.color = WHITE,            // 颜色
+    .ui_config.size = 15,                // 字体大小
+    .ui_config.width = 2,                // 线条宽度
+    .ui_config.start_x = Client_mid_position_x + 300,              // 起点 x 坐标
+    .ui_config.start_y = Client_mid_position_y + 60,              // 起点 y 坐标
+    .ui_config.text = "YAW_OFFSET",            // 显示的文字
+	},
+	[LOB_CHAR] = {
+		/*******不变配置*********/
+    .ui_config.ui_type = CHAR,           // UI内容类型
+    .ui_config.name = "g26",              // 图形名称
+    /*******可变配置*********/
+    .ui_config.layer = 1,                // 图层数，0~9
+    .ui_config.color = WHITE,            // 颜色
+    .ui_config.size = 30,                // 字体大小
+    .ui_config.width = 2,                // 线条宽度
+    .ui_config.start_x = Client_mid_position_x + 640,              // 起点 x 坐标
+    .ui_config.start_y = Client_mid_position_y - 77,              // 起点 y 坐标
+    .ui_config.text = "LOB",            // 显示的文字
+	},
 };
 
 void My_Ui_Init(void)
@@ -2504,6 +2574,16 @@ void Ui_Info_Update(void)
 		Enqueue_Ui_For_Sending(&dynamic_ui_info[FRIC_FRAME]);
 	}
 	fric_last_flag = Board_Tx_Info.is_fric_on;
+	//吊射更新
+			if(Balance.mode == Lob_Mode)
+			{
+				dynamic_ui_info[LOB_FRAME].ui_config.color = GREEN;
+			}
+			else if (Balance.mode != Lob_Mode)
+			{
+				dynamic_ui_info[LOB_FRAME].ui_config.color = WHITE;
+			}
+		Enqueue_Ui_For_Sending(&dynamic_ui_info[LOB_FRAME]);
 	//视觉数字更新
 	static uint8_t vision_last_mode = 0;
 	
@@ -2737,9 +2817,18 @@ void Ui_Info_Update(void)
 	length_mode_last = length_mode;
 	
 	//视觉pitch偏置
-  dynamic_ui_info[PITCH_OFFSET_NUM].ui_config.float_num = gimbal.offset_info->lob_pitch_gyro_offset;
+	if(Balance.Chassis_Com->COMMON_OUTPOST_SHOOT == true)
+	{
+    dynamic_ui_info[PITCH_OFFSET_NUM].ui_config.float_num = gimbal.offset_info->lob_pitch_gyro_offset;
+	}
+	else if(Balance.Chassis_Com->COMMON_BASE_SHOOT == true)
+	{
+    dynamic_ui_info[PITCH_OFFSET_NUM].ui_config.float_num = gimbal.offset_info->lob_pitch_mec_offset;
+    dynamic_ui_info[YAW_OFFSET_NUM].ui_config.float_num = gimbal.offset_info->lob_yaw_mec_offset;
+	}
 	Enqueue_Ui_For_Sending(&dynamic_ui_info[PITCH_OFFSET_NUM]);
-
+	Enqueue_Ui_For_Sending(&dynamic_ui_info[YAW_OFFSET_NUM]);
+	
 	if(Balance.Chassis_Com->COMMON_OUTPOST_SHOOT == true)
 	{
 		dynamic_ui_info[VISION_TAR].ui_config.color = GREEN;

@@ -42,7 +42,7 @@
 #define NO_RESCUE
 
 /*无底盘*************************/
-#define NO_CHASSIS
+//#define NO_CHASSIS
 
 ///*跳跃不进行伸腿缓冲*/
 //#define NO_PRE_LANDING

@@ -15,7 +15,7 @@
 #include "rp_device_config.h"
 #include "rp_math.h"
 #include "communicate.h"
-#define YAW_MOTOR_ANGLE_MIDDLE 		(1.99243188f)       //(1.57075f-0.f)  		  //YAW电机中值
+#define YAW_MOTOR_ANGLE_MIDDLE 		(1.98658347f)       //(1.57075f-0.f)  		  //YAW电机中值
 #define GIMBAL_LOB_MEC_ANGEL	 (0.f)      //吊射机械角度 15.6弹速606
 #define GIMBAL_LOB_LOW_MEC_ANGEL	 (0.f)      //吊射底部机械角度  
 
@@ -66,6 +66,7 @@ typedef struct __attribute__((packed))
 	float lob_yaw_mec_offset;
 	float lob_yaw_gyro_offset;
 	float lob_pitch_gyro_offset;
+	float lob_pitch_mec_offset;
 }gimbal_offset_info_t;
 
 /*pitch控制类型*/

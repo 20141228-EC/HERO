@@ -164,6 +164,7 @@ typedef enum{
 	FRIC_FRAME,
 	JUMP_FRAME,
 	SAVE_FRAME,
+	LOB_FRAME,
 
 //	POWER,
 //	POWER_FRAME,
@@ -187,6 +188,7 @@ typedef enum{
 	BACK_LEG_L,
 	
 	PITCH_OFFSET_NUM,
+	YAW_OFFSET_NUM,
 	VISION_TAR,
 	DYNAMIC_NUM,
 }dynamic_ui_cnt_e;
@@ -200,6 +202,7 @@ typedef enum{
 	VISION_CHAR,
 	JUMP_CHAR,
 	SAVE_CHAR,
+	BASE_CHAR,
 //	VISION_CHAR,
 //	AUTO_CATCH_FRAME,//×ÔÃé¿ò
 	CHAS_CIRCLE,//µ×ÅÌÔ²ÅÌ
@@ -216,6 +219,8 @@ typedef enum{
 	CAP_DIVISION_2,
 	
 	PITCH_OFFSET,
+	YAW_OFFSET,
+	LOB_CHAR,
 	VISION_MODE,
 	CONST_NUM,
 }const_ui_cnt_e;

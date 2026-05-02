@@ -325,12 +325,12 @@ void Gimbal_Gyro_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 void Gimbal_Lob_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 {
 	
-  if(Balance.Vision.Auto_Base_Flag == 1 && Board_Rx_Info.vision_state == 1)
-	{
-    gimbal->base_info.yaw_mec_angle_target = Board_Rx_Info.vision_yaw_tar / 180.f * PI + gimbal->offset_info->lob_yaw_mec_offset ;
-	}
-	else
-	{
+//  if(Balance.Vision.Auto_Base_Flag == 1 && Board_Rx_Info.vision_state == 1)
+//	{
+//    gimbal->base_info.yaw_mec_angle_target = Board_Rx_Info.vision_yaw_tar / 180.f * PI + gimbal->offset_info->lob_yaw_mec_offset ;
+//	}
+//	else
+//	{
 		if(ctrl_mode != KEY_CTRL)
 		{
 			if(my_abs((float)rc_sensor.info->ch0)>=10)
@@ -344,10 +344,21 @@ void Gimbal_Lob_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 		}
 		else
 		{
-			gimbal->base_info.yaw_mec_angle_target -= rc_sensor.info->mouse_x * 0.0003f;
-			gimbal->base_info.pitch_mec_angle_target += rc_sensor.info->mouse_y*0.0003f;
+			if(rc_sensor.info->Z.status == long_press || rc_sensor.info->Z.status == release_to_press || rc_sensor.info->Z.status == short_press)
+			{
+				gimbal->base_info.yaw_mec_angle_target -= gimbal->offset_info->lob_yaw_mec_offset;
+				gimbal->base_info.pitch_mec_angle_target += gimbal->offset_info->lob_pitch_gyro_offset;
+			}
+			else
+			{
+				gimbal->base_info.yaw_mec_angle_target -= rc_sensor.info->mouse_x * 0.00003f;
+				gimbal->base_info.pitch_mec_angle_target += rc_sensor.info->mouse_y*0.00003f;
+				
+				gimbal->base_info.yaw_mec_angle_target -= gimbal->offset_info->lob_yaw_mec_offset;
+				gimbal->base_info.pitch_mec_angle_target += gimbal->offset_info->lob_pitch_gyro_offset;
+			}
 		}
-	}
+//	}
 	  gimbal->base_info.yaw_mec_angle_target = half_cycle(gimbal->base_info.yaw_mec_angle_target, 2*PI);
 		
 	  gimbal->base_info.yaw_imu_angle_target = gimbal->base_info.yaw_imu_angle;
