@@ -9,7 +9,7 @@ shoot_t shoot=
 	.work=Shoot_Work,
 	
 	.config.target_bullet_speed=11.7f,	
-	.config.target_B_friction_speed=2900,//   2890,//    3040,     //3050//4550,4350,4452（21度16.04），4320（22度16.2]）,4290,4530,3585
+	.config.target_B_friction_speed=2945,//   2890,//    3040,     //3050//4550,4350,4452（21度16.04），4320（22度16.2]）,4290,4530,3585
 	
 	.target = 0,
 
@@ -173,7 +173,7 @@ void Shoot_Work(shoot_t *shoot)
 	if(shoot_count != last_shoot_count)
 	{
     Speed_Statistic();
-	  Shooting_Fri_Speed_Adapt();
+//	  Shooting_Fri_Speed_Adapt();
 	}
 	Shoot_extern_get(shoot);
 	Shoot_pid_cal(shoot);
