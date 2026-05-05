@@ -151,6 +151,13 @@ static void Balance_Status_Update(Balance_t* balance)
 	}
 
 #endif
+	else if(Board_HeartBeat.status == DEV_OFFLINE)
+	{
+		balance->mode = Sleep_Mode;
+		balance->Flag->Board_Off_Flag = true;
+		balance->reset_struct.reset_cnt=0;
+		balance->reset_struct.reset_state=Balance_reset_NO;
+	}
 	else if(balance->mode==Sleep_Mode)//开控但是sleep就初始化
 	{
 		balance->mode = Init_Mode;
@@ -160,6 +167,7 @@ static void Balance_Status_Update(Balance_t* balance)
 		balance->reset_struct.reset_cnt=0;
 		balance->mode = Imu_Mode;
 		balance->Flag->Rescue_Flag = false;
+		balance->Flag->Board_Off_Flag = false;
 	    if(fabsf(gimbal.base_info.yaw_motor_angle) >= 3.0f)
 	    {
 		    balance->Flag->Turn_Flag = true;//起立头回正

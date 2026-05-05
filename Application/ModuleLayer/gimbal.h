@@ -15,12 +15,12 @@
 #include "rp_device_config.h"
 #include "rp_math.h"
 #include "communicate.h"
-#define YAW_MOTOR_ANGLE_MIDDLE 		(1.98658347f)       //(1.57075f-0.f)  		  //YAW电机中值
-#define GIMBAL_LOB_MEC_ANGEL	 (0.f)      //吊射机械角度 15.6弹速606
-#define GIMBAL_LOB_LOW_MEC_ANGEL	 (0.f)      //吊射底部机械角度  
+#define YAW_MOTOR_ANGLE_MIDDLE 		(-3.13737416f)       //(1.57075f-0.f)  		  //YAW电机中值
+#define GIMBAL_LOB_MEC_ANGEL	 (0.f)      //
+#define GIMBAL_LOB_LOW_MEC_ANGEL	 (0.f)      // 
 
 #ifdef PITCH_4310
-	#define GIMBAL_MAX_MEC_ANGEL   		(0.58f)				//pitch机械角度电控限位最大值 990  0.60
+	#define GIMBAL_MAX_MEC_ANGEL   		(0.60f)				//pitch机械角度电控限位最大值 990  0.60
 	#define GIMBAL_MIN_MEC_ANGEL  		 (-0.27f)			//pitch机械角度电控限位最小值 -180  0.33
 
 	#define GIMBAL_MAX_GYRO_ANGEL		(Board_Rx_Info.pitch_imu + (GIMBAL_MAX_MEC_ANGEL - Board_Rx_Info.pitch_mec) / (2*PI) * 360.f)

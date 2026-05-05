@@ -62,6 +62,7 @@ typedef struct Balance_Flag_struct_t
 	bool Middle_To_Short_Flag;
 	bool Return_Flag;
 	bool Down_Two_Step_Flag;
+	bool Board_Off_Flag;
 	
 	uint8_t Rescue_step;
 	

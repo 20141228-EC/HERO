@@ -154,7 +154,7 @@ void HT_Motor_Hearbeat(Motor_HT_t *motor)
 {
 	motor->state->offline_cnt++;
 	
-	if(motor->state->offline_cnt > motor->state->offline_cnt_max) 
+	if(motor->state->offline_cnt >= motor->state->offline_cnt_max) 
 	{
 //		motor->state->offline_cnt = motor->state->offline_cnt_max;
 		motor->state->status = DEV_OFFLINE;

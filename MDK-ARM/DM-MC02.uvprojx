@@ -762,11 +762,6 @@
               <FilePath>..\Application\AlgorithmLayer\crc.h</FilePath>
             </File>
             <File>
-              <FileName>LaserRanging_kalman.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Application\AlgorithmLayer\LaserRanging_kalman.c</FilePath>
-            </File>
-            <File>
               <FileName>LaserRanging_kalman.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Application\AlgorithmLayer\LaserRanging_kalman.h</FilePath>
@@ -776,6 +771,11 @@
         <Group>
           <GroupName>Imu</GroupName>
           <Files>
+            <File>
+              <FileName>LaserRanging_kalman.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\AlgorithmLayer\LaserRanging_kalman.c</FilePath>
+            </File>
             <File>
               <FileName>bmi.c</FileName>
               <FileType>1</FileType>

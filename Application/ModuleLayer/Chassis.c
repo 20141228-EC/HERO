@@ -289,6 +289,7 @@ void Chassis_Init(Chassis_t* My_Chassis)
 	My_Chassis->knee_strike_info=&Chassis_Knee_Strike;
 	My_Chassis->fly_info = &Chassis_Fly;
 	My_Chassis->turn_info = &Chassis_Turn;
+	My_Chassis->Power_Limit_info = &Power_Limit;
 	My_Chassis->pid_init_parament=&Chassis_pid_init_parament;
 	My_Chassis->Leg_Unit[R_Leg]=&Leg_Unit[R_Leg];
 	My_Chassis->Leg_Unit[L_Leg]=&Leg_Unit[L_Leg];
@@ -483,7 +484,7 @@ float Cycle_target_theta_r;
 static void Chassis_theta_Target_Update(Chassis_t* My_Chassis)
 {
 	static float init_theta_target;
-	init_theta_target=My_Chassis->target->thetal_l;
+	init_theta_target=0.f;
 	if(My_Chassis->mode==C_Cycle)
 	{
 		My_Chassis->target->thetal_l=Cycle_target_theta_l;
@@ -2625,6 +2626,7 @@ static void Chassis_Offline_Process(Chassis_t* My_Chassis)
   Balance.Chassis_Com->Save_Success_Flag = false;
 	Balance.Chassis_Com->COMMON_OUTPOST_SHOOT = false;
 	Balance.Chassis_Com->COMMON_BASE_SHOOT = false;
+	Balance.Flag->Board_Off_Flag = false;
   Balance.ctrl = RC_CTRL;
 }
 
@@ -3124,15 +3126,15 @@ static void Chassis_Leg_Length_Strength_Cal(Chassis_t* My_Chassis)
 	{
 		if(Balance.Flag->Middle_Flag == true) //·ÉÆÂ0.26
 		{
-			if(My_Chassis->target->leg_length_r <= 0.28f)
+			if(My_Chassis->target->leg_length_r <= 0.25f)
 			{
 				My_Chassis->target->leg_length_r += 0.15f * TIME_STEP;
 				My_Chassis->target->leg_length_l += 0.15f * TIME_STEP;
 			}
-			if(My_Chassis->target->leg_length_r >= 0.28f)
+			if(My_Chassis->target->leg_length_r >= 0.25f)
 			{
-				My_Chassis->target->leg_length_r = 0.28f;
-				My_Chassis->target->leg_length_l = 0.28f;
+				My_Chassis->target->leg_length_r = 0.25f;
+				My_Chassis->target->leg_length_l = 0.25f;
 			}
 		}
 		else
@@ -3585,10 +3587,22 @@ static void Chassis_Torque_Cal(Chassis_t *My_Chassis)
 		
 		if(My_Chassis->Leg_Unit[R_Leg]->off_ground == false && My_Chassis->Leg_Unit[L_Leg]->off_ground == false)
 		{
-			My_Chassis->Leg_Unit[R_Leg]->force->Tw_target=My_Chassis->Leg_Unit[R_Leg]->force->Tw_LQR
-			                                              +My_Chassis->Leg_Unit[R_Leg]->force->Tw_turn;
-			My_Chassis->Leg_Unit[L_Leg]->force->Tw_target=My_Chassis->Leg_Unit[L_Leg]->force->Tw_LQR
-			                                              +My_Chassis->Leg_Unit[L_Leg]->force->Tw_turn;
+//			if(My_Chassis->mode == C_Cycle)
+//			{
+//				My_Chassis->Leg_Unit[R_Leg]->force->Tw_turn = 1.5f;
+//				My_Chassis->Leg_Unit[L_Leg]->force->Tw_turn = -1.5f;
+//				My_Chassis->Leg_Unit[R_Leg]->force->Tw_target=My_Chassis->Leg_Unit[R_Leg]->force->Tw_LQR
+//																											+My_Chassis->Leg_Unit[R_Leg]->force->Tw_turn;
+//				My_Chassis->Leg_Unit[L_Leg]->force->Tw_target=My_Chassis->Leg_Unit[L_Leg]->force->Tw_LQR
+//																											+My_Chassis->Leg_Unit[L_Leg]->force->Tw_turn;
+//			}
+//			else
+//			{
+				My_Chassis->Leg_Unit[R_Leg]->force->Tw_target=My_Chassis->Leg_Unit[R_Leg]->force->Tw_LQR
+																											+My_Chassis->Leg_Unit[R_Leg]->force->Tw_turn;
+				My_Chassis->Leg_Unit[L_Leg]->force->Tw_target=My_Chassis->Leg_Unit[L_Leg]->force->Tw_LQR
+																											+My_Chassis->Leg_Unit[L_Leg]->force->Tw_turn;
+//			}
 		}
 //		lll = My_Chassis->Leg_Unit[L_Leg]->force->Tw_target;
 //		rrr = My_Chassis->Leg_Unit[R_Leg]->force->Tw_target;
