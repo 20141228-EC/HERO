@@ -16,7 +16,7 @@ void Shooting_Fri_Speed_Adapt(void)
 	const float over_blind_err = 0.2; // 超过多少内不调整
 	#endif
 	
-	const float less_blind_err = 0.2; // 低于多少内不调整
+	const float less_blind_err = 0.1; // 低于多少内不调整
 	const float max_adapt_range = 100; // 最大单次调整量
 
 	/*函数变量**************************************************************/

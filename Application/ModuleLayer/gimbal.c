@@ -128,9 +128,10 @@ void Gimbal_Lob_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 //	}
 //////	  gimbal->base_info.yaw_imu_angle_target=gimbal->base_info.yaw_imu_angle;
 	
-	if(Board_Rx_Info.vision_mode != 0 && vision.status->rx_state == DEV_ONLINE)
+	if(Board_Rx_Info.vision_mode != 0 && vision.status->rx_state == DEV_ONLINE && vision.status->tx_state == DEV_ONLINE
+		 && vision.VtoE->flag_union.bit.is_find_target == 1)
 	{
-	  gimbal->base_info.pitch_mec_angle_target = vision.VtoE->pitch;// / 180.f * PITCH_MOTOR_HALF_ENCODER;//Board_Rx_Info.pitch_mec_tar;
+	  gimbal->base_info.pitch_mec_angle_target = vision.VtoE->pitch / 180.f * PITCH_MOTOR_HALF_ENCODER;//Board_Rx_Info.pitch_mec_tar;
 	}
 	else
 	{

@@ -60,10 +60,12 @@ void DM_Single_Motor_Set_Torque(Motor_DM_t *motor)
 {
 	  if(motor != NULL)
 		{
-			if(motor->state->motor_state == Motor_Unenable)
+			if(motor->state->motor_state != Motor_Enable)
 			{
-				motor->state->motor_state = Motor_Enable;
-				Motor_Send_Command(motor, Enter_Motor_Mode);
+				if(motor->state->motor_state == Motor_Unenable)
+				  Motor_Send_Command(motor, Enter_Motor_Mode);
+				else
+				  Motor_Send_Command(motor, Clear_Err);
 			}
 			else
 			{
@@ -368,6 +370,9 @@ void Motor_Send_Command(Motor_DM_t *motor, Motor_MIT_Command_e Command)
 		break;
 		case Zero_Position_Sensor:
 		Motor_Command[7] = 0xFE;
+		break;
+		case Clear_Err:
+		Motor_Command[7] = 0xFB;
 		break;
 		default:
 		break;

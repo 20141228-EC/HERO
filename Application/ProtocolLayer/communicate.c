@@ -331,12 +331,13 @@ void C_Board_HeartBeat(void)
     Board_HeartBeat.offline_cnt_max;
 
     Board_HeartBeat.status = DEV_OFFLINE;
-	
+	  
 	 
   }
   else if(Board_HeartBeat.status == DEV_OFFLINE)
   {
     Board_HeartBeat.status = DEV_ONLINE;
+		
   }	
 }
 

@@ -135,6 +135,9 @@ typedef struct __attribute__((packed))shooting_struct{
 	shooting_shake_angle_t   shooting_shake_angle;
 	
 	void     	    (*work)(struct shooting_struct *shoot);  
+	int16_t debug_target_fric_B_UP_speed;   //目标第一级上摩擦轮速度
+	int16_t debug_target_fric_B_L_speed;    //目标第一级左摩擦轮速度
+	int16_t debug_target_fric_B_R_speed;    //目标第一级右摩擦轮速度
 
 }shoot_t;
 

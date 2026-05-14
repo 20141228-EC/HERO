@@ -9,7 +9,7 @@ shoot_t shoot=
 	.work=Shoot_Work,
 	
 	.config.target_bullet_speed=11.7f,	
-	.config.target_B_friction_speed=2945,//   2890,//    3040,     //3050//4550,4350,4452（21度16.04），4320（22度16.2]）,4290,4530,3585
+	.config.target_B_friction_speed=2908,//  2845gen3   2890,//    3040,     //3050//4550,4350,4452（21度16.04），4320（22度16.2]）,4290,4530,3585
 	
 	.target = 0,
 
@@ -30,13 +30,13 @@ void Shoot_stuck_deal(shoot_t *shoot)
 		}
 	}
 }
-
+float fric_offset = 0;
 /*发射pid计算*/
 void Shoot_pid_cal(shoot_t *shoot)
 {
-	shoot->fric_b_l->ctrl->speed_ctrl->target=shoot->base_info.fric_info.target_fric_B_L_speed;
-	shoot->fric_b_r->ctrl->speed_ctrl->target=shoot->base_info.fric_info.target_fric_B_R_speed;	
-	shoot->fric_b_up->ctrl->speed_ctrl->target=shoot->base_info.fric_info.target_fric_B_UP_speed;			
+	shoot->fric_b_l->ctrl->speed_ctrl->target=shoot->base_info.fric_info.target_fric_B_L_speed+fric_offset;
+	shoot->fric_b_r->ctrl->speed_ctrl->target=shoot->base_info.fric_info.target_fric_B_R_speed-fric_offset;	
+	shoot->fric_b_up->ctrl->speed_ctrl->target=shoot->base_info.fric_info.target_fric_B_UP_speed+fric_offset;			
 	if((my_abs(rm_motor[B_L_Fric].rx_info->encoder_speed)<=500 &&//不在发射不控摩擦轮
 		 my_abs(rm_motor[B_R_Fric].rx_info->encoder_speed)<=500 &&
 		 my_abs(rm_motor[B_UP_Fric].rx_info->encoder_speed)<=500 && Board_Rx_Info.is_fric_on == 0 )
@@ -74,6 +74,12 @@ void Shoot_extern_get(shoot_t *shoot)
 	}
 }
 
+void Debug_Fric_Speed(shoot_t *shoot)
+{
+	shoot->debug_target_fric_B_L_speed = my_abs(shoot->fric_b_l->ctrl->speed_ctrl->measure);
+	shoot->debug_target_fric_B_R_speed = my_abs(shoot->fric_b_r->ctrl->speed_ctrl->measure);
+	shoot->debug_target_fric_B_UP_speed = my_abs(shoot->fric_b_up->ctrl->speed_ctrl->measure);
+}
 
 /*离线保护*/
 void Shoot_offline_detect(shoot_t *shoot)
@@ -177,4 +183,5 @@ void Shoot_Work(shoot_t *shoot)
 	}
 	Shoot_extern_get(shoot);
 	Shoot_pid_cal(shoot);
+	Debug_Fric_Speed(shoot);
 }

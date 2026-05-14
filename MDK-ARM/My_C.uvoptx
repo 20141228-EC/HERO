@@ -159,7 +159,7 @@
           <Type>0</Type>
           <LineNumber>105</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134254680</Address>
+          <Address>134255016</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -492,6 +492,41 @@
           <WinNumber>1</WinNumber>
           <ItemText>\\My_C\../Application/ModuleLayer/gimbal.c\gimbal.gimbal_p-&gt;ctrl-&gt;angle_ctrl_outer-&gt;ki</ItemText>
         </Ww>
+        <Ww>
+          <count>64</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\My_C\../Application/ProtocolLayer/judge_protocol.c\shoot_statistics.speed_158</ItemText>
+        </Ww>
+        <Ww>
+          <count>65</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\My_C\../Application/ProtocolLayer/judge_protocol.c\shoot_statistics.speed_118</ItemText>
+        </Ww>
+        <Ww>
+          <count>66</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\My_C\../Application/ProtocolLayer/judge_protocol.c\shoot_statistics.speed_123</ItemText>
+        </Ww>
+        <Ww>
+          <count>67</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\My_C\../Application/ProtocolLayer/judge_protocol.c\shoot_statistics.speed_160</ItemText>
+        </Ww>
+        <Ww>
+          <count>68</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\My_C\../Application/ProtocolLayer/judge_protocol.c\shoot_statistics.speed_110</ItemText>
+        </Ww>
+        <Ww>
+          <count>69</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\My_C\../Application/ProtocolLayer/judge_protocol.c\shoot_statistics.variance</ItemText>
+        </Ww>
+        <Ww>
+          <count>70</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\My_C\../Application/ProtocolLayer/judge_protocol.c\shoot_statistics.speed_121</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -543,6 +578,16 @@
           <count>9</count>
           <WinNumber>2</WinNumber>
           <ItemText>pitch_offset,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>10</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>\\My_C\../Application/ModuleLayer/gimbal.c\gimbal</ItemText>
+        </Ww>
+        <Ww>
+          <count>11</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>fric_offset</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>
