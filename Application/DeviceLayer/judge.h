@@ -20,6 +20,7 @@ typedef struct Judge_Org_Info_struct_t
 	ext_robot_hurt_t ext_robot_hurt;
 	ext_game_robot_HP_t ext_game_robot_HP;
   ext_projectile_allowance_t projectile_allowance;
+	robot_health_data_t robot_health_data;
 }Judge_Org_Info_t;
 
 typedef struct
@@ -38,6 +39,7 @@ typedef struct
 	uint16_t remain_HP_last;
 	uint8_t rfid;
 	float shooting_speed;
+	uint32_t radio_health_timestamp;
 }Judge_Info_t;
 
 typedef struct
@@ -54,12 +56,23 @@ typedef struct
 	Judge_Status_t* status;
 }My_Judge_t;
 
+// 全局变量
+typedef struct
+{
+    float mean;  // 均值
+    float var;   // 方差
+    float sum;
+    float sum_sq;
+    uint32_t cnt;
+} LaunchStat_t;
+
 extern My_Judge_t My_Judge;
 
 void My_Judge_Init(void);
 void My_Judge_Realtime_Task(My_Judge_t* my_judge);
 void My_Judge_Update(My_Judge_t * my_judge);
 void judge_update(uint16_t id, uint8_t *rxBuf);
+void Launch_Stat_Calc(float val);
 uint8_t check_hero_revive(My_Judge_t * my_judge);
 
 #endif

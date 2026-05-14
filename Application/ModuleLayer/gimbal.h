@@ -15,7 +15,7 @@
 #include "rp_device_config.h"
 #include "rp_math.h"
 #include "communicate.h"
-#define YAW_MOTOR_ANGLE_MIDDLE 		(-3.13737416f)       //(1.57075f-0.f)  		  //YAW电机中值
+#define YAW_MOTOR_ANGLE_MIDDLE 		(-1.71314716f)       //(1.57075f-0.f)  		  //YAW电机中值
 #define GIMBAL_LOB_MEC_ANGEL	 (0.f)      //
 #define GIMBAL_LOB_LOW_MEC_ANGEL	 (0.f)      // 
 
@@ -50,7 +50,8 @@ typedef struct __attribute__((packed))
 
 	float pre_aim_yaw_angle;//吊射预瞄yaw陀螺角
  
-	float gyro_init_lob_yaw_angle; //取吊射命令的那一刻的角度
+	float gyro_lob_pitch_angle_dynamic_tar; //取吊射命令的那一刻的角度
+	float gyro_lob_yaw_angle_dynamic_tar; //取吊射命令的那一刻的角度
 	
 	uint8_t last_into_oblique_lob_command_flag;//判断下降沿跳变
 	uint16_t out_oblique_head_homing_timeout;

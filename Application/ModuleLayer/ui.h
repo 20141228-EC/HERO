@@ -182,14 +182,40 @@ typedef enum{
 	CAR_SPEED,//车体速度
 	LENGTH_FRAME,//腿长模式框
 	
-	FRONT_LEG_R,
-	FRONT_LEG_L,
-	BACK_LEG_R,
-	BACK_LEG_L,
+//////	FRONT_LEG_R,
+//////	FRONT_LEG_L,
+//////	BACK_LEG_R,
+//////	BACK_LEG_L,
 	
 	PITCH_OFFSET_NUM,
 	YAW_OFFSET_NUM,
 	VISION_TAR,
+	
+	L_LEG_BODY_LINE,
+	L_LEG_A_TO_D,
+	L_LEG_D_TO_C,
+	R_LEG_BODY_LINE,
+	R_LEG_A_TO_D,
+	R_LEG_D_TO_C,
+	L_LEG_BODY_BACK_CIRCLE,
+	L_LEG_BODY_FRONT_CIRCLE,
+	L_LEG_C_CIRCLE,
+	R_LEG_BODY_BACK_CIRCLE,
+	R_LEG_BODY_FRONT_CIRCLE,
+	R_LEG_C_CIRCLE,
+
+    D_RED_1_HEALTH_CHAR,
+    D_RED_2_HEALTH_CHAR,
+    D_RED_3_HEALTH_CHAR,
+    D_RED_4_HEALTH_CHAR,
+    D_RED_5_HEALTH_CHAR,
+    D_BLUE_1_HEALTH_CHAR,
+    D_BLUE_2_HEALTH_CHAR,
+    D_BLUE_3_HEALTH_CHAR,
+    D_BLUE_4_HEALTH_CHAR,
+    D_BLUE_5_HEALTH_CHAR,
+
+
 	DYNAMIC_NUM,
 }dynamic_ui_cnt_e;
 
@@ -202,7 +228,8 @@ typedef enum{
 	VISION_CHAR,
 	JUMP_CHAR,
 	SAVE_CHAR,
-	BASE_CHAR,
+	BASE_1_CHAR,
+	BASE_2_CHAR,
 //	VISION_CHAR,
 //	AUTO_CATCH_FRAME,//自瞄框
 	CHAS_CIRCLE,//底盘圆盘
@@ -222,8 +249,55 @@ typedef enum{
 	YAW_OFFSET,
 	LOB_CHAR,
 	VISION_MODE,
+	
+    C_RED_1_CHAR,
+    C_RED_2_CHAR,
+    C_RED_3_CHAR,
+    C_RED_4_CHAR,
+    C_RED_5_CHAR,
+    C_BLUE_1_CHAR,
+    C_BLUE_2_CHAR,
+    C_BLUE_3_CHAR,
+    C_BLUE_4_CHAR,
+    C_BLUE_5_CHAR,
+		
 	CONST_NUM,
 }const_ui_cnt_e;
+
+typedef struct {
+    float scale;            // 放大比例
+    int16_t leg_offset_x;   // 左腿整体偏置X
+    int16_t leg_offset_y;   // 左腿整体偏置Y
+    int16_t right_offset_x; // 右腿相对左腿偏置X
+    int16_t right_offset_y; // 右腿相对左腿偏置Y
+    int16_t body_length;    // 机体杆半长度
+} Leg_UI_Config_t;
+
+typedef struct {
+    float pitch; // 机体pitch角度
+    // 左腿原始坐标（取负后）
+    float raw_A_l_x, raw_A_l_y;
+    float raw_D_l_x, raw_D_l_y;
+    float raw_C_l_x, raw_C_l_y;
+    // 右腿原始坐标（取负后）
+    float raw_A_r_x, raw_A_r_y;
+    float raw_D_r_x, raw_D_r_y;
+    float raw_C_r_x, raw_C_r_y;
+    // 左腿世界坐标（旋转后）
+    float world_A_l_x, world_A_l_y;
+    float world_D_l_x, world_D_l_y;
+    float world_C_l_x, world_C_l_y;
+    // 右腿世界坐标（旋转后）
+    float world_A_r_x, world_A_r_y;
+    float world_D_r_x, world_D_r_y;
+    float world_C_r_x, world_C_r_y;
+    // 机体杆端点（左腿）
+    float body_back_l_x, body_back_l_y;       
+    float body_front_l_x, body_front_l_y; 
+    // 机体杆端点（右腿）
+    float body_back_r_x, body_back_r_y;
+    float body_front_r_x, body_front_r_y;
+} Leg_UI_Var_t;
 
 typedef struct UI_Dynamic_Info_struct_t
 {

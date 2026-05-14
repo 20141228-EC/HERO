@@ -807,14 +807,14 @@
               <FilePath>..\Application\DeviceLayer\chassis_motor.c</FilePath>
             </File>
             <File>
-              <FileName>gimbal_motor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Application\DeviceLayer\gimbal_motor.c</FilePath>
-            </File>
-            <File>
               <FileName>device.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Application\DeviceLayer\device.c</FilePath>
+            </File>
+            <File>
+              <FileName>gimbal_motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\DeviceLayer\gimbal_motor.c</FilePath>
             </File>
             <File>
               <FileName>imu_sensor.c</FileName>
@@ -980,6 +980,16 @@
               <FileName>motor_def.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Application\HardwareLayer\motor_def.h</FilePath>
+            </File>
+            <File>
+              <FileName>KT_motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\HardwareLayer\KT_motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>KT_motor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Application\HardwareLayer\KT_motor.h</FilePath>
             </File>
           </Files>
         </Group>

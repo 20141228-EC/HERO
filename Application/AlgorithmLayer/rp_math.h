@@ -61,5 +61,7 @@ int float_to_uint(float x, float x_min, float x_max, int bits);
 /*整数线性映射成浮点数*/
 float uint_to_float(int x_int, float x_min, float x_max, int bits);
 float my_sqrt(float num);
+uint8_t Delay_cnt(uint8_t condition,uint16_t time);
+
 #endif
 

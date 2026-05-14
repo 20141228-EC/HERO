@@ -5,8 +5,11 @@
 #include "chassis.h"
 
 #include "Command_Instance.h"
+#ifdef NO_CHASSIS
+#define BALANCE_INIT_CNT_MAX 2000  //自己加上的
+#else
 #define BALANCE_INIT_CNT_MAX 10000  //自己加上的
-
+#endif
 typedef enum
 {
 	RC_CTRL = 0,

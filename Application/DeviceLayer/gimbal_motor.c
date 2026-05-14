@@ -1,5 +1,6 @@
 #include "gimbal_motor.h"
 #include "DM_Motor.h"
+
 /*yawµç»ú*/
 #ifdef UART_COMMUNICATE
 Motor_DM_Born_Info_t Yaw_Born_Info =
@@ -19,6 +20,34 @@ Motor_DM_Born_Info_t Yaw_Born_Info =
 };
 #endif
 
+//#ifdef YAW_KT6012
+KT_motor_t kt_motor[] = {
+	[0] = {
+		.KT_motor_info = {
+			.tx_info = {
+				.angle_single_Control = 0,
+				.angle_single_Control_maxSpeed = 0,
+				.angle_single_Control_spinDirection = 0,
+				.angle_add_Control = 0,
+				.angle_add_Control_maxSpeed = 0,
+				.angle_sum_Control = 0,
+				.angle_sum_Control_maxSpeed = 0,
+				.iqControl = 0,
+				.speedControl = 0,
+			},
+			.id = {
+				.tx_id = 0x143,
+				.rx_id = 0x88,
+				.drive_type = M_CAN2,
+//				.motor_type = KT9015,
+			},
+		},
+		.init = KT_motor_class_init,
+	},
+};
+
+//#else
+
 #ifdef YAW_4310
 Motor_DM_Rx_Info_t Yaw_Rx_Info_t;
 
@@ -28,38 +57,38 @@ Motor_DM_State_t Yaw_State_t;
 
 pid_ctrl_t Yaw_Gyro_Ctrl_out = 
 {
-	.kp = 14.f,////15.f,//18.f,    //30.f,//
-	.ki = 2.f,//0.1f,   //0.3f,//0.2f,
+	.kp = 15.f,//   20.f,////15.f,//18.f,    //30.f,//
+	.ki = 1.f,//0.1f,   //0.3f,//0.2f,
 	.kd = 0.f,
 	.integral_max = 5.f,
-	.out_max = 0.f,   //400.f,
+	.out_max = 600.f,   //400.f,
 };
 
 pid_ctrl_t Yaw_Gyro_Ctrl_inn = 
 {
-	.kp = 0.06f,//0.08f,   //0.05f,   //0.15f,//0.35f,//0.75f,//
+	.kp = 0.14f,//0.095f,//0.08f,   //0.05f,   //0.15f,//0.35f,//0.75f,//
 	.ki = 0.f,
 	.kd = 0.f,
 	.integral_max = 0.f,
-	.out_max = 0.f,
+	.out_max = 10.f,
 };
 
 pid_ctrl_t Yaw_Lob_Ctrl_out = 
 {
-	.kp = 23.f,//20.f,  //30.f,//
-	.ki = 2.f,//0.1f,   //0.3f,
+	.kp = 18.f,//15.f,//20.f,  //30.f,//
+	.ki = 1.155,   //1.3f,//    2.f,//0.1f,   //0.3f,
 	.kd = 0.f,
 	.integral_max = 5.f,
-	.out_max = 0.f,   //400.f,
+	.out_max = 800.f,   //400.f,
 };
 
 pid_ctrl_t Yaw_Lob_Ctrl_inn = 
 {
-	.kp = 0.07f,//0.05f,   //0.08f,//
+	.kp = 0.14f,//     0.09f,//0.05f,   //0.08f,//
 	.ki = 0.f,
 	.kd = 0.f,
 	.integral_max = 0.f,
-	.out_max = 0.f,
+	.out_max = 8.f,
 };
 
 
@@ -160,3 +189,4 @@ Motor_DM_t Yaw_Motor =
 
 };
 #endif
+//#endif

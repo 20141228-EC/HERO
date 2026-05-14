@@ -43,6 +43,8 @@ typedef struct __attribute__((packed)){
 	
 	bool is_heat_allow;//热量允许打弹
 	bool is_enable_shoot;//热量允许打弹
+	uint32_t shoot_begin;
+	uint32_t shoot_end;
 	uint16_t launch_timer;//延时发弹
 	
 	friction_info_t fric_info;

@@ -324,7 +324,7 @@ void Shoot_Init(Shoot_t* shoot)
 	#else
 	//		//拨盘基本配置 
 		shoot->info.cfg_rx_info.base_cfg_info.reset_speed =-10;               
-	    shoot->info.cfg_rx_info.base_cfg_info.reset_adjust_angle =-0.85f;        
+	    shoot->info.cfg_rx_info.base_cfg_info.reset_adjust_angle =-1.5f;//-0.85f;        
 	    shoot->info.cfg_rx_info.base_cfg_info.reset_speed_work_time_max =5000; 
 		//拨盘复位堵转配置
 		shoot->info.cfg_rx_info.reset_speed_block_cfg_info.angle_sum_err_integral_max =0;

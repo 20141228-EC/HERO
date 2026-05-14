@@ -191,3 +191,31 @@ float DeathZoom(float input, float center, float death)
 		return center;
 	return input;
 }
+
+//跳变条件触发计时
+uint8_t Delay_cnt(uint8_t condition,uint16_t time)
+{
+	static uint8_t start_flag = 0;
+	static uint16_t loop_cnt = 0;
+	static uint16_t delay_time = 0;
+	delay_time = time;
+	
+	if(condition && (start_flag == 0))
+	{
+		start_flag = 1;
+		loop_cnt = 0;
+	}
+	if(start_flag == 1)
+	{
+		loop_cnt ++;
+		if(loop_cnt >= delay_time)
+		{
+			start_flag = 0;
+			loop_cnt = 0;
+			return 1;
+		}
+	}
+	
+	return 0;
+	
+}

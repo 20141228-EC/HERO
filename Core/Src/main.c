@@ -126,6 +126,7 @@ int main(void)
 	DEVICE_Init();
 	DRIVER_Init();
   LaserRange_KF_Init(&LR_Speed_KF);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
   /* USER CODE END 2 */
 
   /* Init scheduler */

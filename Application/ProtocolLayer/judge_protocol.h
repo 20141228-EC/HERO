@@ -216,6 +216,18 @@ typedef struct __attribute__((packed))
  uint8_t user_data[112]; //内容数据段最大112
 }robot_interaction_data_t; 
 
+/*雷达解机器人血量*/
+typedef struct __attribute__((packed))
+{ 
+ uint16_t hero_health; 
+ uint16_t engineer_health; 
+ uint16_t infantry3_health; 
+ uint16_t infantry4_health;
+ uint16_t reserve; 	
+ uint16_t sentry_health;
+}robot_health_data_t; 
+
+
 /********************命令码枚举********************/
 enum
 {
@@ -239,7 +251,8 @@ enum
 	ID_rfid_status									= 0x0209,//机器人RFID状态，3Hz
 	ID_interactive_header_data			= 0x0301,//机器人交互数据，发送方触发发送
   ID_Custom_client                = 0x0310,//机器人发送给自定义客户端的数据，频率上限为 50Hz
-	ID_map                          = 0x0305///手端小地图接收雷达数据，频率上限为 5Hz
+	ID_map                          = 0x0305,///手端小地图接收雷达数据，频率上限为 5Hz
+	ID_radio_health                 = 0x0A02,//雷达解机器人血量
 };
 
 /********************长度枚举********************/
@@ -267,7 +280,8 @@ enum
 	LEN_bullet_remaining						= 6,			//0x0208,//弹丸剩余发送数，仅空中机器人，哨兵机器人以及ICRA机器人发送，1Hz
 	LEN_rfid_status									= 5,  		//0x0209,//机器人RFID状态，1Hz
 //	LEN_interactive_header_data			= n			//0x0301 //机器人交互数据，发送方触发发送
-  LEN_map                         = 24      //0x0305 //选手端小地图接收雷达数据，频率上限为 5Hz
+  LEN_map                         = 24,      //0x0305 //选手端小地图接收雷达数据，频率上限为 5Hz
+	LEN_radio_health                = 10,     //0x0A02
 };
 
 

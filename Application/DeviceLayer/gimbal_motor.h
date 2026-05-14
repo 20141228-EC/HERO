@@ -3,6 +3,7 @@
 
 #include "DM_Motor.h"
 #include "drv_can.h"
+#include "KT_Motor.h"
 
 extern Motor_DM_t Yaw_Motor;
 extern Motor_DM_t Dail_Motor;

@@ -27,11 +27,11 @@ void HT_Single_Motor_Sleep(Motor_HT_t *motor)
 {
 	if(motor != NULL)
 	{
-//		if(motor->state->mode == Motor_UnControl)
-//		{
-//			Motor_Send_Command(motor, Enter_Motor_Mode);//开启电机控制
-//			motor->state->mode = Motor_Control;
-//		}
+		if(motor->state->mode == Motor_UnControl)
+		{
+			Motor_Send_Command(motor, Enter_Motor_Mode);//开启电机控制
+			motor->state->mode = Motor_Control;
+		}
 		
 		Motor_HT_Tx_Info_t* motor_tx_info = motor->tx_info;
 		motor_tx_info->torque = 0;

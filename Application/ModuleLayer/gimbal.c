@@ -6,6 +6,7 @@ gimbal_offset_info_t offset_info =
 	.vision_yaw_offset = 0, //ÊÓ¾õÆ«ÖÃ 
 	.lob_yaw_mec_offset = 0,    //µõÉäÆ«ÖÃ
 	.lob_pitch_gyro_offset = 0,
+	.lob_pitch_mec_offset = 0,
 };
 
 gimbal_t gimbal=
@@ -19,13 +20,15 @@ gimbal_t gimbal=
 	.gimbal_ctrl_mode = 1,//ÍÓÂÝÒÇ
 	.lob_info.pre_aim_yaw_angle = 45,
 	.base_info.init_time=0,
-	.base_info.init_time_max=1000,	
+	.base_info.init_time_max=3000,	
 	.base_info.init_time_max_count=0,
   .base_info.pitch_imu_angle_target = 0,
 	.base_info.pitch_mec_angle_target = 0,
 	.base_info.turn_time = 0,
 	.base_info.turn_time_max = 2000,
 	.base_info.Gimbal_Turn_Finish = 0,
+	.lob_info.gyro_lob_pitch_angle_dynamic_tar = 0,
+	.lob_info.gyro_lob_yaw_angle_dynamic_tar = 0,
 };
 
 /*ÔÆÌ¨×´Ì¬¸üÐÂ*/
@@ -319,6 +322,8 @@ void Gimbal_Gyro_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 //		}
 	}
 	gimbal->base_info.yaw_mec_angle_target = gimbal->base_info.yaw_motor_angle;
+	gimbal->lob_info.gyro_lob_yaw_angle_dynamic_tar = gimbal->base_info.yaw_motor_angle;
+	gimbal->lob_info.gyro_lob_pitch_angle_dynamic_tar = 0.52f;//Board_Rx_Info.pitch_mec;
 }
 
 /*ÔÆÌ¨µõÉäÄ£Ê½*/
@@ -344,21 +349,37 @@ void Gimbal_Lob_Update(gimbal_t *gimbal,uint8_t ctrl_mode)
 		}
 		else
 		{
+			
+//			if(rc_sensor.info->Z.status == long_press || rc_sensor.info->Z.status == release_to_press || rc_sensor.info->Z.status == short_press)
+//			{
+////				gimbal->base_info.yaw_mec_angle_target -= gimbal->offset_info->lob_yaw_mec_offset;
+////				gimbal->base_info.pitch_mec_angle_target += gimbal->offset_info->lob_pitch_mec_offset;
+//			}
+//			else
+//			{
+//				gimbal->base_info.yaw_mec_angle_target -= rc_sensor.info->mouse_x * 0.000006f;
+//				gimbal->base_info.pitch_mec_angle_target += rc_sensor.info->mouse_y*0.000006f;			
+////				gimbal->base_info.yaw_mec_angle_target -= gimbal->offset_info->lob_yaw_mec_offset;
+////				gimbal->base_info.pitch_mec_angle_target += gimbal->offset_info->lob_pitch_mec_offset;
+//			}
+			
 			if(rc_sensor.info->Z.status == long_press || rc_sensor.info->Z.status == release_to_press || rc_sensor.info->Z.status == short_press)
 			{
-				gimbal->base_info.yaw_mec_angle_target -= gimbal->offset_info->lob_yaw_mec_offset;
-				gimbal->base_info.pitch_mec_angle_target += gimbal->offset_info->lob_pitch_gyro_offset;
+				
+				gimbal->base_info.yaw_mec_angle_target = gimbal->offset_info->lob_yaw_mec_offset + gimbal->lob_info.gyro_lob_yaw_angle_dynamic_tar;
+				gimbal->base_info.pitch_mec_angle_target = gimbal->offset_info->lob_pitch_mec_offset + gimbal->lob_info.gyro_lob_pitch_angle_dynamic_tar;
 			}
 			else
 			{
-				gimbal->base_info.yaw_mec_angle_target -= rc_sensor.info->mouse_x * 0.00003f;
-				gimbal->base_info.pitch_mec_angle_target += rc_sensor.info->mouse_y*0.00003f;
-				
-				gimbal->base_info.yaw_mec_angle_target -= gimbal->offset_info->lob_yaw_mec_offset;
-				gimbal->base_info.pitch_mec_angle_target += gimbal->offset_info->lob_pitch_gyro_offset;
+				gimbal->lob_info.gyro_lob_yaw_angle_dynamic_tar -= rc_sensor.info->mouse_x * 0.000006f;
+				gimbal->lob_info.gyro_lob_pitch_angle_dynamic_tar += rc_sensor.info->mouse_y*0.000006f;			
+				gimbal->base_info.yaw_mec_angle_target = gimbal->offset_info->lob_yaw_mec_offset + gimbal->lob_info.gyro_lob_yaw_angle_dynamic_tar;
+				gimbal->base_info.pitch_mec_angle_target = gimbal->offset_info->lob_pitch_mec_offset + gimbal->lob_info.gyro_lob_pitch_angle_dynamic_tar;
 			}
+			
+			
 		}
-//	}
+
 	  gimbal->base_info.yaw_mec_angle_target = half_cycle(gimbal->base_info.yaw_mec_angle_target, 2*PI);
 		
 	  gimbal->base_info.yaw_imu_angle_target = gimbal->base_info.yaw_imu_angle;

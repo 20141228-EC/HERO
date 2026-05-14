@@ -1499,7 +1499,33 @@
 #define L_SHANK_END_X0    (L_SHANK_START_X0 + 125)   // 长度110，水平方向
 #define L_SHANK_END_Y0    L_SHANK_START_Y0
 
+#define Sd_Circle_Radius 15
+#define Wheel_Circle_Radius 16
+
+#define BLUE_ROBOT_1_X (Client_mid_position_x + 220)
+#define BLUE_ROBOT_2_X 1300
+#define BLUE_ROBOT_3_X 1420
+#define BLUE_ROBOT_4_X 1540
+#define BLUE_ROBOT_5_X 1780
+#define RED_ROBOT_1_X (Client_mid_position_x - 220 - 80)
+#define RED_ROBOT_2_X (Client_mid_position_x - 340 - 80)
+#define RED_ROBOT_3_X (Client_mid_position_x - 460 - 80)
+#define RED_ROBOT_4_X (Client_mid_position_x - 580 - 80)
+#define RED_ROBOT_5_X (Client_mid_position_x - 820 - 80)
+#define ROBOT_HEALTH_UI_Y (Client_mid_position_y + 365)
+#define ROBOT_NUM_UI_Y (Client_mid_position_y + 340)
+
 UI_Dynamic_Info_t My_UI_Dynamic_Info;
+Leg_UI_Config_t Leg_UI_Config=
+{
+	.scale = 200,
+	.leg_offset_x = 1500,
+	.leg_offset_y = 420,
+	.right_offset_x = 200,
+	.right_offset_y = 0,
+	.body_length = 40,
+};
+Leg_UI_Var_t Leg_UI_Var;
 
 void UI_Info_Update_Leg_length(void);
 void rotate_point(__packed uint16_t *x, __packed uint16_t *y, uint16_t raw_x, uint16_t raw_y, float mid_x, float mid_y, float angle);
@@ -1508,6 +1534,13 @@ void My_Chas_Theta_Update(float angle);
 void My_Chas_Circle_Update(float angle);
 void My_Front_Leg_Update(float angle1,float angle2);
 void My_Back_Leg_Update(float angle1,float angle2);
+static void update_leg_ui(void);
+static void read_left_leg_raw_coords(void);
+static void read_right_leg_raw_coords(void);
+static uint8_t is_sd_motor_online(Motor_DM_t *motor);
+static void update_robot_health(void);
+
+
 ui_info_t dynamic_ui_info [DYNAMIC_NUM] = 
 {
 	
@@ -1897,68 +1930,68 @@ ui_info_t dynamic_ui_info [DYNAMIC_NUM] =
 		.ui_config.end_x = Client_mid_position_x - 310 ,
 		.ui_config.end_y = Client_mid_position_y - 165 ,
 	},
-	[FRONT_LEG_R] = {
-		/*******不变配置*********/
-    .ui_config.priority = HIGH_PRIORITY, // UI优先级(仅动态UI需要配置)
-    .ui_config.ui_type = LINE,         // UI内容类型
-    .ui_config.name = "d19",              // 图形名称
-    /*******可变配置*********/
-    .ui_config.operate_type = MODIFY,    // 操作类型
-    .ui_config.layer = 2,                // 图层数，0~9
-    .ui_config.color = WHITE,            // 颜色
-    .ui_config.width = 5,                // 线条宽度
-     .ui_config.start_x =R_THIGH_START_X,              // 起点 x 坐标
-    .ui_config.start_y = R_THIGH_START_Y ,              // 起点 y 坐标
-		.ui_config.end_x = R_THIGH_END_X0 ,
-		.ui_config.end_y = R_THIGH_END_Y0 ,
-	},
-	
-	[BACK_LEG_R] = {
-		/*******不变配置*********/
-    .ui_config.priority = MID_PRIORITY, // UI优先级(仅动态UI需要配置)
-    .ui_config.ui_type = LINE,         // UI内容类型
-    .ui_config.name = "d20",              // 图形名称
-    /*******可变配置*********/
-    .ui_config.operate_type = MODIFY,    // 操作类型
-    .ui_config.layer = 2,                // 图层数，0~9
-    .ui_config.color = WHITE,            // 颜色
-    .ui_config.width = 5,                // 线条宽度
-     .ui_config.start_x = 0,              // 起点 x 坐标
-    .ui_config.start_y = 0,              // 起点 y 坐标
-		.ui_config.end_x = 0 ,
-		.ui_config.end_y = 0,
-	},
-	[FRONT_LEG_L] = {
-		/*******不变配置*********/
-    .ui_config.priority = MID_PRIORITY, // UI优先级(仅动态UI需要配置)
-    .ui_config.ui_type = LINE,         // UI内容类型
-    .ui_config.name = "d21",              // 图形名称
-    /*******可变配置*********/
-    .ui_config.operate_type = MODIFY,    // 操作类型
-    .ui_config.layer = 2,                // 图层数，0~9
-    .ui_config.color = WHITE,            // 颜色
-    .ui_config.width = 5,                // 线条宽度
-     .ui_config.start_x = L_THIGH_START_X,              // 起点 x 坐标
-    .ui_config.start_y = L_THIGH_START_Y ,              // 起点 y 坐标
-		.ui_config.end_x = L_THIGH_END_X0 ,
-		.ui_config.end_y = L_THIGH_END_Y0 ,
-	},
-	
-	[BACK_LEG_L] = {
-		/*******不变配置*********/
-    .ui_config.priority = MID_PRIORITY, // UI优先级(仅动态UI需要配置)
-    .ui_config.ui_type = LINE,         // UI内容类型
-    .ui_config.name = "d22",              // 图形名称
-    /*******可变配置*********/
-    .ui_config.operate_type = MODIFY,    // 操作类型
-    .ui_config.layer = 2,                // 图层数，0~9
-    .ui_config.color = WHITE,            // 颜色
-    .ui_config.width = 5,                // 线条宽度
-     .ui_config.start_x = 0,              // 起点 x 坐标
-    .ui_config.start_y = 0 ,              // 起点 y 坐标
-		.ui_config.end_x = 0 ,
-		.ui_config.end_y = 0 ,
-	},
+//////	[FRONT_LEG_R] = {
+//////		/*******不变配置*********/
+//////    .ui_config.priority = HIGH_PRIORITY, // UI优先级(仅动态UI需要配置)
+//////    .ui_config.ui_type = LINE,         // UI内容类型
+//////    .ui_config.name = "d19",              // 图形名称
+//////    /*******可变配置*********/
+//////    .ui_config.operate_type = MODIFY,    // 操作类型
+//////    .ui_config.layer = 2,                // 图层数，0~9
+//////    .ui_config.color = WHITE,            // 颜色
+//////    .ui_config.width = 5,                // 线条宽度
+//////     .ui_config.start_x =R_THIGH_START_X,              // 起点 x 坐标
+//////    .ui_config.start_y = R_THIGH_START_Y ,              // 起点 y 坐标
+//////		.ui_config.end_x = R_THIGH_END_X0 ,
+//////		.ui_config.end_y = R_THIGH_END_Y0 ,
+//////	},
+//////	
+//////	[BACK_LEG_R] = {
+//////		/*******不变配置*********/
+//////    .ui_config.priority = MID_PRIORITY, // UI优先级(仅动态UI需要配置)
+//////    .ui_config.ui_type = LINE,         // UI内容类型
+//////    .ui_config.name = "d20",              // 图形名称
+//////    /*******可变配置*********/
+//////    .ui_config.operate_type = MODIFY,    // 操作类型
+//////    .ui_config.layer = 2,                // 图层数，0~9
+//////    .ui_config.color = WHITE,            // 颜色
+//////    .ui_config.width = 5,                // 线条宽度
+//////     .ui_config.start_x = 0,              // 起点 x 坐标
+//////    .ui_config.start_y = 0,              // 起点 y 坐标
+//////		.ui_config.end_x = 0 ,
+//////		.ui_config.end_y = 0,
+//////	},
+//////	[FRONT_LEG_L] = {
+//////		/*******不变配置*********/
+//////    .ui_config.priority = MID_PRIORITY, // UI优先级(仅动态UI需要配置)
+//////    .ui_config.ui_type = LINE,         // UI内容类型
+//////    .ui_config.name = "d21",              // 图形名称
+//////    /*******可变配置*********/
+//////    .ui_config.operate_type = MODIFY,    // 操作类型
+//////    .ui_config.layer = 2,                // 图层数，0~9
+//////    .ui_config.color = WHITE,            // 颜色
+//////    .ui_config.width = 5,                // 线条宽度
+//////     .ui_config.start_x = L_THIGH_START_X,              // 起点 x 坐标
+//////    .ui_config.start_y = L_THIGH_START_Y ,              // 起点 y 坐标
+//////		.ui_config.end_x = L_THIGH_END_X0 ,
+//////		.ui_config.end_y = L_THIGH_END_Y0 ,
+//////	},
+//////	
+//////	[BACK_LEG_L] = {
+//////		/*******不变配置*********/
+//////    .ui_config.priority = MID_PRIORITY, // UI优先级(仅动态UI需要配置)
+//////    .ui_config.ui_type = LINE,         // UI内容类型
+//////    .ui_config.name = "d22",              // 图形名称
+//////    /*******可变配置*********/
+//////    .ui_config.operate_type = MODIFY,    // 操作类型
+//////    .ui_config.layer = 2,                // 图层数，0~9
+//////    .ui_config.color = WHITE,            // 颜色
+//////    .ui_config.width = 5,                // 线条宽度
+//////     .ui_config.start_x = 0,              // 起点 x 坐标
+//////    .ui_config.start_y = 0 ,              // 起点 y 坐标
+//////		.ui_config.end_x = 0 ,
+//////		.ui_config.end_y = 0 ,
+//////	},
 	[PITCH_OFFSET_NUM] = {
 		/*******不变配置*********/
 		.ui_config.priority = HIGH_PRIORITY,
@@ -1971,7 +2004,7 @@ ui_info_t dynamic_ui_info [DYNAMIC_NUM] =
     .ui_config.size = 15,                // 字体大小
     .ui_config.width = 2,                // 线条宽度
     .ui_config.start_x = Client_mid_position_x + 450,              // 起点 x 坐标
-    .ui_config.start_y = Client_mid_position_y + 80,              // 起点 y 坐标
+    .ui_config.start_y = Client_mid_position_y + 95,              // 起点 y 坐标
     .ui_config.int_num = 0,
 		
 	},
@@ -1987,7 +2020,7 @@ ui_info_t dynamic_ui_info [DYNAMIC_NUM] =
     .ui_config.size = 15,                // 字体大小
     .ui_config.width = 2,                // 线条宽度
     .ui_config.start_x = Client_mid_position_x + 450,              // 起点 x 坐标
-    .ui_config.start_y = Client_mid_position_y + 60,              // 起点 y 坐标
+    .ui_config.start_y = Client_mid_position_y + 75,              // 起点 y 坐标
     .ui_config.int_num = 0,
 		
 	},
@@ -2007,6 +2040,298 @@ ui_info_t dynamic_ui_info [DYNAMIC_NUM] =
 	  .ui_config.end_y = Client_mid_position_y - 110 ,
 	},
 	
+/* 左腿线段 begin */
+    [L_LEG_BODY_LINE] = {
+        .ui_config.priority = HIGH_PRIORITY,
+        .ui_config.ui_type = LINE,
+			  .ui_config.name = "d29",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 2,
+        .ui_config.color = WHITE,
+        .ui_config.width = 3,
+        .ui_config.start_x = 0,
+        .ui_config.start_y = 0,
+        .ui_config.end_x = 0,
+        .ui_config.end_y = 0,
+    },
+    [L_LEG_A_TO_D] = {
+        .ui_config.priority = HIGH_PRIORITY,
+        .ui_config.ui_type = LINE,
+			.ui_config.name = "d30",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 2,
+        .ui_config.color = CYAN_BLUE,
+        .ui_config.width = 3,
+        .ui_config.start_x = 0,
+        .ui_config.start_y = 0,
+        .ui_config.end_x = 0,
+        .ui_config.end_y = 0,
+    },
+    [L_LEG_D_TO_C] = {
+        .ui_config.priority = HIGH_PRIORITY,
+        .ui_config.ui_type = LINE,
+			.ui_config.name = "d31",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 2,
+        .ui_config.color = CYAN_BLUE,
+        .ui_config.width = 3,
+        .ui_config.start_x = 0,
+        .ui_config.start_y = 0,
+        .ui_config.end_x = 0,
+        .ui_config.end_y = 0,
+    },
+    /* 左腿线段 end */
+    /* 右腿线段 begin */
+    [R_LEG_BODY_LINE] = {
+        .ui_config.priority = HIGH_PRIORITY,
+        .ui_config.ui_type = LINE,
+        .ui_config.operate_type = MODIFY,
+			.ui_config.name = "d32",
+        .ui_config.layer = 2,
+        .ui_config.color = WHITE,
+        .ui_config.width = 3,
+        .ui_config.start_x = 0,
+        .ui_config.start_y = 0,
+        .ui_config.end_x = 0,
+        .ui_config.end_y = 0,
+    },
+    [R_LEG_A_TO_D] = {
+        .ui_config.priority = HIGH_PRIORITY,
+        .ui_config.ui_type = LINE,
+        .ui_config.operate_type = MODIFY,
+			.ui_config.name = "d33",
+        .ui_config.layer = 2,
+        .ui_config.color = CYAN_BLUE,
+        .ui_config.width = 3,
+        .ui_config.start_x = 0,
+        .ui_config.start_y = 0,
+        .ui_config.end_x = 0,
+        .ui_config.end_y = 0,
+    },
+    [R_LEG_D_TO_C] = {
+        .ui_config.priority = HIGH_PRIORITY,
+        .ui_config.ui_type = LINE,
+        .ui_config.operate_type = MODIFY,
+			.ui_config.name = "d34",
+        .ui_config.layer = 2,
+        .ui_config.color = CYAN_BLUE,
+        .ui_config.width = 3,
+        .ui_config.start_x = 0,
+        .ui_config.start_y = 0,
+        .ui_config.end_x = 0,
+        .ui_config.end_y = 0,
+    },
+    /* 右腿线段 end */
+    /* 左腿圆点 begin */
+    [L_LEG_BODY_BACK_CIRCLE] = {
+        .ui_config.priority = HIGH_PRIORITY,
+        .ui_config.ui_type = CIRCLE,
+			.ui_config.name = "d35",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 2,
+        .ui_config.color = GREEN,
+        .ui_config.width = 2,
+        .ui_config.start_x = 0,
+        .ui_config.start_y = 0,
+        .ui_config.radius = Sd_Circle_Radius,
+    },
+    [L_LEG_BODY_FRONT_CIRCLE] = {
+        .ui_config.priority = HIGH_PRIORITY,
+        .ui_config.ui_type = CIRCLE,
+			.ui_config.name = "d36",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 2,
+        .ui_config.color = GREEN,
+        .ui_config.width = 2,
+        .ui_config.start_x = 0,
+        .ui_config.start_y = 0,
+        .ui_config.radius = Sd_Circle_Radius,
+    },
+    [L_LEG_C_CIRCLE] = {
+        .ui_config.priority = HIGH_PRIORITY,
+        .ui_config.ui_type = CIRCLE,
+			.ui_config.name = "d37",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 2,
+        .ui_config.color = GREEN,
+        .ui_config.width = 2,
+        .ui_config.start_x = 0,
+        .ui_config.start_y = 0,
+        .ui_config.radius = Wheel_Circle_Radius,
+    },
+    /* 左腿圆点 end */
+    /* 右腿圆点 begin */
+    [R_LEG_BODY_BACK_CIRCLE] = {
+        .ui_config.priority = HIGH_PRIORITY,
+        .ui_config.ui_type = CIRCLE,
+			.ui_config.name = "d38",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 2,
+        .ui_config.color = GREEN,
+        .ui_config.width = 2,
+        .ui_config.start_x = 0,
+        .ui_config.start_y = 0,
+        .ui_config.radius = Sd_Circle_Radius,
+    },
+    [R_LEG_BODY_FRONT_CIRCLE] = {
+        .ui_config.priority = HIGH_PRIORITY,
+        .ui_config.ui_type = CIRCLE,
+			.ui_config.name = "d39",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 2,
+        .ui_config.color = GREEN,
+        .ui_config.width = 2,
+        .ui_config.start_x = 0,
+        .ui_config.start_y = 0,
+        .ui_config.radius = Sd_Circle_Radius,
+    },
+    [R_LEG_C_CIRCLE] = {
+        .ui_config.priority = HIGH_PRIORITY,
+        .ui_config.ui_type = CIRCLE,
+			  .ui_config.name = "d40",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 2,
+        .ui_config.color = GREEN,
+        .ui_config.width = 2,
+        .ui_config.start_x = 0,
+        .ui_config.start_y = 0,
+        .ui_config.radius = Wheel_Circle_Radius,
+    },
+    /* 右腿圆点 end */
+/* 红方血量 UI begin */
+    [D_RED_1_HEALTH_CHAR] = {
+        .ui_config.priority = MID_PRIORITY,
+        .ui_config.ui_type = CHAR,
+			  .ui_config.name = "d41",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 0,
+        .ui_config.color = WHITE,
+        .ui_config.size = 20,
+        .ui_config.width = 3,
+        .ui_config.start_x = RED_ROBOT_1_X,
+        .ui_config.start_y = ROBOT_HEALTH_UI_Y,
+        .ui_config.text = "0",
+    },
+    [D_RED_2_HEALTH_CHAR] = {
+        .ui_config.priority = MID_PRIORITY,
+        .ui_config.ui_type = CHAR,
+			  .ui_config.name = "d42",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 0,
+        .ui_config.color = WHITE,
+        .ui_config.size = 20,
+        .ui_config.width = 3,
+        .ui_config.start_x = RED_ROBOT_2_X,
+        .ui_config.start_y = ROBOT_HEALTH_UI_Y,
+        .ui_config.text = "0",
+    },
+    [D_RED_3_HEALTH_CHAR] = {
+        .ui_config.priority = MID_PRIORITY,
+        .ui_config.ui_type = CHAR,
+			  .ui_config.name = "d43",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 0,
+        .ui_config.color = WHITE,
+        .ui_config.size = 20,
+        .ui_config.width = 3,
+        .ui_config.start_x = RED_ROBOT_3_X,
+        .ui_config.start_y = ROBOT_HEALTH_UI_Y,
+        .ui_config.text = "0",
+    },
+    [D_RED_4_HEALTH_CHAR] = {
+        .ui_config.priority = MID_PRIORITY,
+        .ui_config.ui_type = CHAR,
+			  .ui_config.name = "d44",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 0,
+        .ui_config.color = WHITE,
+        .ui_config.size = 20,
+        .ui_config.width = 3,
+        .ui_config.start_x = RED_ROBOT_4_X,
+        .ui_config.start_y = ROBOT_HEALTH_UI_Y,
+        .ui_config.text = "0",
+    },
+    [D_RED_5_HEALTH_CHAR] = {
+        .ui_config.priority = MID_PRIORITY,
+        .ui_config.ui_type = CHAR,
+			  .ui_config.name = "d45",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 0,
+        .ui_config.color = WHITE,
+        .ui_config.size = 20,
+        .ui_config.width = 3,
+        .ui_config.start_x = RED_ROBOT_5_X,
+        .ui_config.start_y = ROBOT_HEALTH_UI_Y,
+        .ui_config.text = "0",
+    },
+    /* 红方血量 UI end */
+    /* 蓝方血量 UI begin */
+    [D_BLUE_1_HEALTH_CHAR] = {
+        .ui_config.priority = MID_PRIORITY,
+        .ui_config.ui_type = CHAR,
+			  .ui_config.name = "d46",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 0,
+        .ui_config.color = WHITE,
+        .ui_config.size = 20,
+        .ui_config.width = 3,
+        .ui_config.start_x = BLUE_ROBOT_1_X,
+        .ui_config.start_y = ROBOT_HEALTH_UI_Y,
+        .ui_config.text = "0",
+    },
+    [D_BLUE_2_HEALTH_CHAR] = {
+        .ui_config.priority = MID_PRIORITY,
+        .ui_config.ui_type = CHAR,
+			  .ui_config.name = "d47",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 0,
+        .ui_config.color = WHITE,
+        .ui_config.size = 20,
+        .ui_config.width = 3,
+        .ui_config.start_x = BLUE_ROBOT_2_X,
+        .ui_config.start_y = ROBOT_HEALTH_UI_Y,
+        .ui_config.text = "0",
+    },
+    [D_BLUE_3_HEALTH_CHAR] = {
+        .ui_config.priority = MID_PRIORITY,
+        .ui_config.ui_type = CHAR,
+			  .ui_config.name = "d48",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 0,
+        .ui_config.color = WHITE,
+        .ui_config.size = 20,
+        .ui_config.width = 3,
+        .ui_config.start_x = BLUE_ROBOT_3_X,
+        .ui_config.start_y = ROBOT_HEALTH_UI_Y,
+        .ui_config.text = "0",
+    },
+    [D_BLUE_4_HEALTH_CHAR] = {
+        .ui_config.priority = MID_PRIORITY,
+        .ui_config.ui_type = CHAR,
+			  .ui_config.name = "d49",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 0,
+        .ui_config.color = WHITE,
+        .ui_config.size = 20,
+        .ui_config.width = 3,
+        .ui_config.start_x = BLUE_ROBOT_4_X,
+        .ui_config.start_y = ROBOT_HEALTH_UI_Y,
+        .ui_config.text = "0",
+    },
+    [D_BLUE_5_HEALTH_CHAR] = {
+        .ui_config.priority = MID_PRIORITY,
+        .ui_config.ui_type = CHAR,
+			  .ui_config.name = "d50",
+        .ui_config.operate_type = MODIFY,
+        .ui_config.layer = 0,
+        .ui_config.color = WHITE,
+        .ui_config.size = 20,
+        .ui_config.width = 3,
+        .ui_config.start_x = BLUE_ROBOT_5_X,
+        .ui_config.start_y = ROBOT_HEALTH_UI_Y,
+        .ui_config.text = "0",
+    },
+    /* 蓝方血量 UI end */
 };
 
 ui_info_t const_ui_info [CONST_NUM] = 
@@ -2302,7 +2627,7 @@ ui_info_t const_ui_info [CONST_NUM] =
     .ui_config.size = 15,                // 字体大小
     .ui_config.width = 2,                // 线条宽度
     .ui_config.start_x = Client_mid_position_x + 300,              // 起点 x 坐标
-    .ui_config.start_y = Client_mid_position_y + 80,              // 起点 y 坐标
+    .ui_config.start_y = Client_mid_position_y + 95,              // 起点 y 坐标
     .ui_config.text = "PIT_OFFSET",            // 显示的文字
 	},
 	
@@ -2332,14 +2657,14 @@ ui_info_t const_ui_info [CONST_NUM] =
     .ui_config.start_y = Client_mid_position_y + 27,              // 起点 y 坐标
     .ui_config.text = "OTP",            // 显示的文字
 	},
-	[BASE_CHAR] = {
+	[BASE_1_CHAR] = {
 		/*******不变配置*********/
     .ui_config.ui_type = CHAR,           // UI内容类型
     .ui_config.name = "g24",              // 图形名称
     /*******可变配置*********/
     .ui_config.layer = 1,                // 图层数，0~9
     .ui_config.color = WHITE,            // 颜色
-    .ui_config.size = 20,                // 字体大小
+    .ui_config.size = 30,                // 字体大小
     .ui_config.width = 1,                // 线条宽度,没用
     .ui_config.start_x = Client_mid_position_x,              // 起点 x 坐标
     .ui_config.start_y = Client_mid_position_y - 360,              // 起点 y 坐标
@@ -2355,7 +2680,7 @@ ui_info_t const_ui_info [CONST_NUM] =
     .ui_config.size = 15,                // 字体大小
     .ui_config.width = 2,                // 线条宽度
     .ui_config.start_x = Client_mid_position_x + 300,              // 起点 x 坐标
-    .ui_config.start_y = Client_mid_position_y + 60,              // 起点 y 坐标
+    .ui_config.start_y = Client_mid_position_y + 75,              // 起点 y 坐标
     .ui_config.text = "YAW_OFFSET",            // 显示的文字
 	},
 	[LOB_CHAR] = {
@@ -2370,6 +2695,130 @@ ui_info_t const_ui_info [CONST_NUM] =
     .ui_config.start_x = Client_mid_position_x + 640,              // 起点 x 坐标
     .ui_config.start_y = Client_mid_position_y - 77,              // 起点 y 坐标
     .ui_config.text = "LOB",            // 显示的文字
+	},
+// [C_RED_1_CHAR] = {
+//        .ui_config.ui_type = CHAR,
+//	      .ui_config.name = "g27",
+//        .ui_config.layer = 0,
+//        .ui_config.color = WHITE,
+//        .ui_config.size = 20,
+//        .ui_config.width = 3,
+//        .ui_config.start_x = RED_ROBOT_1_X,
+//        .ui_config.start_y = ROBOT_NUM_UI_Y,
+//        .ui_config.text = "1",
+//    },
+//    [C_RED_2_CHAR] = {
+//        .ui_config.ui_type = CHAR,
+//			  .ui_config.name = "g28",
+//        .ui_config.layer = 0,
+//        .ui_config.color = WHITE,
+//        .ui_config.size = 20,
+//        .ui_config.width = 3,
+//        .ui_config.start_x = RED_ROBOT_2_X,
+//        .ui_config.start_y = ROBOT_NUM_UI_Y,
+//        .ui_config.text = "2",
+//    },
+//    [C_RED_3_CHAR] = {
+//        .ui_config.ui_type = CHAR,
+//			  .ui_config.name = "g29",
+//        .ui_config.layer = 0,
+//        .ui_config.color = WHITE,
+//        .ui_config.size = 20,
+//        .ui_config.width = 3,
+//        .ui_config.start_x = RED_ROBOT_3_X,
+//        .ui_config.start_y = ROBOT_NUM_UI_Y,
+//        .ui_config.text = "3",
+//    },
+//    [C_RED_4_CHAR] = {
+//        .ui_config.ui_type = CHAR,
+//			  .ui_config.name = "g30",
+//        .ui_config.layer = 0,
+//        .ui_config.color = WHITE,
+//        .ui_config.size = 20,
+//        .ui_config.width = 3,
+//        .ui_config.start_x = RED_ROBOT_4_X,
+//        .ui_config.start_y = ROBOT_NUM_UI_Y,
+//        .ui_config.text = "4",
+//    },
+//    [C_RED_5_CHAR] = {
+//        .ui_config.ui_type = CHAR,
+//			  .ui_config.name = "g31",
+//        .ui_config.layer = 0,
+//        .ui_config.color = WHITE,
+//        .ui_config.size = 20,
+//        .ui_config.width = 3,
+//        .ui_config.start_x = RED_ROBOT_5_X,
+//        .ui_config.start_y = ROBOT_NUM_UI_Y,
+//        .ui_config.text = "5",
+//    },
+//    [C_BLUE_1_CHAR] = {
+//        .ui_config.ui_type = CHAR,
+//			  .ui_config.name = "g32",
+//        .ui_config.layer = 0,
+//        .ui_config.color = WHITE,
+//        .ui_config.size = 20,
+//        .ui_config.width = 3,
+//        .ui_config.start_x = BLUE_ROBOT_1_X,
+//        .ui_config.start_y = ROBOT_NUM_UI_Y,
+//        .ui_config.text = "1",
+//    },
+//    [C_BLUE_2_CHAR] = {
+//        .ui_config.ui_type = CHAR,
+//			  .ui_config.name = "g33",
+//        .ui_config.layer = 0,
+//        .ui_config.color = WHITE,
+//        .ui_config.size = 20,
+//        .ui_config.width = 3,
+//        .ui_config.start_x = BLUE_ROBOT_2_X,
+//        .ui_config.start_y = ROBOT_NUM_UI_Y,
+//        .ui_config.text = "2",
+//    },
+//    [C_BLUE_3_CHAR] = {
+//        .ui_config.ui_type = CHAR,
+//			  .ui_config.name = "g34",
+//        .ui_config.layer = 0,
+//        .ui_config.color = WHITE,
+//        .ui_config.size = 20,
+//        .ui_config.width = 3,
+//        .ui_config.start_x = BLUE_ROBOT_3_X,
+//        .ui_config.start_y = ROBOT_NUM_UI_Y,
+//        .ui_config.text = "3",
+//    },
+//    [C_BLUE_4_CHAR] = {
+//        .ui_config.ui_type = CHAR,
+//			  .ui_config.name = "g35",
+//        .ui_config.layer = 1,
+//        .ui_config.color = WHITE,
+//        .ui_config.size = 20,
+//        .ui_config.width = 3,
+//        .ui_config.start_x = BLUE_ROBOT_4_X,
+//        .ui_config.start_y = ROBOT_NUM_UI_Y,
+//        .ui_config.text = "4",
+//    },
+//    [C_BLUE_5_CHAR] = {
+//        .ui_config.ui_type = CHAR,
+//			  .ui_config.name = "g36",
+//        .ui_config.layer = 0,
+//        .ui_config.color = WHITE,
+//        .ui_config.size = 20,
+//        .ui_config.width = 3,
+//        .ui_config.start_x = BLUE_ROBOT_5_X,
+//        .ui_config.start_y = ROBOT_NUM_UI_Y,
+//        .ui_config.text = "5",
+//    },
+
+		[BASE_2_CHAR] = {
+		/*******不变配置*********/
+    .ui_config.ui_type = CHAR,           // UI内容类型
+    .ui_config.name = "g35",              // 图形名称
+    /*******可变配置*********/
+    .ui_config.layer = 1,                // 图层数，0~9
+    .ui_config.color = WHITE,            // 颜色
+    .ui_config.size = 30,                // 字体大小
+    .ui_config.width = 1,                // 线条宽度,没用
+    .ui_config.start_x = Client_mid_position_x,              // 起点 x 坐标
+    .ui_config.start_y = Client_mid_position_y - 330,              // 起点 y 坐标
+    .ui_config.text = "T",            // 显示的文字
 	},
 };
 
@@ -2386,7 +2835,6 @@ void My_Ui_Init(void)
 void Ui_Info_Update(void)
 {
 	client_info_update();
-	
 	//陀螺框更新
 	static uint8_t top_last_mode = false;
 	
@@ -2423,42 +2871,42 @@ void Ui_Info_Update(void)
 	
 	upstep_last_mode = (Balance.Flag->Knee_Strike_1_Flag || Balance.Flag->Knee_Strike_2_Flag);
 
-	//腿角更新
-	float front_angle_last_l = 0.f;
-	float back_angle_last_l = 0.f;
-	float front_angle_last_r = 0.f;
-	float back_angle_last_r = 0.f;
+//////	//腿角更新
+//////	float front_angle_last_l = 0.f;
+//////	float back_angle_last_l = 0.f;
+//////	float front_angle_last_r = 0.f;
+//////	float back_angle_last_r = 0.f;
 
-	
-	//余弦定理，还是太复杂了，后续看看能不能解算好phi4和phi3 2026.3.24
-	thigh_angle_r =PI- Chassis.Leg_Unit[R_Leg]->Straight->info->thetal_err  -  acos((l4*l4 + (Chassis.Leg_Unit[R_Leg]->Link->info->length->l0) * (Chassis.Leg_Unit[R_Leg]->Link->info->length->l0) - l3*l3) / 2 * l4 *(Chassis.Leg_Unit[R_Leg]->Link->info->length->l0))- PI/4;
-	thigh_angle_l = PI - Chassis.Leg_Unit[L_Leg]->Straight->info->thetal_err -  acos((l4*l4 + (Chassis.Leg_Unit[L_Leg]->Link->info->length->l0) * (Chassis.Leg_Unit[L_Leg]->Link->info->length->l0) - l3*l3) / 2 * l4 *(Chassis.Leg_Unit[L_Leg]->Link->info->length->l0))- PI/4;
-	shank_angle_r = 2*PI-acos((l4*l4 + l3*l3 - (Chassis.Leg_Unit[R_Leg]->Link->info->length->l0) * (Chassis.Leg_Unit[R_Leg]->Link->info->length->l0)) / (2 * l4 * l3));
-	shank_angle_l = 2*PI-acos((l4*l4 + l3*l3 - (Chassis.Leg_Unit[L_Leg]->Link->info->length->l0) * (Chassis.Leg_Unit[L_Leg]->Link->info->length->l0)) / (2 * l4 * l3))-PI/8;
-	if(thigh_angle_r < -2*PI)
-	{
-		thigh_angle_r += 2*PI;
-	}
-	if(thigh_angle_l < -2*PI)
-	{
-		thigh_angle_l += 2*PI;
-	}
-	//thigh_angle_r = My_State_Var.theta_r;
-	
-//	front_angle_now_r = lowpass(front_angle_last_r,front_angle_now_r,0.5);
-//	front_angle_now_l = lowpass(front_angle_last_l,front_angle_now_l,0.5);
-//	back_angle_now_r = lowpass(back_angle_last_r,back_angle_now_r,0.5);
-//	back_angle_now_l = lowpass(back_angle_last_l,back_angle_now_l,0.5);
-	
-	    My_Front_Leg_Update(thigh_angle_r, thigh_angle_l);
-        My_Back_Leg_Update(shank_angle_r, shank_angle_l);
+//////	
+//////	//余弦定理，还是太复杂了，后续看看能不能解算好phi4和phi3 2026.3.24
+//////	thigh_angle_r =PI- Chassis.Leg_Unit[R_Leg]->Straight->info->thetal_err  -  acos((l4*l4 + (Chassis.Leg_Unit[R_Leg]->Link->info->length->l0) * (Chassis.Leg_Unit[R_Leg]->Link->info->length->l0) - l3*l3) / 2 * l4 *(Chassis.Leg_Unit[R_Leg]->Link->info->length->l0))- PI/4;
+//////	thigh_angle_l = PI - Chassis.Leg_Unit[L_Leg]->Straight->info->thetal_err -  acos((l4*l4 + (Chassis.Leg_Unit[L_Leg]->Link->info->length->l0) * (Chassis.Leg_Unit[L_Leg]->Link->info->length->l0) - l3*l3) / 2 * l4 *(Chassis.Leg_Unit[L_Leg]->Link->info->length->l0))- PI/4;
+//////	shank_angle_r = 2*PI-acos((l4*l4 + l3*l3 - (Chassis.Leg_Unit[R_Leg]->Link->info->length->l0) * (Chassis.Leg_Unit[R_Leg]->Link->info->length->l0)) / (2 * l4 * l3));
+//////	shank_angle_l = 2*PI-acos((l4*l4 + l3*l3 - (Chassis.Leg_Unit[L_Leg]->Link->info->length->l0) * (Chassis.Leg_Unit[L_Leg]->Link->info->length->l0)) / (2 * l4 * l3))-PI/8;
+//////	if(thigh_angle_r < -2*PI)
+//////	{
+//////		thigh_angle_r += 2*PI;
+//////	}
+//////	if(thigh_angle_l < -2*PI)
+//////	{
+//////		thigh_angle_l += 2*PI;
+//////	}
+//////	//thigh_angle_r = My_State_Var.theta_r;
+//////	
+////////	front_angle_now_r = lowpass(front_angle_last_r,front_angle_now_r,0.5);
+////////	front_angle_now_l = lowpass(front_angle_last_l,front_angle_now_l,0.5);
+////////	back_angle_now_r = lowpass(back_angle_last_r,back_angle_now_r,0.5);
+////////	back_angle_now_l = lowpass(back_angle_last_l,back_angle_now_l,0.5);
+//////	
+//////	    My_Front_Leg_Update(thigh_angle_r, thigh_angle_l);
+//////        My_Back_Leg_Update(shank_angle_r, shank_angle_l);
 
-    // 发送更新后的 UI 数据
-    Enqueue_Ui_For_Sending(&dynamic_ui_info[FRONT_LEG_R]);
-    Enqueue_Ui_For_Sending(&dynamic_ui_info[FRONT_LEG_L]);
-    Enqueue_Ui_For_Sending(&dynamic_ui_info[BACK_LEG_R]);
-    Enqueue_Ui_For_Sending(&dynamic_ui_info[BACK_LEG_L]);
-	
+//////    // 发送更新后的 UI 数据
+//////    Enqueue_Ui_For_Sending(&dynamic_ui_info[FRONT_LEG_R]);
+//////    Enqueue_Ui_For_Sending(&dynamic_ui_info[FRONT_LEG_L]);
+//////    Enqueue_Ui_For_Sending(&dynamic_ui_info[BACK_LEG_R]);
+//////    Enqueue_Ui_For_Sending(&dynamic_ui_info[BACK_LEG_L]);
+//////	
 	//	
 //	if(My_Judge.org_info->power_heat_data.chassis_power_buffer <= 25.f)
 //	{
@@ -2551,6 +2999,7 @@ void Ui_Info_Update(void)
 		{
 			dynamic_ui_info[JUMP_FRAME].ui_config.color = GREEN;
 		}
+
 		else if(Balance.Flag->Jumping_Flag == false)
 		{
 			dynamic_ui_info[JUMP_FRAME].ui_config.color = WHITE;
@@ -2816,15 +3265,20 @@ void Ui_Info_Update(void)
 	}
 	length_mode_last = length_mode;
 	
-	//视觉pitch偏置
+	//视觉,吊射pitch  yaw偏置
 	if(Balance.Chassis_Com->COMMON_OUTPOST_SHOOT == true)
 	{
     dynamic_ui_info[PITCH_OFFSET_NUM].ui_config.float_num = gimbal.offset_info->lob_pitch_gyro_offset;
 	}
 	else if(Balance.Chassis_Com->COMMON_BASE_SHOOT == true)
 	{
-    dynamic_ui_info[PITCH_OFFSET_NUM].ui_config.float_num = gimbal.offset_info->lob_pitch_mec_offset;
-    dynamic_ui_info[YAW_OFFSET_NUM].ui_config.float_num = gimbal.offset_info->lob_yaw_mec_offset;
+    dynamic_ui_info[PITCH_OFFSET_NUM].ui_config.float_num = gimbal.offset_info->lob_pitch_mec_offset * 57.29577f;
+    dynamic_ui_info[YAW_OFFSET_NUM].ui_config.float_num = gimbal.offset_info->lob_yaw_mec_offset * 57.29577f;
+	}
+	else
+	{
+    dynamic_ui_info[PITCH_OFFSET_NUM].ui_config.float_num = 0.f;
+    dynamic_ui_info[YAW_OFFSET_NUM].ui_config.float_num = 0.f;
 	}
 	Enqueue_Ui_For_Sending(&dynamic_ui_info[PITCH_OFFSET_NUM]);
 	Enqueue_Ui_For_Sending(&dynamic_ui_info[YAW_OFFSET_NUM]);
@@ -2839,6 +3293,11 @@ void Ui_Info_Update(void)
 	}
 		Enqueue_Ui_For_Sending(&dynamic_ui_info[VISION_TAR]);
 	
+	//腿部，机体更新
+  update_leg_ui();
+	
+	//机器人血量更新
+	update_robot_health();
 }
 //2201-2431
 
@@ -2895,6 +3354,21 @@ void rotate_point(__packed uint16_t *x, __packed uint16_t *y, uint16_t raw_x, ui
   *y = new_y + mid_y;
 }
 
+/* 旋转坐标点 */
+static void rotate_point_f(float *x, float *y,
+                           float raw_x, float raw_y,
+                           float mid_x, float mid_y, float angle)
+{
+    float s = sin(angle);
+    float c = cos(angle);
+    float origin_x = raw_x - mid_x;
+    float origin_y = raw_y - mid_y;
+    float new_x = origin_x * c - origin_y * s;
+    float new_y = origin_x * s + origin_y * c;
+    *x = new_x + mid_x;
+    *y = new_y + mid_y;
+}
+
 /*底盘pitch倾角更新*/
 void My_Chas_Pitch_Update(float angle)
 {
@@ -2938,63 +3412,327 @@ void My_Chas_Circle_Update(float angle)
 	Enqueue_Ui_For_Sending(&dynamic_ui_info[CHAS_HEAD_LINE]);
 	Enqueue_Ui_For_Sending(&dynamic_ui_info[CHAS_SIDE_LINE]);
 }
-/*大腿摆角更新*/
-void My_Front_Leg_Update(float angle_r, float angle_l)
+
+///////*大腿摆角更新*/
+//////void My_Front_Leg_Update(float angle_r, float angle_l)
+//////{
+//////    // 更新右大腿
+//////    rotate_point(&dynamic_ui_info[FRONT_LEG_R].ui_config.end_x,
+//////                 &dynamic_ui_info[FRONT_LEG_R].ui_config.end_y,
+//////                 R_THIGH_END_X0, R_THIGH_END_Y0,
+//////                 R_THIGH_START_X, R_THIGH_START_Y,
+//////                 angle_r);
+//////	
+//////	rotate_point(&dynamic_ui_info[FRONT_LEG_L].ui_config.end_x,
+//////                 &dynamic_ui_info[FRONT_LEG_L].ui_config.end_y,
+//////                 L_THIGH_END_X0, L_THIGH_END_Y0,
+//////                 L_THIGH_START_X, L_THIGH_START_Y,
+//////                 angle_l);
+//////    // 更新左大腿（类似，定义左腿初始坐标）
+
+//////    // 将小腿起点更新为大腿终点
+//////    dynamic_ui_info[BACK_LEG_R].ui_config.start_x = 
+//////        dynamic_ui_info[FRONT_LEG_R].ui_config.end_x;
+//////    dynamic_ui_info[BACK_LEG_R].ui_config.start_y = 
+//////        dynamic_ui_info[FRONT_LEG_R].ui_config.end_y;
+//////		
+//////	 dynamic_ui_info[BACK_LEG_L].ui_config.start_x = 
+//////        dynamic_ui_info[FRONT_LEG_L].ui_config.end_x;
+//////    dynamic_ui_info[BACK_LEG_L].ui_config.start_y = 
+//////        dynamic_ui_info[FRONT_LEG_L].ui_config.end_y;
+
+//////	rotate_point(&dynamic_ui_info[BACK_LEG_R].ui_config.end_x,
+//////                 &dynamic_ui_info[BACK_LEG_R].ui_config.end_y,
+//////                 R_SHANK_END_X0, R_SHANK_END_Y0,
+//////                 R_SHANK_START_X0, R_SHANK_START_Y0,
+//////                 angle_r);
+//////				 
+//////	rotate_point(&dynamic_ui_info[BACK_LEG_L].ui_config.end_x,
+//////                 &dynamic_ui_info[BACK_LEG_L].ui_config.end_y,
+//////                 L_SHANK_END_X0, L_SHANK_END_Y0,
+//////                 L_SHANK_START_X0, L_SHANK_START_Y0,
+//////                 angle_r);
+//////    // 左腿同理
+//////}
+
+//////void My_Back_Leg_Update(float angle_r, float angle_l)
+//////{
+//////    // 右小腿：基于小腿起点旋转固定偏移量
+//////    rotate_point(&dynamic_ui_info[BACK_LEG_R].ui_config.end_x,
+//////                 &dynamic_ui_info[BACK_LEG_R].ui_config.end_y,
+//////                 R_SHANK_END_X0, R_SHANK_END_Y0,
+//////                 dynamic_ui_info[BACK_LEG_R].ui_config.start_x,
+//////                 dynamic_ui_info[BACK_LEG_R].ui_config.start_y,
+//////                 angle_r);
+//////				 
+//////	rotate_point(&dynamic_ui_info[BACK_LEG_L].ui_config.end_x,
+//////                 &dynamic_ui_info[BACK_LEG_L].ui_config.end_y,
+//////                 L_SHANK_END_X0, L_SHANK_END_Y0,
+//////                 dynamic_ui_info[BACK_LEG_L].ui_config.start_x,
+//////                 dynamic_ui_info[BACK_LEG_L].ui_config.start_y,
+//////                 angle_r);
+//////    // 左小腿同理
+//////}
+
+
+
+/* 读取左腿ADC坐标并取负 */
+static void read_left_leg_raw_coords(void)
 {
-    // 更新右大腿
-    rotate_point(&dynamic_ui_info[FRONT_LEG_R].ui_config.end_x,
-                 &dynamic_ui_info[FRONT_LEG_R].ui_config.end_y,
-                 R_THIGH_END_X0, R_THIGH_END_Y0,
-                 R_THIGH_START_X, R_THIGH_START_Y,
-                 angle_r);
-	
-	rotate_point(&dynamic_ui_info[FRONT_LEG_L].ui_config.end_x,
-                 &dynamic_ui_info[FRONT_LEG_L].ui_config.end_y,
-                 L_THIGH_END_X0, L_THIGH_END_Y0,
-                 L_THIGH_START_X, L_THIGH_START_Y,
-                 angle_l);
-    // 更新左大腿（类似，定义左腿初始坐标）
-
-    // 将小腿起点更新为大腿终点
-    dynamic_ui_info[BACK_LEG_R].ui_config.start_x = 
-        dynamic_ui_info[FRONT_LEG_R].ui_config.end_x;
-    dynamic_ui_info[BACK_LEG_R].ui_config.start_y = 
-        dynamic_ui_info[FRONT_LEG_R].ui_config.end_y;
-		
-	 dynamic_ui_info[BACK_LEG_L].ui_config.start_x = 
-        dynamic_ui_info[FRONT_LEG_L].ui_config.end_x;
-    dynamic_ui_info[BACK_LEG_L].ui_config.start_y = 
-        dynamic_ui_info[FRONT_LEG_L].ui_config.end_y;
-
-	rotate_point(&dynamic_ui_info[BACK_LEG_R].ui_config.end_x,
-                 &dynamic_ui_info[BACK_LEG_R].ui_config.end_y,
-                 R_SHANK_END_X0, R_SHANK_END_Y0,
-                 R_SHANK_START_X0, R_SHANK_START_Y0,
-                 angle_r);
-				 
-	rotate_point(&dynamic_ui_info[BACK_LEG_L].ui_config.end_x,
-                 &dynamic_ui_info[BACK_LEG_L].ui_config.end_y,
-                 L_SHANK_END_X0, L_SHANK_END_Y0,
-                 L_SHANK_START_X0, L_SHANK_START_Y0,
-                 angle_r);
-    // 左腿同理
+    Link_Coord_t *coord = Chassis.Leg_Unit[L_Leg]->Link->info->coord;
+    Leg_UI_Var.raw_A_l_x = -coord->xa * Leg_UI_Config.scale;
+    Leg_UI_Var.raw_A_l_y = -coord->ya * Leg_UI_Config.scale;
+    Leg_UI_Var.raw_D_l_x = -coord->xd * Leg_UI_Config.scale;
+    Leg_UI_Var.raw_D_l_y = -coord->yd * Leg_UI_Config.scale;
+    Leg_UI_Var.raw_C_l_x = -coord->xc * Leg_UI_Config.scale;
+    Leg_UI_Var.raw_C_l_y = -coord->yc * Leg_UI_Config.scale;
 }
 
-void My_Back_Leg_Update(float angle_r, float angle_l)
+/* 读取右腿ADC坐标并取负 */
+static void read_right_leg_raw_coords(void)
 {
-    // 右小腿：基于小腿起点旋转固定偏移量
-    rotate_point(&dynamic_ui_info[BACK_LEG_R].ui_config.end_x,
-                 &dynamic_ui_info[BACK_LEG_R].ui_config.end_y,
-                 R_SHANK_END_X0, R_SHANK_END_Y0,
-                 dynamic_ui_info[BACK_LEG_R].ui_config.start_x,
-                 dynamic_ui_info[BACK_LEG_R].ui_config.start_y,
-                 angle_r);
-				 
-	rotate_point(&dynamic_ui_info[BACK_LEG_L].ui_config.end_x,
-                 &dynamic_ui_info[BACK_LEG_L].ui_config.end_y,
-                 L_SHANK_END_X0, L_SHANK_END_Y0,
-                 dynamic_ui_info[BACK_LEG_L].ui_config.start_x,
-                 dynamic_ui_info[BACK_LEG_L].ui_config.start_y,
-                 angle_r);
-    // 左小腿同理
+    Link_Coord_t *coord = Chassis.Leg_Unit[R_Leg]->Link->info->coord;
+    Leg_UI_Var.raw_A_r_x = -coord->xa * Leg_UI_Config.scale;
+    Leg_UI_Var.raw_A_r_y = -coord->ya * Leg_UI_Config.scale;
+    Leg_UI_Var.raw_D_r_x = -coord->xd * Leg_UI_Config.scale;
+    Leg_UI_Var.raw_D_r_y = -coord->yd * Leg_UI_Config.scale;
+    Leg_UI_Var.raw_C_r_x = -coord->xc * Leg_UI_Config.scale;
+    Leg_UI_Var.raw_C_r_y = -coord->yc * Leg_UI_Config.scale;
+}
+
+/* 根据电机实例判断在线状态 */
+static uint8_t is_sd_motor_online(Motor_DM_t *motor)
+{
+    return (motor->state->status == DEV_ONLINE) ? 1 : 0;
+}
+
+static uint8_t is_wheel_motor_online(Motor_RM_t *motor)
+{
+    return (motor->state->status == DEV_ONLINE) ? 1 : 0;
+}
+
+/**
+ * @brief 腿部、机体UI更新
+ * @author RobotPilots 2026 LYQ
+ */
+static void update_leg_ui(void)
+{
+    static float last_pitch = 0.f;
+    float pitch_now = Chassis.Posture->info->pitch;
+
+    // 读取原始坐标
+    read_left_leg_raw_coords();
+    read_right_leg_raw_coords();
+
+    // 计算左腿世界坐标（绕A点旋转pitch）
+    float ax_l = Leg_UI_Var.raw_A_l_x + Leg_UI_Config.leg_offset_x;
+    float ay_l = Leg_UI_Var.raw_A_l_y + Leg_UI_Config.leg_offset_y;
+    rotate_point_f(&Leg_UI_Var.world_A_l_x, &Leg_UI_Var.world_A_l_y,
+                   Leg_UI_Var.raw_A_l_x + Leg_UI_Config.leg_offset_x,
+                   Leg_UI_Var.raw_A_l_y + Leg_UI_Config.leg_offset_y,
+                   ax_l, ay_l,
+                   pitch_now);
+    rotate_point_f(&Leg_UI_Var.world_D_l_x, &Leg_UI_Var.world_D_l_y,
+                   Leg_UI_Var.raw_D_l_x + Leg_UI_Config.leg_offset_x,
+                   Leg_UI_Var.raw_D_l_y + Leg_UI_Config.leg_offset_y,
+                   ax_l, ay_l,
+                   pitch_now);
+    rotate_point_f(&Leg_UI_Var.world_C_l_x, &Leg_UI_Var.world_C_l_y,
+                   Leg_UI_Var.raw_C_l_x + Leg_UI_Config.leg_offset_x,
+                   Leg_UI_Var.raw_C_l_y + Leg_UI_Config.leg_offset_y,
+                   ax_l, ay_l,
+                   pitch_now);
+
+    // 计算右腿世界坐标
+    float ax_r = Leg_UI_Var.raw_A_r_x + Leg_UI_Config.leg_offset_x + Leg_UI_Config.right_offset_x;
+    float ay_r = Leg_UI_Var.raw_A_r_y + Leg_UI_Config.leg_offset_y + Leg_UI_Config.right_offset_y;
+    rotate_point_f(&Leg_UI_Var.world_A_r_x, &Leg_UI_Var.world_A_r_y,
+                   Leg_UI_Var.raw_A_r_x + Leg_UI_Config.leg_offset_x + Leg_UI_Config.right_offset_x,
+                   Leg_UI_Var.raw_A_r_y + Leg_UI_Config.leg_offset_y + Leg_UI_Config.right_offset_y,
+                   ax_r, ay_r,
+                   pitch_now);
+    rotate_point_f(&Leg_UI_Var.world_D_r_x, &Leg_UI_Var.world_D_r_y,
+                   Leg_UI_Var.raw_D_r_x + Leg_UI_Config.leg_offset_x + Leg_UI_Config.right_offset_x,
+                   Leg_UI_Var.raw_D_r_y + Leg_UI_Config.leg_offset_y + Leg_UI_Config.right_offset_y,
+                   ax_r, ay_r,
+                   pitch_now);
+    rotate_point_f(&Leg_UI_Var.world_C_r_x, &Leg_UI_Var.world_C_r_y,
+                   Leg_UI_Var.raw_C_r_x + Leg_UI_Config.leg_offset_x + Leg_UI_Config.right_offset_x,
+                   Leg_UI_Var.raw_C_r_y + Leg_UI_Config.leg_offset_y + Leg_UI_Config.right_offset_y,
+                   ax_r, ay_r,
+                   pitch_now);
+
+    // 减少计算量
+    float cos_pitch = cos(pitch_now);
+    float sin_pitch = sin(pitch_now);
+
+    // 计算机体杆端点（左腿）
+    Leg_UI_Var.body_back_l_x = ax_l - Leg_UI_Config.body_length * cos_pitch;
+    Leg_UI_Var.body_back_l_y = ay_l - Leg_UI_Config.body_length * sin_pitch;
+    Leg_UI_Var.body_front_l_x = ax_l + Leg_UI_Config.body_length * cos_pitch;
+    Leg_UI_Var.body_front_l_y = ay_l + Leg_UI_Config.body_length * sin_pitch;
+
+    // 计算机体杆端点（右腿）
+    Leg_UI_Var.body_back_r_x = ax_r - Leg_UI_Config.body_length * cos_pitch;
+    Leg_UI_Var.body_back_r_y = ay_r - Leg_UI_Config.body_length * sin_pitch;
+    Leg_UI_Var.body_front_r_x = ax_r + Leg_UI_Config.body_length * cos_pitch;
+    Leg_UI_Var.body_front_r_y = ay_r + Leg_UI_Config.body_length * sin_pitch;
+
+    // 更新左腿线段坐标
+    dynamic_ui_info[L_LEG_BODY_LINE].ui_config.start_x = (uint16_t)Leg_UI_Var.body_back_l_x;
+    dynamic_ui_info[L_LEG_BODY_LINE].ui_config.start_y = (uint16_t)Leg_UI_Var.body_back_l_y;
+    dynamic_ui_info[L_LEG_BODY_LINE].ui_config.end_x = (uint16_t)Leg_UI_Var.body_front_l_x;
+    dynamic_ui_info[L_LEG_BODY_LINE].ui_config.end_y = (uint16_t)Leg_UI_Var.body_front_l_y;
+
+    dynamic_ui_info[L_LEG_A_TO_D].ui_config.start_x = (uint16_t)Leg_UI_Var.world_A_l_x;
+    dynamic_ui_info[L_LEG_A_TO_D].ui_config.start_y = (uint16_t)Leg_UI_Var.world_A_l_y;
+    dynamic_ui_info[L_LEG_A_TO_D].ui_config.end_x = (uint16_t)Leg_UI_Var.world_D_l_x;
+    dynamic_ui_info[L_LEG_A_TO_D].ui_config.end_y = (uint16_t)Leg_UI_Var.world_D_l_y;
+
+    dynamic_ui_info[L_LEG_D_TO_C].ui_config.start_x = (uint16_t)Leg_UI_Var.world_D_l_x;
+    dynamic_ui_info[L_LEG_D_TO_C].ui_config.start_y = (uint16_t)Leg_UI_Var.world_D_l_y;
+    dynamic_ui_info[L_LEG_D_TO_C].ui_config.end_x = (uint16_t)Leg_UI_Var.world_C_l_x;
+    dynamic_ui_info[L_LEG_D_TO_C].ui_config.end_y = (uint16_t)Leg_UI_Var.world_C_l_y;
+
+    // 更新右腿线段坐标
+    dynamic_ui_info[R_LEG_BODY_LINE].ui_config.start_x = (uint16_t)Leg_UI_Var.body_back_r_x;
+    dynamic_ui_info[R_LEG_BODY_LINE].ui_config.start_y = (uint16_t)Leg_UI_Var.body_back_r_y;
+    dynamic_ui_info[R_LEG_BODY_LINE].ui_config.end_x = (uint16_t)Leg_UI_Var.body_front_r_x;
+    dynamic_ui_info[R_LEG_BODY_LINE].ui_config.end_y = (uint16_t)Leg_UI_Var.body_front_r_y;
+
+    dynamic_ui_info[R_LEG_A_TO_D].ui_config.start_x = (uint16_t)Leg_UI_Var.world_A_r_x;
+    dynamic_ui_info[R_LEG_A_TO_D].ui_config.start_y = (uint16_t)Leg_UI_Var.world_A_r_y;
+    dynamic_ui_info[R_LEG_A_TO_D].ui_config.end_x = (uint16_t)Leg_UI_Var.world_D_r_x;
+    dynamic_ui_info[R_LEG_A_TO_D].ui_config.end_y = (uint16_t)Leg_UI_Var.world_D_r_y;
+
+    dynamic_ui_info[R_LEG_D_TO_C].ui_config.start_x = (uint16_t)Leg_UI_Var.world_D_r_x;
+    dynamic_ui_info[R_LEG_D_TO_C].ui_config.start_y = (uint16_t)Leg_UI_Var.world_D_r_y;
+    dynamic_ui_info[R_LEG_D_TO_C].ui_config.end_x = (uint16_t)Leg_UI_Var.world_C_r_x;
+    dynamic_ui_info[R_LEG_D_TO_C].ui_config.end_y = (uint16_t)Leg_UI_Var.world_C_r_y;
+
+    // 更新左腿圆点坐标
+    dynamic_ui_info[L_LEG_BODY_BACK_CIRCLE].ui_config.start_x = (uint16_t)Leg_UI_Var.body_back_l_x;
+    dynamic_ui_info[L_LEG_BODY_BACK_CIRCLE].ui_config.start_y = (uint16_t)Leg_UI_Var.body_back_l_y;
+    dynamic_ui_info[L_LEG_BODY_FRONT_CIRCLE].ui_config.start_x = (uint16_t)Leg_UI_Var.body_front_l_x;
+    dynamic_ui_info[L_LEG_BODY_FRONT_CIRCLE].ui_config.start_y = (uint16_t)Leg_UI_Var.body_front_l_y;
+    dynamic_ui_info[L_LEG_C_CIRCLE].ui_config.start_x = (uint16_t)Leg_UI_Var.world_C_l_x;
+    dynamic_ui_info[L_LEG_C_CIRCLE].ui_config.start_y = (uint16_t)Leg_UI_Var.world_C_l_y;
+
+    // 更新右腿圆点坐标
+    dynamic_ui_info[R_LEG_BODY_BACK_CIRCLE].ui_config.start_x = (uint16_t)Leg_UI_Var.body_back_r_x;
+    dynamic_ui_info[R_LEG_BODY_BACK_CIRCLE].ui_config.start_y = (uint16_t)Leg_UI_Var.body_back_r_y;
+    dynamic_ui_info[R_LEG_BODY_FRONT_CIRCLE].ui_config.start_x = (uint16_t)Leg_UI_Var.body_front_r_x;
+    dynamic_ui_info[R_LEG_BODY_FRONT_CIRCLE].ui_config.start_y = (uint16_t)Leg_UI_Var.body_front_r_y;
+    dynamic_ui_info[R_LEG_C_CIRCLE].ui_config.start_x = (uint16_t)Leg_UI_Var.world_C_r_x;
+    dynamic_ui_info[R_LEG_C_CIRCLE].ui_config.start_y = (uint16_t)Leg_UI_Var.world_C_r_y;
+
+    // 更新电机在线状态颜色
+    uint8_t l_front_sd_online = is_sd_motor_online(Sd_Group.motor[L_F_Sd_M]);
+    uint8_t l_back_sd_online = is_sd_motor_online(Sd_Group.motor[L_B_Sd_M]);
+    uint8_t l_wheel_online = is_wheel_motor_online(Wheel_Group.motor[L_WHEEL_M]);
+    uint8_t r_front_sd_online = is_sd_motor_online(Sd_Group.motor[R_F_Sd_M]);
+    uint8_t r_back_sd_online = is_sd_motor_online(Sd_Group.motor[R_B_Sd_M]);
+    uint8_t r_wheel_online = is_wheel_motor_online(Wheel_Group.motor[R_WHEEL_M]);
+
+    dynamic_ui_info[L_LEG_BODY_BACK_CIRCLE].ui_config.color = l_back_sd_online ? GREEN : FUCHSIA;
+    dynamic_ui_info[L_LEG_BODY_FRONT_CIRCLE].ui_config.color = l_front_sd_online ? GREEN : FUCHSIA;
+    dynamic_ui_info[L_LEG_C_CIRCLE].ui_config.color = l_wheel_online ? GREEN : FUCHSIA;
+    dynamic_ui_info[R_LEG_BODY_BACK_CIRCLE].ui_config.color = r_back_sd_online ? GREEN : FUCHSIA;
+    dynamic_ui_info[R_LEG_BODY_FRONT_CIRCLE].ui_config.color = r_front_sd_online ? GREEN : FUCHSIA;
+    dynamic_ui_info[R_LEG_C_CIRCLE].ui_config.color = r_wheel_online ? GREEN : FUCHSIA;
+
+    // 发送腿部UI
+    Enqueue_Ui_For_Sending(&dynamic_ui_info[L_LEG_BODY_LINE]);
+    Enqueue_Ui_For_Sending(&dynamic_ui_info[L_LEG_A_TO_D]);
+    Enqueue_Ui_For_Sending(&dynamic_ui_info[L_LEG_D_TO_C]);
+    Enqueue_Ui_For_Sending(&dynamic_ui_info[R_LEG_BODY_LINE]);
+    Enqueue_Ui_For_Sending(&dynamic_ui_info[R_LEG_A_TO_D]);
+    Enqueue_Ui_For_Sending(&dynamic_ui_info[R_LEG_D_TO_C]);
+
+    Enqueue_Ui_For_Sending(&dynamic_ui_info[L_LEG_BODY_BACK_CIRCLE]);
+    Enqueue_Ui_For_Sending(&dynamic_ui_info[L_LEG_BODY_FRONT_CIRCLE]);
+    Enqueue_Ui_For_Sending(&dynamic_ui_info[L_LEG_C_CIRCLE]);
+    Enqueue_Ui_For_Sending(&dynamic_ui_info[R_LEG_BODY_BACK_CIRCLE]);
+    Enqueue_Ui_For_Sending(&dynamic_ui_info[R_LEG_BODY_FRONT_CIRCLE]);
+    Enqueue_Ui_For_Sending(&dynamic_ui_info[R_LEG_C_CIRCLE]);
+}
+
+static void update_robot_health(void)
+{
+    static uint32_t last_health_update_timestamp;
+    static uint8_t health_value_color; // 0白1绿
+    uint32_t health_update_timestamp = My_Judge.info->radio_health_timestamp;
+
+    if (My_Judge.info->car_color == 0) // 红色
+    {
+        if (health_update_timestamp != last_health_update_timestamp)
+        {
+            sprintf(dynamic_ui_info[D_BLUE_1_HEALTH_CHAR].ui_config.text, "%d", My_Judge.org_info->robot_health_data.hero_health);
+            sprintf(dynamic_ui_info[D_BLUE_2_HEALTH_CHAR].ui_config.text, "%d", My_Judge.org_info->robot_health_data.engineer_health);
+            sprintf(dynamic_ui_info[D_BLUE_3_HEALTH_CHAR].ui_config.text, "%d", My_Judge.org_info->robot_health_data.infantry3_health);
+            sprintf(dynamic_ui_info[D_BLUE_4_HEALTH_CHAR].ui_config.text, "%d", My_Judge.org_info->robot_health_data.infantry4_health);
+            sprintf(dynamic_ui_info[D_BLUE_5_HEALTH_CHAR].ui_config.text, "%d", My_Judge.org_info->robot_health_data.sentry_health);
+
+            if (health_value_color == 0)
+            {
+                dynamic_ui_info[D_BLUE_1_HEALTH_CHAR].ui_config.color = WHITE;
+                dynamic_ui_info[D_BLUE_2_HEALTH_CHAR].ui_config.color = WHITE;
+                dynamic_ui_info[D_BLUE_3_HEALTH_CHAR].ui_config.color = WHITE;
+                dynamic_ui_info[D_BLUE_4_HEALTH_CHAR].ui_config.color = WHITE;
+                dynamic_ui_info[D_BLUE_5_HEALTH_CHAR].ui_config.color = WHITE;
+                health_value_color = !health_value_color;
+            }
+            else
+            {
+                dynamic_ui_info[D_BLUE_1_HEALTH_CHAR].ui_config.color = GREEN;
+                dynamic_ui_info[D_BLUE_2_HEALTH_CHAR].ui_config.color = GREEN;
+                dynamic_ui_info[D_BLUE_3_HEALTH_CHAR].ui_config.color = GREEN;
+                dynamic_ui_info[D_BLUE_4_HEALTH_CHAR].ui_config.color = GREEN;
+                dynamic_ui_info[D_BLUE_5_HEALTH_CHAR].ui_config.color = GREEN;
+                health_value_color = !health_value_color;
+            }
+
+//            Enqueue_Ui_For_Sending(&dynamic_ui_info[D_BLUE_1_HEALTH_CHAR]);
+//            Enqueue_Ui_For_Sending(&dynamic_ui_info[D_BLUE_2_HEALTH_CHAR]);
+//            Enqueue_Ui_For_Sending(&dynamic_ui_info[D_BLUE_3_HEALTH_CHAR]);
+//            Enqueue_Ui_For_Sending(&dynamic_ui_info[D_BLUE_4_HEALTH_CHAR]);
+//            Enqueue_Ui_For_Sending(&dynamic_ui_info[D_BLUE_5_HEALTH_CHAR]);
+        }
+    }
+    else // 蓝色
+    {
+        if (health_update_timestamp != last_health_update_timestamp)
+        {
+            sprintf(dynamic_ui_info[D_RED_1_HEALTH_CHAR].ui_config.text, "%d", My_Judge.org_info->robot_health_data.hero_health);
+            sprintf(dynamic_ui_info[D_RED_2_HEALTH_CHAR].ui_config.text, "%d", My_Judge.org_info->robot_health_data.engineer_health);
+            sprintf(dynamic_ui_info[D_RED_3_HEALTH_CHAR].ui_config.text, "%d", My_Judge.org_info->robot_health_data.infantry3_health);
+            sprintf(dynamic_ui_info[D_RED_4_HEALTH_CHAR].ui_config.text, "%d", My_Judge.org_info->robot_health_data.infantry4_health);
+            sprintf(dynamic_ui_info[D_RED_5_HEALTH_CHAR].ui_config.text, "%d", My_Judge.org_info->robot_health_data.sentry_health);
+            if (health_value_color == 0)
+            {
+                dynamic_ui_info[D_RED_1_HEALTH_CHAR].ui_config.color = WHITE;
+                dynamic_ui_info[D_RED_2_HEALTH_CHAR].ui_config.color = WHITE;
+                dynamic_ui_info[D_RED_3_HEALTH_CHAR].ui_config.color = WHITE;
+                dynamic_ui_info[D_RED_4_HEALTH_CHAR].ui_config.color = WHITE;
+                dynamic_ui_info[D_RED_5_HEALTH_CHAR].ui_config.color = WHITE;
+                health_value_color = !health_value_color;
+            }
+            else
+            {
+                dynamic_ui_info[D_RED_1_HEALTH_CHAR].ui_config.color = GREEN;
+                dynamic_ui_info[D_RED_2_HEALTH_CHAR].ui_config.color = GREEN;
+                dynamic_ui_info[D_RED_3_HEALTH_CHAR].ui_config.color = GREEN;
+                dynamic_ui_info[D_RED_4_HEALTH_CHAR].ui_config.color = GREEN;
+                dynamic_ui_info[D_RED_5_HEALTH_CHAR].ui_config.color = GREEN;
+                health_value_color = !health_value_color;
+            }
+//            Enqueue_Ui_For_Sending(&dynamic_ui_info[D_RED_1_HEALTH_CHAR]);
+//            Enqueue_Ui_For_Sending(&dynamic_ui_info[D_RED_2_HEALTH_CHAR]);
+//            Enqueue_Ui_For_Sending(&dynamic_ui_info[D_RED_3_HEALTH_CHAR]);
+//            Enqueue_Ui_For_Sending(&dynamic_ui_info[D_RED_4_HEALTH_CHAR]);
+//            Enqueue_Ui_For_Sending(&dynamic_ui_info[D_RED_5_HEALTH_CHAR]);
+        }
+    }
+
+    last_health_update_timestamp = health_update_timestamp;
 }

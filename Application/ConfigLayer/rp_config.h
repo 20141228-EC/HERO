@@ -59,7 +59,7 @@
 //***********************************8
 
 #define PITCH_4310
-//#define YAW_4310
+#define YAW_4310
 //#define YAW_KT6012
 
 #define Power_limit     1

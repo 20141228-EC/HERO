@@ -432,6 +432,7 @@ static void RC_Move_Mode_Update(Balance_t* balance)
 				if(rc_info->s2 == 1 && cnt>=600)
 				{
 					balance->Shoot.Single_Shoot_Flag = 1;
+					shoot_out.base_info.shoot_begin = HAL_GetTick();
 					cnt=0;
 				}
 				else
@@ -760,7 +761,7 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 	rc_sensor_info_t*  rc_info=balance->rc->sensor->info;
 	static uint16_t cnt;
 	
-	if(balance->mode == Imu_Mode || balance->mode == Lob_Mode)//动作命令识别
+	if(balance->mode == Imu_Mode)// || balance->mode == Lob_Mode)//动作命令识别
 	{
 		if(balance->command[JUMP].cmd_value==true && balance->Flag->Down_Two_Step_Flag != true 
 			&& balance->Flag->Knee_Strike_1_Flag != true && balance->Flag->Middle_Flag != true)//q
@@ -847,7 +848,7 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 		}		
 	
 	
-  if(rc_info->X.status == release_to_press)//前哨
+  if(rc_info->X.status == release_to_press && balance->Chassis_Com->COMMON_BASE_SHOOT == false)//前哨
 	{
     balance->Chassis_Com->COMMON_OUTPOST_SHOOT =! balance->Chassis_Com->COMMON_OUTPOST_SHOOT;
 	}
@@ -862,13 +863,17 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 
 	if(rc_info->G.status == release_to_press)//吊基地
 	{
-		if(balance->mode != Lob_Mode)
+		if(balance->mode != Lob_Mode && balance->Chassis_Com->COMMON_OUTPOST_SHOOT == false)
 		{
 			balance->mode = Lob_Mode;
+			balance->Chassis_Com->COMMON_BASE_SHOOT = true;
+
 		}
 		else
 		{
 			balance->mode = Imu_Mode;
+			balance->Chassis_Com->COMMON_BASE_SHOOT = false;
+
 		  gimbal.offset_info->lob_pitch_mec_offset = 0.f;
 		  gimbal.offset_info->lob_yaw_mec_offset = 0.f;
 		}
@@ -878,21 +883,21 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 	{
 		if(rc_info->Z.status == long_press || rc_info->Z.status == release_to_press || rc_info->Z.status == short_press)
 		{
-			if(rc_info->W.status == release_to_press)
+			if(rc_info->W.status == release_to_press)//一次动0.1度
 			{
-				gimbal.offset_info->lob_pitch_mec_offset += 0.1f;
+				gimbal.offset_info->lob_pitch_mec_offset += angle2rad(0.1f);
 			}
 			if(rc_info->S.status == release_to_press)
 			{
-				gimbal.offset_info->lob_pitch_mec_offset -= 0.1f;
+				gimbal.offset_info->lob_pitch_mec_offset -= angle2rad(0.1f);
 			}
 			if(rc_info->A.status == release_to_press)
 			{
-				gimbal.offset_info->lob_yaw_mec_offset += 0.1f;
+				gimbal.offset_info->lob_yaw_mec_offset += angle2rad(0.1f);
 			}
 			if(rc_info->D.status == release_to_press)
 			{
-				gimbal.offset_info->lob_yaw_mec_offset -= 0.1f;
+				gimbal.offset_info->lob_yaw_mec_offset -= angle2rad(0.1f);
 			}
 		}
 
@@ -913,14 +918,16 @@ static void KEY_Move_Mode_Update(Balance_t* balance)
 		Chassis.knee_strike_info->step1 = Knee_RETRACT;
 		Chassis.knee_strike_info->RETRACT_tick = Chassis.knee_strike_info->Max_RETRACT_tick;
 	}
-	else if(rc_info->Ctrl.status == release_to_press || balance->mode == Lob_Mode)
+	else if(rc_info->Ctrl.status == release_to_press && balance->mode == Lob_Mode)
 	{
 		balance->mode = Imu_Mode;
+		balance->Chassis_Com->COMMON_BASE_SHOOT = false;
 		gimbal.offset_info->lob_pitch_mec_offset = 0.f;
 		gimbal.offset_info->lob_yaw_mec_offset = 0.f;
 	}
 	else if(rc_info->Ctrl.status == release_to_press)
 	{
+		b = 1;
 		Balance.Flag->Cycle_Flag = false;
 		Balance.Flag->Rescue_Flag = false;
 		Balance.Flag->Return_Flag = true;

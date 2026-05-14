@@ -17,6 +17,7 @@ My_Judge_t My_Judge =
 	.status = &Judge_Status,
 };
 
+LaunchStat_t ls = {0};
 
 /**
   * @brief  裁判系统初始化
@@ -110,6 +111,9 @@ void judge_update(uint16_t id, uint8_t *rxBuf)
 			memcpy(&My_Judge.org_info->shoot_data, rxBuf, LEN_shoot_data);
 		  My_Judge.status->offline_cnt = 0;
 		  My_Judge.status->status = DEV_ONLINE;
+		  shoot_out.base_info.shoot_end = HAL_GetTick();
+		  shoot_out.base_info.launch_timer = shoot_out.base_info.shoot_end - shoot_out.base_info.shoot_begin;
+		  Launch_Stat_Calc(shoot_out.base_info.launch_timer);
 		  Board_Tx_Info.shoot_count ++;
 			break;
 		case ID_game_robot_HP:
@@ -125,6 +129,10 @@ void judge_update(uint16_t id, uint8_t *rxBuf)
 		  My_Judge.status->offline_cnt = 0;
 		  My_Judge.status->status = DEV_ONLINE;
 			break;
+		case ID_radio_health:
+			memcpy(&My_Judge.org_info->robot_health_data, rxBuf, LEN_radio_health);
+		  My_Judge.info->radio_health_timestamp = HAL_GetTick();
+		  break;
 		default:
 			break;
 	}
@@ -150,4 +158,25 @@ uint8_t check_hero_revive(My_Judge_t * my_judge)
 		return 0;
 	}
 	
+}
+
+// 每次 launch_time 刷新时调用
+void Launch_Stat_Calc(float val)
+{
+    ls.cnt++;
+    ls.sum += val;
+    ls.sum_sq += val * val;
+
+    // 均值
+    ls.mean = ls.sum / ls.cnt;
+
+    // 方差（>=2个数据才计算）
+    if (ls.cnt >= 2)
+    {
+        ls.var = (ls.sum_sq - (ls.sum * ls.sum) / ls.cnt) / (ls.cnt - 1);
+    }
+    else
+    {
+        ls.var = 0.0f;
+    }
 }
